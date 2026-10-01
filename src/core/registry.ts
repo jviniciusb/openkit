@@ -24,15 +24,13 @@ export interface RegisterToolsResult {
  * registrations are disposed and the tool is reported in `degraded`, leaving
  * other tools unaffected.
  *
- * `makeKit` is only forwarded to `register`; the registry never inspects it, so
- * tests may pass a partial kit stub. The full `KitApi` from `createKitApi`
- * satisfies this signature too.
+ * `makeKit` is only forwarded to `register`; the registry never inspects it.
  */
 export async function registerTools(
   tools: KitTool[],
   resolved: Map<string, ResolvedToolConfig<unknown>>,
   ctx: KitContext,
-  makeKit: (toolId: string) => Partial<KitApi>,
+  makeKit: (toolId: string) => KitApi,
 ): Promise<RegisterToolsResult> {
   const registrations: Registration[] = []
   const degraded: DegradedTool[] = []
@@ -75,7 +73,7 @@ export async function registerTools(
     }
 
     try {
-      await tool.register(tracking, config.settings, makeKit(tool.id) as KitApi)
+      await tool.register(tracking, config.settings, makeKit(tool.id))
       registrations.push(...created)
     } catch (error) {
       for (const registration of created) {

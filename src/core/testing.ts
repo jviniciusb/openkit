@@ -44,26 +44,31 @@ export interface FakeContextCalls {
 
 const noopRegistration: Registration = { dispose() {} }
 
+/** A recording editor shared by the tool/command/skill transforms. */
+interface RecordingEditor<D> {
+  namespace(namespace: Namespace): void
+  add(definition: D): void
+}
+
 /**
- * Invokes a transform callback against a recording editor.
- *
- * Definitions passed to `add` are pushed into `bucket`. When the callback adds
- * nothing, an invocation marker is pushed instead so every transform call
- * contributes at least one recorded entry.
+ * Builds a typed editor that records `add` definitions into `bucket`. Call
+ * `finish` after the callback: if nothing was added, an invocation marker is
+ * pushed so every transform call contributes at least one recorded entry.
  */
-function runTransform<D, E>(bucket: unknown[], callback: (editor: E) => void): void {
+function recordingEditor<D>(bucket: unknown[]): RecordingEditor<D> & { finish(): void } {
   const before = bucket.length
   const namespaceSeen: Namespace[] = []
-  const editor = {
+  return {
     namespace(namespace: Namespace) {
       namespaceSeen.push(namespace)
     },
     add(definition: D) {
       bucket.push(definition)
     },
+    finish() {
+      if (bucket.length === before) bucket.push({ namespace: namespaceSeen })
+    },
   }
-  callback(editor as unknown as E)
-  if (bucket.length === before) bucket.push({ namespace: namespaceSeen })
 }
 
 /**
@@ -102,19 +107,25 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
     storage,
     tool: {
       async transform(callback: (editor: ToolEditor) => void) {
-        runTransform<ToolDefinition, ToolEditor>(calls.tool, callback)
+        const editor = recordingEditor<ToolDefinition>(calls.tool)
+        callback(editor)
+        editor.finish()
         return makeRegistration()
       },
     },
     command: {
       async transform(callback: (editor: CommandEditor) => void) {
-        runTransform<CommandDefinition, CommandEditor>(calls.command, callback)
+        const editor = recordingEditor<CommandDefinition>(calls.command)
+        callback(editor)
+        editor.finish()
         return makeRegistration()
       },
     },
     skill: {
       async transform(callback: (editor: SkillEditor) => void) {
-        runTransform<SkillDefinition, SkillEditor>(calls.skill, callback)
+        const editor = recordingEditor<SkillDefinition>(calls.skill)
+        callback(editor)
+        editor.finish()
         return makeRegistration()
       },
     },

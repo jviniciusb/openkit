@@ -1,10 +1,21 @@
 import { expect, test } from "bun:test"
-import { defineTool } from "../../src/core/tool"
+import { defineTool, type KitApi } from "../../src/core/tool"
+import { type KitStorage } from "../../src/core/context"
 import { registerTools } from "../../src/core/registry"
 import { createFakeContext } from "../../src/core/testing"
 
-const kit = { namespace() {}, scriptPath: (n: string) => n, storage: {} as any,
-  log: { debug(){}, info(){}, warn(){}, error(){} }, version: "0.0.0" }
+const noop = () => ({ dispose() {} })
+const kit: KitApi = {
+  namespace() {},
+  scriptPath: (n: string) => n,
+  storage: {} as KitStorage,
+  log: { debug(){}, info(){}, warn(){}, error(){} },
+  version: "0.0.0",
+  async tool() { return noop() },
+  async command() { return noop() },
+  async skill() { return noop() },
+  async on() { return noop() },
+}
 
 const ok = defineTool({ id: "ok", name: "OK", description: "d", defaultSettings: {},
   register(ctx) { return ctx.tool.transform(() => {}) } })
