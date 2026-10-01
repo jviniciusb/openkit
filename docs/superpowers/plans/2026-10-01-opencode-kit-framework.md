@@ -367,11 +367,15 @@ test("invalid settings fall back to defaults and mark degraded", () => {
 ```ts
 import { expect, test } from "bun:test"
 import { defineTool } from "../../src/core/tool"
+import type { KitApi } from "../../src/core/tool"
+import type { KitStorage } from "../../src/core/context"
 import { registerTools } from "../../src/core/registry"
 import { createFakeContext } from "../../src/core/testing"
 
-const kit = { namespace() {}, scriptPath: (n: string) => n, storage: {} as any,
-  log: { debug(){}, info(){}, warn(){}, error(){} }, version: "0.0.0" }
+const kit: KitApi = { namespace() {}, scriptPath: (n: string) => n, storage: {} as KitStorage,
+  log: { debug(){}, info(){}, warn(){}, error(){} }, version: "0.0.0",
+  tool: async () => ({ dispose() {} }), command: async () => ({ dispose() {} }),
+  skill: async () => ({ dispose() {} }), on: async () => ({ dispose() {} }) }
 
 const ok = defineTool({ id: "ok", name: "OK", description: "d", defaultSettings: {},
   register(ctx) { return ctx.tool.transform(() => {}) } })
