@@ -7,6 +7,7 @@ import type { KitContext } from "./core/context"
 import type { KitTool } from "./core/tool"
 import { discoverKitConfigFiles } from "./config/discover"
 import { loadKitConfig } from "./config/load"
+import { deepMerge } from "./config/merge"
 import { resolveToolConfig } from "./config/resolve"
 import { resolveValidated } from "./config/validate"
 import type { KitConfigFile, ResolvedToolConfig } from "./config/types"
@@ -34,8 +35,8 @@ export interface BootstrapResult {
  * Boots the kit against a plugin context.
  *
  * Discovers global + project config files, loads and merges them (low → high
- * precedence, with `ctx.options` highest), resolves and validates each tool's
- * effective config, then registers every enabled tool. Per-tool failures are
+ * precedence, then `ctx.options`, then any explicit `options`), resolves and
+ * validates each tool's effective config, then registers every enabled tool. Per-tool failures are
  * isolated and reported in `degraded`; the returned `dispose` releases every
  * registration made.
  */
@@ -48,7 +49,12 @@ export async function bootstrap(
   const paths = discoverKitConfigFiles(ctx.location.directory, home)
   const loaded = await loadKitConfig(paths)
 
-  const sources: KitConfigFile[] = [...loaded, { ...(options ?? ctx.options) } as KitConfigFile]
+  // Plugin options stay the highest layer; explicit `options` layer on top
+  // without dropping nested keys from `ctx.options` (deep, config-file merge).
+  const sources: KitConfigFile[] = [
+    ...loaded,
+    deepMerge(ctx.options, options ?? {}) as KitConfigFile,
+  ]
 
   const resolved = new Map<string, ResolvedToolConfig<unknown>>()
   const degraded: DegradedTool[] = []
@@ -66,8 +72,13 @@ export async function bootstrap(
 
   return {
     async dispose() {
-      for (const registration of result.registrations) {
-        await registration.dispose()
+      // Release every registration even if a disposer throws, so one faulty
+      // tool cannot leave the rest registered.
+      const settled = await Promise.allSettled(result.registrations.map((r) => r.dispose()))
+      for (const outcome of settled) {
+        if (outcome.status === "rejected") {
+          console.warn("opencode-kit: a registration disposer threw", outcome.reason)
+        }
       }
     },
     degraded,

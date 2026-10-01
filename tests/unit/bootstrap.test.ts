@@ -36,3 +36,33 @@ test("bootstrap returns one dispose that releases registrations", async () => {
   await res.dispose()
   expect(disposed).toBe(1)
 })
+
+test("explicit options layer over ctx.options without replacing it", async () => {
+  const { proj } = projectWithConfig(`{ "tools": { "a": { "enabled": true } } }`)
+  const { ctx } = createFakeContext({ directory: proj })
+  // ctx.options is the plugin's own layer; the explicit `options` argument overrides only its keys.
+  const scoped = { ...ctx, options: { tools: { a: { settings: { x: 1, y: 1 } } } } }
+  let seen: unknown
+  const a = defineTool({ id: "a", name: "A", description: "d", defaultSettings: {},
+    register(_c, settings) { seen = settings } })
+  const res = await bootstrap(scoped, [a], { tools: { a: { settings: { y: 2 } } } })
+  expect(seen).toEqual({ x: 1, y: 2 })
+  await res.dispose()
+})
+
+test("dispose releases remaining registrations when one disposer throws", async () => {
+  const { proj } = projectWithConfig(`{ "tools": { "a": { "enabled": true } } }`)
+  let made = 0
+  let disposed = 0
+  const { ctx } = createFakeContext({ directory: proj, onRegistration: () => {
+    made++
+    return made === 1
+      ? { dispose: async () => { throw new Error("boom") } }
+      : { dispose: async () => { disposed++ } }
+  } })
+  const a = defineTool({ id: "a", name: "A", description: "d", defaultSettings: {},
+    async register(c) { await c.tool.transform(() => {}); await c.tool.transform(() => {}) } })
+  const res = await bootstrap(ctx, [a])
+  await res.dispose()
+  expect(disposed).toBe(1)
+})
