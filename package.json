@@ -1,0 +1,20 @@
+{
+  "name": "opencode-kit",
+  "version": "0.1.0",
+  "description": "A framework of toggleable, configurable tools for OpenCode V2",
+  "type": "module",
+  "license": "MIT",
+  "main": "./dist/plugin.js",
+  "bin": { "opencode-kit": "./bin/opencode-kit.js" },
+  "files": ["dist", "bin", "skills", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "build": "bun run build:plugin && bun run build:cli",
+    "build:plugin": "bun build src/plugin.ts --target=bun --outfile=dist/plugin.js",
+    "build:cli": "bun build src/cli/index.ts --target=bun --outfile=dist/cli.js",
+    "prepare": "bun run build"
+  },
+  "dependencies": { "ajv": "^8.17.1", "jsonc-parser": "^3.3.1" },
+  "devDependencies": { "@types/bun": "latest", "typescript": "^5.6.0" }
+}
