@@ -93,8 +93,7 @@ export PATH="$HOME/.bun/bin:$PATH"
     "test": "bun test",
     "build": "bun run build:plugin && bun run build:cli",
     "build:plugin": "bun build src/plugin.ts --target=bun --outfile=dist/plugin.js",
-    "build:cli": "bun build src/cli/index.ts --target=bun --outfile=dist/cli.js",
-    "prepare": "bun run build"
+    "build:cli": "bun build src/cli/index.ts --target=bun --outfile=dist/cli.js"
   },
   "dependencies": { "ajv": "^8.17.1", "jsonc-parser": "^3.3.1" },
   "devDependencies": { "@types/bun": "latest", "typescript": "^5.6.0" }
@@ -761,6 +760,8 @@ test("refuses to overwrite an existing tool", async () => {
 `opencode-kit.schema.json` (Draft-07): `{ "type":"object", "properties": { "configVersion": {"type":"integer"}, "tools": { "type":"object", "additionalProperties": { "type":"object", "properties": { "enabled": {"type":"boolean"}, "settings": {"type":"object"} }, "additionalProperties": false } } }, "additionalProperties": false }`.
 
 `index.js` as above.
+
+Also add `"prepare": "bun run build"` to `package.json` scripts. (Deferred from Task 1: a `prepare` hook runs on `bun install` and fails until `src/plugin.ts` and `src/cli/index.ts` exist — they exist by now.)
 
 - [ ] **Step 2: Write a failing integration test** — `tests/integration/plugin-loads.test.ts`
 
