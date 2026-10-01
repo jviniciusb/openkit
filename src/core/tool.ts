@@ -26,8 +26,14 @@ export interface KitTool<S = unknown> {
   defaultSettings: S
   /** JSON Schema validating `settings`. */
   settingsSchema?: JsonSchema
-  /** Single registration mechanism: declare everything the tool needs here. */
-  register(ctx: KitContext, settings: S, kit: KitApi): void | Promise<void>
+  /** Single registration mechanism: declare everything the tool needs here.
+   * A tool may return the `Registration` from a direct `ctx` call so the caller
+   * can dispose it; the registry also tracks registrations independently. */
+  register(
+    ctx: KitContext,
+    settings: S,
+    kit: KitApi,
+  ): void | Registration | Promise<void | Registration>
 }
 
 /** Convenience API passed to `register`, scoped to a single tool. */
