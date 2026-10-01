@@ -21,3 +21,17 @@ test("invalid settings fall back to defaults and mark degraded", () => {
   expect(r.config).toEqual({ enabled: true, settings: { n: 5 } })
   expect(r.degraded).toBeDefined()
 })
+
+test("malformed schema does not throw; degrades to defaults", () => {
+  const bad = { type: 123 }
+  expect(() => validateToolSettings(bad, { n: 1 })).not.toThrow()
+  const v = validateToolSettings(bad, { n: 1 })
+  expect(v.valid).toBe(false)
+
+  const tool = defineTool({ id: "t", name: "T", description: "d",
+    defaultSettings: { n: 5 }, settingsSchema: bad, register() {} })
+  const r = resolveValidated(tool, { enabled: true, settings: { n: "x" } })
+  expect(r.config).toEqual({ enabled: true, settings: { n: 5 } })
+  expect(r.degraded).toBeDefined()
+  expect(r.degraded).toContain("t")
+})

@@ -25,7 +25,9 @@ function formatError(error: {
 /**
  * Validates `settings` against a tool's JSON Schema.
  *
- * When no schema is declared, every value is accepted.
+ * When no schema is declared, every value is accepted. A schema that Ajv
+ * cannot compile (malformed keywords, unresolvable `$ref`, async schema) is
+ * reported as validation failure rather than thrown, so callers can degrade.
  */
 export function validateToolSettings(
   schema: JsonSchema | undefined,
@@ -33,19 +35,25 @@ export function validateToolSettings(
 ): ValidationResult {
   if (schema === undefined) return { valid: true }
 
-  const validate = ajv.compile(schema)
-  if (validate(settings)) return { valid: true }
+  try {
+    const validate = ajv.compile(schema)
+    if (validate(settings)) return { valid: true }
 
-  const errors = (validate.errors ?? []).map(formatError)
-  return { valid: false, errors: errors.length > 0 ? errors : ["settings failed validation"] }
+    const errors = (validate.errors ?? []).map(formatError)
+    return { valid: false, errors: errors.length > 0 ? errors : ["settings failed validation"] }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    return { valid: false, errors: [`schema compile error: ${message}`] }
+  }
 }
 
 /**
  * Resolves a tool's config, validating settings against its schema.
  *
- * Valid settings pass through untouched. Invalid settings never block loading:
- * the tool falls back to its `defaultSettings` and a `degraded` reason is
- * reported so the caller can surface the problem.
+ * Valid settings pass through untouched. Invalid settings — or a schema that
+ * fails to compile — never block loading: the tool falls back to its
+ * `defaultSettings` and a `degraded` reason is reported so the caller can
+ * surface the problem.
  */
 export function resolveValidated<S>(
   tool: KitTool<S>,
@@ -57,6 +65,6 @@ export function resolveValidated<S>(
     return { config: { enabled: config.enabled, settings: config.settings as S } }
   }
 
-  const reason = `Tool "${tool.id}" settings are invalid; using defaults: ${result.errors.join("; ")}`
+  const reason = `Tool "${tool.id}" settings are invalid (or its schema failed to compile); using defaults: ${result.errors.join("; ")}`
   return { config: { enabled: config.enabled, settings: tool.defaultSettings }, degraded: reason }
 }
