@@ -14,17 +14,17 @@ function projectConfigPath(directory: string): string {
 }
 
 /**
- * Discovers candidate kit config files, ordered low → high precedence.
+ * Discovers existing kit config files, ordered low → high precedence.
  *
- * Returns the global file first, followed by the project-level files that
- * actually exist for `locationDirectory` and each ancestor up to the
- * filesystem root, ordered farthest → nearest so that nearer directories
- * override farther ones.
- *
- * The global path is always returned even when the file is absent (callers may
- * want to create it); `loadKitConfig` skips it when missing.
+ * Returns existing config files, global first then project farthest → nearest;
+ * the global file is included only when it exists, symmetric with the
+ * project-level files. Project candidates are `<dir>/.opencode/opencode-kit.jsonc`
+ * for `locationDirectory` and each ancestor up to the filesystem root, ordered
+ * farthest → nearest so that nearer directories override farther ones.
  */
 export function discoverKitConfigFiles(locationDirectory: string, home: string): string[] {
+  const globalFile = globalConfigPath(home)
+
   const ancestors: string[] = []
   let current = resolve(locationDirectory)
 
@@ -39,5 +39,6 @@ export function discoverKitConfigFiles(locationDirectory: string, home: string):
     .reverse()
     .map(projectConfigPath)
     .filter((candidate) => existsSync(candidate))
-  return [globalConfigPath(home), ...projectFiles]
+
+  return existsSync(globalFile) ? [globalFile, ...projectFiles] : projectFiles
 }

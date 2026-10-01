@@ -18,3 +18,12 @@ test("includes global then project ancestors farthest->nearest", () => {
   expect(files[0]).toBe(join(globalDir, "opencode-kit.jsonc"))
   expect(files[files.length - 1]).toBe(join(root, ".opencode", "opencode-kit.jsonc"))
 })
+
+test("omits the global path when it does not exist", () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const root = join(home, "proj")
+  mkdirSync(join(root, ".opencode"), { recursive: true })
+  writeFileSync(join(root, ".opencode", "opencode-kit.jsonc"), "{}")
+  const files = discoverKitConfigFiles(root, home)
+  expect(files).toEqual([join(root, ".opencode", "opencode-kit.jsonc")])
+})
