@@ -1,3 +1,4 @@
+import { watch, type FSWatcher } from "node:fs"
 import { homedir } from "node:os"
 import { fileURLToPath } from "node:url"
 
@@ -85,13 +86,113 @@ export async function bootstrap(
   }
 }
 
+/** Debounce window applied to filesystem change bursts. */
+const WATCH_DEBOUNCE_MS = 150
+
+/**
+ * Factory that starts watching `paths`, invoking `cb` on change, and returns a
+ * teardown that stops watching. Tests inject a no-op; production uses
+ * {@link defaultWatch}.
+ */
+export type WatchFactory = (paths: string[], cb: () => void) => () => void
+
+/**
+ * Default watcher: one `fs.watch` per config file, debounced ~150ms, so a burst
+ * of writes triggers a single reload.
+ */
+export function defaultWatch(paths: string[], cb: () => void): () => void {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const debounced = () => {
+    if (timer !== undefined) clearTimeout(timer)
+    timer = setTimeout(() => {
+      timer = undefined
+      cb()
+    }, WATCH_DEBOUNCE_MS)
+  }
+
+  const watchers: FSWatcher[] = []
+  for (const path of paths) {
+    try {
+      watchers.push(watch(path, debounced))
+    } catch {
+      // The file may have vanished between discovery and watch; skip it.
+    }
+  }
+
+  return () => {
+    if (timer !== undefined) {
+      clearTimeout(timer)
+      timer = undefined
+    }
+    for (const watcher of watchers) watcher.close()
+  }
+}
+
+export interface Lifecycle {
+  /** Disposes the current registrations, then bootstraps a fresh generation. */
+  reload(): Promise<void>
+  /** Disposes the current registrations and stops watching. */
+  dispose(): Promise<void>
+  /** Tools degraded in the current generation. */
+  degraded(): DegradedTool[]
+}
+
+/**
+ * Wraps {@link bootstrap} with a reload lifecycle.
+ *
+ * The lifecycle owns one bootstrapped generation at a time. `reload` disposes
+ * the prior generation before bootstrapping a fresh one (never mutating in
+ * place); `dispose` releases the generation and tears down the watcher. Reloads
+ * are serialized, and a reload requested after disposal is ignored.
+ */
+export async function createLifecycle(
+  ctx: KitContext,
+  tools: KitTool[],
+  options?: Record<string, unknown>,
+  watch: WatchFactory = defaultWatch,
+): Promise<Lifecycle> {
+  let current = await bootstrap(ctx, tools, options)
+  let stopped = false
+  let queue: Promise<unknown> = Promise.resolve()
+
+  const paths = discoverKitConfigFiles(ctx.location.directory, resolveHome(ctx))
+  const unwatch = watch(paths, () => {
+    void reload()
+  })
+
+  function reload(): Promise<void> {
+    const run = queue.then(async () => {
+      if (stopped) return
+      await current.dispose()
+      if (stopped) return
+      current = await bootstrap(ctx, tools, options)
+    })
+    // Keep the chain alive even if a generation fails to dispose or bootstrap.
+    queue = run.catch(() => {})
+    return run
+  }
+
+  async function dispose(): Promise<void> {
+    if (stopped) return
+    stopped = true
+    unwatch()
+    await current.dispose()
+  }
+
+  return {
+    reload,
+    dispose,
+    degraded: () => current.degraded,
+  }
+}
+
 // Task 8 provides the real tool barrel; until then the setup wiring stays minimal.
 const tools: KitTool[] = []
 
 export default {
   id: "opencode-kit",
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
-    const result = await bootstrap(ctx, tools, ctx.options as Record<string, unknown>)
-    return result.dispose
+    const life = await createLifecycle(ctx, tools, ctx.options as Record<string, unknown>)
+    return life.dispose
   },
 }
