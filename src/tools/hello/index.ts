@@ -27,17 +27,15 @@ export const hello: KitTool<HelloSettings> = defineTool({
   },
   register(ctx, settings, kit) {
     kit.namespace("hello")
-    return ctx.tool.transform((editor) => {
-      editor.add({
-        name: "hello",
-        description: settings.greeting,
-        input: {
-          type: "object",
-          properties: { name: { type: "string" } },
-          additionalProperties: false,
-        },
-        execute: () => settings.greeting,
-      })
+    return kit.tool({
+      name: "hello",
+      description: settings.greeting,
+      input: {
+        type: "object",
+        properties: { name: { type: "string" } },
+        additionalProperties: false,
+      },
+      execute: () => settings.greeting,
     })
   },
 })
