@@ -550,19 +550,22 @@ test("reload disposes previous registrations then re-registers", async () => {
 ```ts
 import { expect, test } from "bun:test"
 import { tools } from "../../src/tools/index"
+import { createKitApi } from "../../src/core/kit-api"
 import { createFakeContext } from "../../src/core/testing"
 
 test("hello registers exactly one tool named hello", async () => {
   const hello = tools.find(t => t.id === "hello")!
   const { ctx, calls } = createFakeContext()
-  await hello.register(ctx, { greeting: "hi" }, {} as any)
+  const kit = createKitApi(hello.id, ctx, "/pkg", "0.0.0")
+  await hello.register(ctx, { greeting: "hi" }, kit)
+  expect(calls.tool.length).toBe(1)
   expect(JSON.stringify(calls.tool)).toContain("hello")
 })
 ```
 
 - [ ] **Step 2: Run, expect failure** → FAIL.
 
-- [ ] **Step 3: Implement** `hello` (calls `ctx.tool.transform(editor => editor.add({ name: "hello", description, input, execute }))` and `kit.namespace("hello")`) and the barrel exporting `[hello]`.
+- [ ] **Step 3: Implement** `hello` so `register` calls `kit.namespace("hello")` then registers via the kit helper `kit.tool({ name: "hello", description, input, execute })` (the helper applies the namespace to the editor), and build the barrel exporting `[hello]` with the `// <kit:tools>` / `// </kit:tools>` markers.
 
 - [ ] **Step 4: Run + typecheck** → PASS.
 
