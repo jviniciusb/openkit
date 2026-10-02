@@ -12,6 +12,7 @@ import { deepMerge } from "./config/merge"
 import { resolveToolConfig } from "./config/resolve"
 import { resolveValidated } from "./config/validate"
 import type { KitConfigFile, ResolvedToolConfig } from "./config/types"
+import { tools } from "./tools/index"
 
 /** Absolute path of this package's root, used to resolve bundled scripts. */
 const PACKAGE_ROOT = fileURLToPath(new URL("..", import.meta.url))
@@ -215,9 +216,6 @@ export async function createLifecycle(
     degraded: () => current.degraded,
   }
 }
-
-// Task 8 provides the real tool barrel; until then the setup wiring stays minimal.
-const tools: KitTool[] = []
 
 export default {
   id: "opencode-kit",
