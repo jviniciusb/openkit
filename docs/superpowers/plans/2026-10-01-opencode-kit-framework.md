@@ -537,11 +537,13 @@ test("reload disposes previous registrations then re-registers", async () => {
 
 **Files:**
 - Create: `src/tools/hello/index.ts`, `src/tools/index.ts`
+- Modify: `src/plugin.ts` (replace the temporary empty `tools` array with `import { tools } from "./tools/index"`)
 - Test: `tests/unit/tools-hello.test.ts`
 
 **Interfaces:**
 - Consumes: `defineTool` (Task 1), `KitContext`.
 - Produces: `hello` (a `KitTool` with `id: "hello"`, `defaultEnabled: true`, settings `{ greeting: string }`, registering one tool named `hello` in namespace `hello`), and `export const tools: KitTool[]` from `src/tools/index.ts`.
+- Ruling carried from Task 6: `setup` currently passes an empty placeholder tool array; this task MUST wire `setup` to the real barrel so the plugin registers `hello`.
 
 - [ ] **Step 1: Write failing test** — `tests/unit/tools-hello.test.ts`
 
