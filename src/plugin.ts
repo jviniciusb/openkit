@@ -113,7 +113,13 @@ export function defaultWatch(paths: string[], cb: () => void): () => void {
   const watchers: FSWatcher[] = []
   for (const path of paths) {
     try {
-      watchers.push(watch(path, debounced))
+      const watcher = watch(path, debounced)
+      // Watch errors are emitted asynchronously; log them rather than throwing
+      // from an event callback, which would crash the process.
+      watcher.on("error", (error) => {
+        console.warn("opencode-kit: config watcher error", error)
+      })
+      watchers.push(watcher)
     } catch {
       // The file may have vanished between discovery and watch; skip it.
     }
@@ -142,8 +148,11 @@ export interface Lifecycle {
  *
  * The lifecycle owns one bootstrapped generation at a time. `reload` disposes
  * the prior generation before bootstrapping a fresh one (never mutating in
- * place); `dispose` releases the generation and tears down the watcher. Reloads
- * are serialized, and a reload requested after disposal is ignored.
+ * place). Every state change runs on a single serialized queue, so `dispose`
+ * can await all pending reloads before releasing the latest generation — a
+ * reload in flight when `dispose` is called still installs its generation, and
+ * `dispose` then releases that one too (exactly once). A reload requested after
+ * disposal is a no-op, and `dispose` is idempotent.
  */
 export async function createLifecycle(
   ctx: KitContext,
@@ -153,30 +162,51 @@ export async function createLifecycle(
 ): Promise<Lifecycle> {
   let current = await bootstrap(ctx, tools, options)
   let stopped = false
-  let queue: Promise<unknown> = Promise.resolve()
 
-  const paths = discoverKitConfigFiles(ctx.location.directory, resolveHome(ctx))
-  const unwatch = watch(paths, () => {
-    void reload()
-  })
+  /** Tail of the serialized operation chain; always settles, never rejects. */
+  let queue: Promise<void> = Promise.resolve()
+  let disposePromise: Promise<void> | undefined
 
-  function reload(): Promise<void> {
-    const run = queue.then(async () => {
-      if (stopped) return
-      await current.dispose()
-      if (stopped) return
-      current = await bootstrap(ctx, tools, options)
-    })
-    // Keep the chain alive even if a generation fails to dispose or bootstrap.
-    queue = run.catch(() => {})
+  /** Appends `task` to the serialized chain and returns its own promise. */
+  function enqueue(task: () => Promise<void>): Promise<void> {
+    const run = queue.then(task)
+    // Swallow failures on the tail so one rejection cannot stall later work.
+    queue = run.then(
+      () => undefined,
+      () => undefined,
+    )
     return run
   }
 
-  async function dispose(): Promise<void> {
-    if (stopped) return
+  const paths = discoverKitConfigFiles(ctx.location.directory, resolveHome(ctx))
+  const unwatch = watch(paths, () => {
+    reload().catch((error) => {
+      console.warn("opencode-kit: config reload failed", error)
+    })
+  })
+
+  function reload(): Promise<void> {
+    if (disposePromise !== undefined) return Promise.resolve()
+    return enqueue(async () => {
+      if (stopped) return
+      await current.dispose()
+      // If disposal began while the prior generation was being released, the
+      // queued disposable will collect whatever this task installs below.
+      current = await bootstrap(ctx, tools, options)
+    })
+  }
+
+  function dispose(): Promise<void> {
+    if (disposePromise !== undefined) return disposePromise
     stopped = true
     unwatch()
-    await current.dispose()
+    // `enqueue` runs after every pending/queued reload, so `current` is then
+    // the newest generation — including one installed by a reload that was
+    // still bootstrapping when dispose() was called.
+    disposePromise = enqueue(async () => {
+      await current.dispose()
+    })
+    return disposePromise
   }
 
   return {
