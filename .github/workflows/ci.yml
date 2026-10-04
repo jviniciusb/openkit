@@ -26,3 +26,8 @@ jobs:
 
       - name: Test
         run: bun test
+
+      - name: Verify committed dist is up to date
+        run: |
+          bun run build
+          git diff --exit-code -- dist
