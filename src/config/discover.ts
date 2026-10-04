@@ -9,7 +9,7 @@ export function globalConfigPath(home: string): string {
 }
 
 /** Absolute path of the project-level kit config for `directory`. */
-function projectConfigPath(directory: string): string {
+export function projectConfigPath(directory: string): string {
   return join(directory, ".opencode", CONFIG_FILE_NAME)
 }
 

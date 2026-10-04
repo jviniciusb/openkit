@@ -1,4 +1,6 @@
 import { configCommand } from "./commands/config"
+import { doctorCommand, versionCommand } from "./commands/doctor"
+import { initCommand } from "./commands/init"
 import { listCommand, type CliIo } from "./commands/list"
 import { toggleCommand } from "./commands/toggle"
 
@@ -28,6 +30,12 @@ async function dispatch(argv: string[], io: CliIo): Promise<number> {
   const [command, ...rest] = argv
 
   switch (command) {
+    case "init":
+      return initCommand(io, { project: rest.includes("--project") })
+    case "doctor":
+      return doctorCommand(io)
+    case "version":
+      return versionCommand(io)
     case "list":
       return listCommand(io)
     case "enable":
