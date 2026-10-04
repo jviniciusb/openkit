@@ -1,1 +1,1 @@
-export { default } from "./dist/plugin.js"
+export { default } from "./src/plugin.ts"
