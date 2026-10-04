@@ -6,9 +6,10 @@
   "license": "MIT",
   "main": "./dist/plugin.js",
   "bin": { "opencode-kit": "./bin/opencode-kit.js" },
-  "files": ["dist", "bin", "skills", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "files": ["dist", "bin", "index.js", "skills", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "prepare": "bun run build",
     "test": "bun test",
     "build": "bun run build:plugin && bun run build:cli",
     "build:plugin": "bun build src/plugin.ts --target=bun --outfile=dist/plugin.js",
