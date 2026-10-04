@@ -1,0 +1,25 @@
+// Example opencode-kit configuration (JSONC — comments are allowed).
+//
+// Place this at:
+//   ~/.config/opencode/opencode-kit.jsonc            (global)
+//   <project>/.opencode/opencode-kit.jsonc           (project)
+//
+// `configVersion` is the current schema version. See the JSON Schema for the
+// full shape: https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json
+{
+  "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
+  "configVersion": 1,
+  "tools": {
+    // The example tool. `enabled` defaults to its declared default (true for
+    // `hello`); state it explicitly so the effective config is obvious.
+    "hello": {
+      "enabled": true,
+      "settings": {
+        "greeting": "Hello"
+      }
+    }
+    // Add further tools as `"<tool-id>": { "enabled": true, "settings": { ... } }`.
+    // A disabled tool's `register` never runs, so none of its tools, commands,
+    // skills, or hooks exist. `enable`/`disable` and `config set` write here.
+  }
+}

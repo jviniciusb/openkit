@@ -1,0 +1,62 @@
+import { expect, test } from "bun:test"
+import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { discoverKitConfigFiles, globalConfigDir, globalConfigPath, globalOpencodePath } from "../../src/config/discover"
+
+test("includes global then project ancestors farthest->nearest", () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const root = join(home, "proj")
+  const child = join(root, "pkg")
+  mkdirSync(child, { recursive: true })
+  const globalDir = join(home, ".config", "opencode")
+  mkdirSync(globalDir, { recursive: true })
+  writeFileSync(join(globalDir, "opencode-kit.jsonc"), "{}")
+  mkdirSync(join(root, ".opencode"), { recursive: true })
+  writeFileSync(join(root, ".opencode", "opencode-kit.jsonc"), "{}")
+  const files = discoverKitConfigFiles(child, home)
+  expect(files[0]).toBe(join(globalDir, "opencode-kit.jsonc"))
+  expect(files[files.length - 1]).toBe(join(root, ".opencode", "opencode-kit.jsonc"))
+})
+
+test("omits the global path when it does not exist", () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const root = join(home, "proj")
+  mkdirSync(join(root, ".opencode"), { recursive: true })
+  writeFileSync(join(root, ".opencode", "opencode-kit.jsonc"), "{}")
+  const files = discoverKitConfigFiles(root, home)
+  expect(files).toEqual([join(root, ".opencode", "opencode-kit.jsonc")])
+})
+
+test("globalConfigDir honors XDG_CONFIG_HOME and falls back without it", () => {
+  expect(globalConfigDir({ XDG_CONFIG_HOME: "/xdg" }, "/home/u")).toBe(join("/xdg", "opencode"))
+  expect(globalConfigDir({}, "/home/u")).toBe(join("/home/u", ".config", "opencode"))
+  // An empty XDG_CONFIG_HOME is treated as unset.
+  expect(globalConfigDir({ XDG_CONFIG_HOME: "" }, "/home/u")).toBe(
+    join("/home/u", ".config", "opencode"),
+  )
+})
+
+test("globalConfigPath and globalOpencodePath follow XDG_CONFIG_HOME", () => {
+  const withXdg = { XDG_CONFIG_HOME: "/xdg" }
+  expect(globalConfigPath("/home/u", withXdg)).toBe(
+    join("/xdg", "opencode", "opencode-kit.jsonc"),
+  )
+  expect(globalOpencodePath("/home/u", withXdg)).toBe(join("/xdg", "opencode", "opencode.json"))
+
+  expect(globalConfigPath("/home/u", {})).toBe(
+    join("/home/u", ".config", "opencode", "opencode-kit.jsonc"),
+  )
+  expect(globalOpencodePath("/home/u", {})).toBe(
+    join("/home/u", ".config", "opencode", "opencode.json"),
+  )
+})
+
+test("discoverKitConfigFiles honors XDG_CONFIG_HOME", () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const xdg = mkdtempSync(join(tmpdir(), "xdg-"))
+  mkdirSync(join(xdg, "opencode"), { recursive: true })
+  writeFileSync(join(xdg, "opencode", "opencode-kit.jsonc"), "{}")
+  const files = discoverKitConfigFiles(home, home, { XDG_CONFIG_HOME: xdg })
+  expect(files[0]).toBe(join(xdg, "opencode", "opencode-kit.jsonc"))
+})
