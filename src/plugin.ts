@@ -2,6 +2,7 @@ import { watch, type FSWatcher } from "node:fs"
 import { homedir } from "node:os"
 import { fileURLToPath } from "node:url"
 
+import { registerKitCommand } from "./commands/kit"
 import { createKitApi } from "./core/kit-api"
 import { registerTools, type DegradedTool } from "./core/registry"
 import type { KitContext } from "./core/context"
@@ -221,6 +222,18 @@ export default {
   id: "opencode-kit",
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
     const life = await createLifecycle(ctx, tools, ctx.options as Record<string, unknown>)
-    return life.dispose
+    // Register the `/kit` command alongside the tool lifecycle so it is
+    // disposed with everything else. It lives for the whole session (not per
+    // reload generation) and drives reloads after each config mutation.
+    const command = await registerKitCommand(ctx, {
+      home: resolveHome(ctx),
+      cwd: ctx.location.directory,
+      reload: () => life.reload(),
+      stdout: (message) => console.log(message),
+    })
+    return async () => {
+      await command.dispose()
+      await life.dispose()
+    }
   },
 }
