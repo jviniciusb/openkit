@@ -14,8 +14,9 @@ verify. Do the four steps below in order and report the result to the user.
 ## Before you start
 
 - Confirm OpenCode V2 `>= 2.0.4` is installed (`opencode --version`).
-- Decide whether the CLI is available: try `npx opencode-kit version` (or
-  `bunx opencode-kit version`). If it works, `init` can do steps 2–3 for you.
+- The CLI is in the repo (not on npm). If the user has a checkout they can run
+  `bun bin/opencode-kit.js <command>`; otherwise use the `/kit` command or edit
+  the config by hand.
 - Locate the user's OpenCode config. It may be `opencode.json` or
   `opencode.jsonc`, either globally (`~/.config/opencode/opencode.json`) or in
   the project root. Prefer the file the user already uses.
@@ -49,11 +50,13 @@ The kit reads `opencode-kit.jsonc` from the global
 (`~/.config/opencode/opencode-kit.jsonc`) and/or project
 (`<project>/.opencode/opencode-kit.jsonc`) locations.
 
-**Preferred:** if the CLI is available, run:
+**Preferred:** in an OpenCode session, use `/kit list` (and `/kit enable <tool>`)
+to see and toggle tools. To seed a config file from every tool's defaults, run
+the CLI from a checkout:
 
 ```bash
-npx opencode-kit init            # global config + global opencode.json
-npx opencode-kit init --project  # project config + project opencode.json
+bun bin/opencode-kit.js init            # global config + global opencode.json
+bun bin/opencode-kit.js init --project  # project config + project opencode.json
 ```
 
 `init` is idempotent — it never overwrites existing tool entries or duplicates
@@ -95,9 +98,13 @@ about, tell them a restart is required before continuing.
 
 ## Step 4 — Verify
 
+From a checkout:
+
 ```bash
-npx opencode-kit doctor
+bun bin/opencode-kit.js doctor
 ```
+
+Or in-session, `/kit list`.
 
 Success looks like:
 
@@ -115,13 +122,12 @@ plugin: active
   global location lists `opencode-kit`. If you added the entry, confirm the file
   path and restart.
 
-You can also run `npx opencode-kit list` to show every tool and its enabled
-state.
+You can also run `/kit list` in a session, or `bun bin/opencode-kit.js list` from
+a checkout, to show every tool and its enabled state.
 
 ## Fallback: the `/kit` command
 
-If neither `npx opencode-kit` nor a global `opencode-kit` is available, the
-plugin exposes the same operations from inside a session:
+The plugin exposes these operations from inside a session (no CLI needed):
 
 ```text
 /kit list                        # show tools and their state
