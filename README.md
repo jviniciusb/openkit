@@ -26,16 +26,21 @@ enabled by default.
 
 ### 1. Add the plugin
 
-> **Status:** not yet published to npm. Install from git until then.
+opencode-kit is distributed directly from GitHub (there is no npm package).
 
 ```bash
 opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git"
 ```
 
-Once published to npm this becomes `opencode plugin add opencode-kit`. Either
-installs the package into OpenCode's cache and loads every tool that is enabled
-in your config. Add the same spec to the `plugins` array of your
+This installs the package into OpenCode's cache and loads every tool that is
+enabled in your config. Add the same spec to the `plugins` array of your
 `opencode.json(c)` if it is not added for you.
+
+To **pin a release** instead of tracking `main`, append a tag or a commit hash:
+
+```bash
+opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git#v0.1.0"
+```
 
 ### 2. Configure (optional)
 
