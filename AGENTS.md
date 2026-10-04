@@ -66,8 +66,8 @@ tests/unit, tests/integration
 - **Do not name scripts `build`, `prepare`, `prepack`, or `postinstall`.** For
   git-installed dependencies Bun runs (and, for untrusted git deps, blocks)
   those lifecycle names, which makes `opencode plugin add <git spec>` fail with
-  `git dep preparation failed`. The build script is named `compile` for this
-  reason.
+  `git dep preparation failed`. Keep the build step out of `package.json`
+  entirely (there is none).
 
 ## Configuration model (memorize this)
 
