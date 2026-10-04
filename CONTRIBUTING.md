@@ -9,7 +9,6 @@ building OpenCode V2 tools.
 bun install
 bun run typecheck   # tsc --noEmit
 bun test            # bun test
-bun run compile     # bundle dist/plugin.js and dist/cli.js
 ```
 
 ## Making changes

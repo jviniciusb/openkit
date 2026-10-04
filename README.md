@@ -20,7 +20,7 @@ enabled by default.
 ## Requirements
 
 - OpenCode V2 `>= 2.0.4`.
-- [Bun](https://bun.sh) for running the CLI from a checkout and for building.
+- [Bun](https://bun.sh) to run the CLI from a checkout (`bun bin/opencode-kit.js <command>`). The plugin ships TypeScript and is transpiled by OpenCode's Bun at load — there is no build step, and the package is not consumable by plain Node.
 
 ## Install
 
@@ -170,8 +170,8 @@ Unknown commands, unknown tool ids, and malformed config exit non-zero.
 
 ## The `/kit` command
 
-If you install the plugin but neither `npx` nor a global CLI, the kit registers a
-`/kit` slash command as the in-session fallback:
+To use the kit without a checkout, the plugin registers a `/kit` slash command
+for in-session use:
 
 ```text
 /kit list                        # show tools and their state
@@ -235,7 +235,6 @@ See `src/tools/hello/index.ts` for a complete, working example.
 bun install
 bun run typecheck
 bun test
-bun run compile
 ```
 
 ## License
