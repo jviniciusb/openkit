@@ -93,8 +93,7 @@ export PATH="$HOME/.bun/bin:$PATH"
     "test": "bun test",
     "build": "bun run build:plugin && bun run build:cli",
     "build:plugin": "bun build src/plugin.ts --target=bun --outfile=dist/plugin.js",
-    "build:cli": "bun build src/cli/index.ts --target=bun --outfile=dist/cli.js",
-    "prepare": "bun run build"
+    "build:cli": "bun build src/cli/index.ts --target=bun --outfile=dist/cli.js"
   },
   "dependencies": { "ajv": "^8.17.1", "jsonc-parser": "^3.3.1" },
   "devDependencies": { "@types/bun": "latest", "typescript": "^5.6.0" }
@@ -368,11 +367,15 @@ test("invalid settings fall back to defaults and mark degraded", () => {
 ```ts
 import { expect, test } from "bun:test"
 import { defineTool } from "../../src/core/tool"
+import type { KitApi } from "../../src/core/tool"
+import type { KitStorage } from "../../src/core/context"
 import { registerTools } from "../../src/core/registry"
 import { createFakeContext } from "../../src/core/testing"
 
-const kit = { namespace() {}, scriptPath: (n: string) => n, storage: {} as any,
-  log: { debug(){}, info(){}, warn(){}, error(){} }, version: "0.0.0" }
+const kit: KitApi = { namespace() {}, scriptPath: (n: string) => n, storage: {} as KitStorage,
+  log: { debug(){}, info(){}, warn(){}, error(){} }, version: "0.0.0",
+  tool: async () => ({ dispose() {} }), command: async () => ({ dispose() {} }),
+  skill: async () => ({ dispose() {} }), on: async () => ({ dispose() {} }) }
 
 const ok = defineTool({ id: "ok", name: "OK", description: "d", defaultSettings: {},
   register(ctx) { return ctx.tool.transform(() => {}) } })
@@ -534,30 +537,35 @@ test("reload disposes previous registrations then re-registers", async () => {
 
 **Files:**
 - Create: `src/tools/hello/index.ts`, `src/tools/index.ts`
+- Modify: `src/plugin.ts` (replace the temporary empty `tools` array with `import { tools } from "./tools/index"`)
 - Test: `tests/unit/tools-hello.test.ts`
 
 **Interfaces:**
 - Consumes: `defineTool` (Task 1), `KitContext`.
 - Produces: `hello` (a `KitTool` with `id: "hello"`, `defaultEnabled: true`, settings `{ greeting: string }`, registering one tool named `hello` in namespace `hello`), and `export const tools: KitTool[]` from `src/tools/index.ts`.
+- Ruling carried from Task 6: `setup` currently passes an empty placeholder tool array; this task MUST wire `setup` to the real barrel so the plugin registers `hello`.
 
 - [ ] **Step 1: Write failing test** — `tests/unit/tools-hello.test.ts`
 
 ```ts
 import { expect, test } from "bun:test"
 import { tools } from "../../src/tools/index"
+import { createKitApi } from "../../src/core/kit-api"
 import { createFakeContext } from "../../src/core/testing"
 
 test("hello registers exactly one tool named hello", async () => {
   const hello = tools.find(t => t.id === "hello")!
   const { ctx, calls } = createFakeContext()
-  await hello.register(ctx, { greeting: "hi" }, {} as any)
+  const kit = createKitApi(hello.id, ctx, "/pkg", "0.0.0")
+  await hello.register(ctx, { greeting: "hi" }, kit)
+  expect(calls.tool.length).toBe(1)
   expect(JSON.stringify(calls.tool)).toContain("hello")
 })
 ```
 
 - [ ] **Step 2: Run, expect failure** → FAIL.
 
-- [ ] **Step 3: Implement** `hello` (calls `ctx.tool.transform(editor => editor.add({ name: "hello", description, input, execute }))` and `kit.namespace("hello")`) and the barrel exporting `[hello]`.
+- [ ] **Step 3: Implement** `hello` so `register` calls `kit.namespace("hello")` then registers via the kit helper `kit.tool({ name: "hello", description, input, execute })` (the helper applies the namespace to the editor), and build the barrel exporting `[hello]` with the `// <kit:tools>` / `// </kit:tools>` markers.
 
 - [ ] **Step 4: Run + typecheck** → PASS.
 
@@ -761,6 +769,8 @@ test("refuses to overwrite an existing tool", async () => {
 `opencode-kit.schema.json` (Draft-07): `{ "type":"object", "properties": { "configVersion": {"type":"integer"}, "tools": { "type":"object", "additionalProperties": { "type":"object", "properties": { "enabled": {"type":"boolean"}, "settings": {"type":"object"} }, "additionalProperties": false } } }, "additionalProperties": false }`.
 
 `index.js` as above.
+
+Also add `"prepare": "bun run build"` to `package.json` scripts. (Deferred from Task 1: a `prepare` hook runs on `bun install` and fails until `src/plugin.ts` and `src/cli/index.ts` exist — they exist by now.)
 
 - [ ] **Step 2: Write a failing integration test** — `tests/integration/plugin-loads.test.ts`
 
