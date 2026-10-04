@@ -29,5 +29,5 @@ jobs:
 
       - name: Verify committed dist is up to date
         run: |
-          bun run build
+          bun run compile
           git diff --exit-code -- dist
