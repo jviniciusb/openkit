@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test"
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
+import { globalConfigPath, globalOpencodePath } from "../../src/config/discover"
 import { initCommand } from "../../src/cli/commands/init"
 import { runCli } from "../../src/cli/index"
 
@@ -9,11 +10,11 @@ test("init seeds config and adds plugin entry once", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
   await initCommand(io, {})
-  const cfg = join(home, ".config", "opencode", "opencode-kit.jsonc")
+  const cfg = globalConfigPath(home)
   expect(existsSync(cfg)).toBe(true)
   expect(readFileSync(cfg, "utf8")).toContain("hello")
   await initCommand(io, {}) // idempotent
-  const oc = JSON.parse(readFileSync(join(home, ".config", "opencode", "opencode.json"), "utf8"))
+  const oc = JSON.parse(readFileSync(globalOpencodePath(home), "utf8"))
   expect(oc.plugins.filter((p: string) => p === "opencode-kit").length).toBe(1)
 })
 
@@ -21,7 +22,7 @@ test("init seeds the hello tool with its default enabled state and settings", as
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
   await initCommand(io, {})
-  const cfg = JSON.parse(readFileSync(join(home, ".config", "opencode", "opencode-kit.jsonc"), "utf8"))
+  const cfg = JSON.parse(readFileSync(globalConfigPath(home), "utf8"))
   expect(cfg.configVersion).toBe(1)
   expect(cfg.tools.hello.enabled).toBe(true)
   expect(cfg.tools.hello.settings).toEqual({ greeting: "Hello" })
@@ -29,7 +30,7 @@ test("init seeds the hello tool with its default enabled state and settings", as
 
 test("init does not clobber existing user edits or comments", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   const cfg = join(dir, "opencode-kit.jsonc")
   writeFileSync(cfg, '{\n  // keep me\n  "tools": { "hello": { "enabled": false } }\n}\n')
@@ -47,12 +48,12 @@ test("init --project writes to the project directory, not home", async () => {
   await initCommand(io, { project: true })
   expect(existsSync(join(cwd, ".opencode", "opencode-kit.jsonc"))).toBe(true)
   expect(existsSync(join(cwd, "opencode.json"))).toBe(true)
-  expect(existsSync(join(home, ".config", "opencode", "opencode-kit.jsonc"))).toBe(false)
+  expect(existsSync(globalConfigPath(home))).toBe(false)
 })
 
 test("init appends the plugin entry to an existing opencode.json", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, "opencode.json"), '{ "plugins": ["other-plugin"], "theme": "dark" }\n')
   const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
@@ -64,7 +65,7 @@ test("init appends the plugin entry to an existing opencode.json", async () => {
 
 test("init preserves comments and other entries inside the plugins array", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   writeFileSync(
     join(dir, "opencode.json"),
@@ -80,7 +81,7 @@ test("init preserves comments and other entries inside the plugins array", async
 
 test("init refuses a non-array plugins value and leaves opencode.json intact", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   const original = '{ "plugins": "opencode-kit" }\n'
   writeFileSync(join(dir, "opencode.json"), original)

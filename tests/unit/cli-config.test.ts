@@ -3,6 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import { parse } from "jsonc-parser"
+import { globalConfigPath } from "../../src/config/discover"
 import { runCli } from "../../src/cli/index"
 
 function home(): string {
@@ -10,7 +11,7 @@ function home(): string {
 }
 
 function globalConfig(h: string): string {
-  return join(h, ".config", "opencode", "opencode-kit.jsonc")
+  return globalConfigPath(h)
 }
 
 function storedTools(h: string): Record<string, { enabled?: boolean; settings?: Record<string, unknown> }> {
@@ -133,4 +134,96 @@ test("config set seeds an empty global config", async () => {
 
   expect(code).toBe(0)
   expect(storedTools(h).hello?.settings?.greeting).toBe("Hi")
+})
+
+test("config set warns (advisory) when the write degrades the tool", async () => {
+  const h = home()
+  const { io: streams, out, err } = io(h)
+
+  const code = await runCli(["config", "set", "hello", "count", "42"], streams)
+
+  expect(code).toBe(0)
+  expect(out()).toContain("hello.count = 42")
+  expect(err()).toContain("hello")
+  expect(err()).toContain("invalid")
+  // The value is still persisted; the warning tells the user it will not apply.
+  expect(storedTools(h).hello?.settings?.count).toBe(42)
+})
+
+test("config set warns when a project config overrides the value", async () => {
+  const h = home()
+  const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
+  mkdirSync(join(cwd, ".opencode"), { recursive: true })
+  const project = join(cwd, ".opencode", "opencode-kit.jsonc")
+  writeFileSync(project, '{ "tools": { "hello": { "settings": { "greeting": "Project" } } } }')
+
+  const { io: streams, err } = io(h)
+  streams.cwd = cwd
+
+  const code = await runCli(["config", "set", "hello", "greeting", "Global"], streams)
+
+  expect(code).toBe(0)
+  expect(err()).toContain("overridden")
+  expect(err()).toContain(project)
+})
+
+test("enable warns when a project config overrides the global write", async () => {
+  const h = home()
+  const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
+  mkdirSync(join(cwd, ".opencode"), { recursive: true })
+  const project = join(cwd, ".opencode", "opencode-kit.jsonc")
+  writeFileSync(project, '{ "tools": { "hello": { "enabled": false } } }')
+
+  const { io: streams, err } = io(h)
+  streams.cwd = cwd
+
+  const code = await runCli(["enable", "hello"], streams)
+
+  expect(code).toBe(0)
+  expect(storedTools(h).hello?.enabled).toBe(true)
+  expect(err()).toContain("overridden")
+  expect(err()).toContain(project)
+})
+
+test("enable warns when opencode.json plugin options override the global write", async () => {
+  const h = home()
+  const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
+  writeFileSync(
+    join(cwd, "opencode.json"),
+    '{ "plugins": [["opencode-kit", { "tools": { "hello": { "enabled": false } } }]] }',
+  )
+
+  const { io: streams, err } = io(h)
+  streams.cwd = cwd
+
+  const code = await runCli(["enable", "hello"], streams)
+
+  expect(code).toBe(0)
+  expect(err()).toContain("overridden")
+  expect(err()).toContain("plugin options")
+})
+
+test("CLI honors an explicit XDG_CONFIG_HOME and restores the ambient value", async () => {
+  const h = home()
+  const xdg = mkdtempSync(join(tmpdir(), "xdg-"))
+  const dir = join(xdg, "opencode")
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(join(dir, "opencode-kit.jsonc"), '{ "tools": { "hello": { "enabled": false } } }')
+
+  const previous = process.env.XDG_CONFIG_HOME
+  process.env.XDG_CONFIG_HOME = xdg
+  try {
+    let out = ""
+    const code = await runCli(["list"], {
+      cwd: h,
+      home: h,
+      stdout: (s) => { out += s },
+      stderr: () => {},
+    })
+    expect(code).toBe(0)
+    expect(out).toMatch(/hello\s+disabled/)
+  } finally {
+    if (previous === undefined) delete process.env.XDG_CONFIG_HOME
+    else process.env.XDG_CONFIG_HOME = previous
+  }
 })

@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test"
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
+import { globalConfigPath } from "../../src/config/discover"
 import { runCli } from "../../src/cli/index"
 
 test("list prints hello and its enabled state", async () => {
@@ -15,9 +16,9 @@ test("list prints hello and its enabled state", async () => {
 
 test("list reflects config-driven disable", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const globalDir = join(home, ".config", "opencode")
-  mkdirSync(globalDir, { recursive: true })
-  writeFileSync(join(globalDir, "opencode-kit.jsonc"), '{ "tools": { "hello": { "enabled": false } } }')
+  const globalFile = globalConfigPath(home)
+  mkdirSync(dirname(globalFile), { recursive: true })
+  writeFileSync(globalFile, '{ "tools": { "hello": { "enabled": false } } }')
   let out = ""
   const code = await runCli(["list"], { cwd: home, home, stdout: (s) => { out += s }, stderr: () => {} })
   expect(code).toBe(0)

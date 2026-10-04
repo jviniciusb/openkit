@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test"
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
+import { globalConfigPath } from "../../src/config/discover"
 import { doctorCommand, versionCommand } from "../../src/cli/commands/doctor"
 import { runCli } from "../../src/cli/index"
 
@@ -25,7 +26,7 @@ test("doctor returns 0 for valid (or absent) config", async () => {
 
 test("doctor returns non-zero and reports a malformed config", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, "opencode-kit.jsonc"), '{ "tools": { ')
   const h = io(home)
@@ -36,7 +37,7 @@ test("doctor returns non-zero and reports a malformed config", async () => {
 
 test("doctor reports degraded tools without failing", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   writeFileSync(
     join(dir, "opencode-kit.jsonc"),
@@ -50,7 +51,7 @@ test("doctor reports degraded tools without failing", async () => {
 
 test("doctor reports plugin active when listed in opencode.json", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const dir = join(home, ".config", "opencode")
+  const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   writeFileSync(join(dir, "opencode.json"), '{ "plugins": ["opencode-kit"] }')
   const h = io(home)

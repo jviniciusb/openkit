@@ -1,8 +1,15 @@
 import { coerceScalar } from "../../config/coerce"
 import { globalConfigPath } from "../../config/discover"
 import { setToolSetting } from "../../config/edit"
+import {
+  buildConfigLayers,
+  readPluginOptions,
+  resolveEffective,
+  valuesEqual,
+} from "../../config/effective"
 import { loadKitConfig } from "../../config/load"
 import { resolveToolConfig } from "../../config/resolve"
+import { resolveValidated } from "../../config/validate"
 import { tools } from "../../tools/index"
 import type { CliIo } from "./list"
 
@@ -67,5 +74,25 @@ async function configSet(
   const value = coerceScalar(valueParts.join(" "))
   await setToolSetting(globalConfigPath(io.home), tool.id, key, value)
   io.stdout(`${tool.id}.${key} = ${JSON.stringify(value)}`)
+
+  // A typo can be written but never take effect: the tool silently degrades to
+  // defaults at load. Surface that here instead of reporting a clean success.
+  const layers = await buildConfigLayers(io.cwd, io.home, process.env, readPluginOptions(io.cwd, io.home))
+  const effective = resolveEffective(tool, layers)
+  const { degraded } = resolveValidated(tool, { enabled: effective.enabled, settings: effective.settings })
+  if (degraded !== undefined) {
+    io.stderr(`opencode-kit: warning: ${degraded}`)
+  }
+
+  // A higher-precedence layer (project config or plugin options) can override
+  // the value we just wrote globally. Report the mismatch, but stay advisory.
+  const effectiveValue = effective.settings[key]
+  if (!valuesEqual(effectiveValue, value)) {
+    const layer = effective.settingLayers[key]
+    io.stderr(
+      `opencode-kit: warning: "${tool.id}.${key}" is effectively ${JSON.stringify(effectiveValue)}; your change is overridden by ${layer?.label ?? "a higher-precedence layer"}`,
+    )
+  }
+
   return 0
 }
