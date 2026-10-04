@@ -35,7 +35,7 @@ jobs:
         run: bun test
 
       - name: Build
-        run: bun run build
+        run: bun run compile
 
       - name: Verify tag matches package version
         run: |

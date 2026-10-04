@@ -16,7 +16,7 @@ Prepend Bun to your `PATH` (`~/.bun/bin`) if needed.
 ```bash
 bun run typecheck   # must pass before you commit
 bun test            # must pass before you commit
-bun run build       # bundle dist/plugin.js + dist/cli.js
+bun run compile     # bundle dist/plugin.js + dist/cli.js
 ```
 
 Run a single test file with `bun test tests/unit/<file>.test.ts`.
@@ -60,7 +60,12 @@ tests/unit, tests/integration
 - **`dist/` is committed on purpose.** Consumers install directly from GitHub,
   and postinstall build scripts are blocked, so `dist/plugin.js` and
   `dist/cli.js` must be present in git. After any `src/` change, run
-  `bun run build` and commit the updated `dist/`. CI verifies it stays current.
+  `bun run compile` and commit the updated `dist/`. CI verifies it stays current.
+- **Do not name scripts `build`, `prepare`, `prepack`, or `postinstall`.** For
+  git-installed dependencies Bun runs (and, for untrusted git deps, blocks)
+  those lifecycle names, which makes `opencode plugin add <git spec>` fail with
+  `git dep preparation failed`. The build script is named `compile` for this
+  reason.
 
 ## Configuration model (memorize this)
 
