@@ -28,7 +28,6 @@
   "publishConfig": { "access": "public" },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "prepare": "bun run build",
     "test": "bun test",
     "build": "bun run build:plugin && bun run build:cli",
     "build:plugin": "bun build src/plugin.ts --target=bun --outfile=dist/plugin.js",
