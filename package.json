@@ -23,7 +23,7 @@
   "type": "module",
   "main": "./src/plugin.ts",
   "bin": { "opencode-kit": "./bin/opencode-kit.js" },
-  "files": ["src", "bin", "index.js", "scripts", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "files": ["src", "bin", "index.js", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
   "engines": { "bun": ">=1.1.39" },
   "scripts": {
     "typecheck": "tsc --noEmit",
