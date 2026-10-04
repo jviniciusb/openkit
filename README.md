@@ -26,12 +26,15 @@ enabled by default.
 
 ### 1. Add the plugin
 
+> **Status:** not yet published to npm. Install from git until then.
+
 ```bash
-opencode plugin add opencode-kit
+opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git"
 ```
 
-This installs the package into OpenCode's cache and loads every tool that is
-enabled in your config. Add `opencode-kit` to the `plugins` array of your
+Once published to npm this becomes `opencode plugin add opencode-kit`. Either
+installs the package into OpenCode's cache and loads every tool that is enabled
+in your config. Add the same spec to the `plugins` array of your
 `opencode.json(c)` if it is not added for you.
 
 ### 2. Seed a config (optional but recommended)
