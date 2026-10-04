@@ -35,7 +35,7 @@ export const hello: KitTool<HelloSettings> = defineTool({
         properties: { name: { type: "string" } },
         additionalProperties: false,
       },
-      execute: () => settings.greeting,
+      execute: async () => ({ content: settings.greeting }),
     })
   },
 })

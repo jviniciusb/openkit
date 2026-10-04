@@ -34,11 +34,17 @@ export interface Namespace {
   description?: string
 }
 
+/** Result a tool executor returns (V2 `Tool.Content`-shaped). */
+export interface ToolResult {
+  content: unknown
+}
+
 export interface ToolDefinition {
   name: string
   description?: string
   input?: unknown
-  execute?: (...args: never[]) => unknown
+  /** V2 tool executors are async and return `{ content }`. */
+  execute?: (input: unknown, context?: unknown) => Promise<ToolResult> | ToolResult
   [key: string]: unknown
 }
 
