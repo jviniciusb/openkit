@@ -2,11 +2,30 @@
   "name": "opencode-kit",
   "version": "0.1.0",
   "description": "A framework of toggleable, configurable tools for OpenCode V2",
-  "type": "module",
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "opencode-v2",
+    "ai",
+    "coding-agent",
+    "tools"
+  ],
+  "homepage": "https://github.com/jviniciusb/opencode-kit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jviniciusb/opencode-kit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jviniciusb/opencode-kit/issues"
+  },
+  "author": "Jader Barbosa",
   "license": "MIT",
+  "type": "module",
   "main": "./dist/plugin.js",
   "bin": { "opencode-kit": "./bin/opencode-kit.js" },
-  "files": ["dist", "bin", "index.js", "skills", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "files": ["dist", "bin", "index.js", "scripts", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "engines": { "bun": ">=1.1.39", "node": ">=18.0.0" },
+  "publishConfig": { "access": "public" },
   "scripts": {
     "typecheck": "tsc --noEmit",
     "prepare": "bun run build",

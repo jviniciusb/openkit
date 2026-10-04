@@ -26,21 +26,22 @@ instead of replacing it.
 
 ## Step 1 — Add the plugin entry
 
-Add `"opencode-kit"` to the `plugins` array of `opencode.json(c)`.
+> **Status:** `opencode-kit` is not yet published to npm. Add the git spec below
+> until it is; once published, `"opencode-kit"` works instead.
 
-If `opencode-kit` is already present (as a string or as the first element of a
-`[name, options]` pair), skip this step.
+Add the git spec to the `plugins` array of `opencode.json(c)`:
 
 ```jsonc
 {
   "plugins": [
-    "opencode-kit"
+    "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git"
   ]
 }
 ```
 
-If the array already has entries, append `"opencode-kit"` — do not remove or
-reorder the existing ones. If there is no `plugins` key, add one.
+If `opencode-kit` or its git spec is already present, skip this step. If the
+array already has entries, append — do not remove or reorder existing ones. If
+there is no `plugins` key, add one.
 
 ## Step 2 — Seed the kit config
 
