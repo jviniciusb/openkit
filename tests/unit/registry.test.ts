@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { defineTool, type KitApi } from "../../src/core/tool"
-import { type KitStorage } from "../../src/core/context"
+import { type KitContext, type KitStorage } from "../../src/core/context"
 import { registerTools } from "../../src/core/registry"
 import { createFakeContext } from "../../src/core/testing"
 
@@ -43,6 +43,40 @@ test("a throwing tool is isolated and its partial registrations disposed", async
   expect(res.degraded.map(d => d.id)).toEqual(["boom"])
   expect(disposed).toBe(1)
   expect(res.registrations.length).toBe(1) // only "ok"
+})
+
+test("wrapper construction does not throw for getter-backed or frozen context", async () => {
+  let disposed = 0
+  const { ctx } = createFakeContext({
+    onRegistration: () => ({ dispose: async () => { disposed++ } }),
+  })
+  const real = ctx as unknown as Record<string, unknown>
+  // Expose `tool`/`session` only as getter-backed inherited members (no
+  // setter): a construction based on Object.assign/[[Set]] would throw here.
+  const proto = {
+    get tool() { return real.tool },
+    get session() { return real.session },
+  }
+  const holder: Record<string, unknown> = {}
+  for (const key of ["app", "location", "options", "storage", "command", "skill"]) {
+    holder[key] = real[key]
+  }
+  const getterCtx = Object.freeze(Object.assign(Object.create(proto), holder)) as unknown as KitContext
+
+  const a = defineTool({ id: "getter", name: "G", description: "d", defaultSettings: {},
+    register(c) { return c.tool.transform(() => {}) } })
+
+  const res = await registerTools(
+    [a],
+    new Map([["getter", { enabled: true, settings: {} }]]),
+    getterCtx,
+    () => kit,
+  )
+
+  expect(res.degraded).toEqual([])
+  expect(res.registrations.length).toBe(1)
+  for (const registration of res.registrations) await registration.dispose()
+  expect(disposed).toBe(1)
 })
 
 test("tracking wrapper preserves getter/prototype context members", async () => {

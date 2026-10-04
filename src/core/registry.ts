@@ -46,7 +46,9 @@ export async function registerTools(
     // Build the wrapper with `ctx` as its prototype rather than spreading it.
     // A real V2 context may expose members through getters or on the prototype;
     // spreading would copy only own enumerable properties and silently drop
-    // them. We override just the domains we need to track as own properties.
+    // them. We override just the domains we need to track, and use
+    // `defineProperties` (not `Object.assign`/[[Set]]) so a frozen `ctx` or a
+    // getter/readonly member cannot make the wrapper construction throw.
     const overrides: Pick<KitContext, "tool" | "command" | "skill" | "session" | "storage"> = {
       tool: {
         async transform(callback) {
@@ -78,7 +80,13 @@ export async function registerTools(
       },
       storage: ctx.storage,
     }
-    const tracking = Object.assign(Object.create(ctx) as KitContext, overrides)
+    const tracking = Object.defineProperties(Object.create(ctx) as KitContext, {
+      tool: { value: overrides.tool, enumerable: true, configurable: true, writable: true },
+      command: { value: overrides.command, enumerable: true, configurable: true, writable: true },
+      skill: { value: overrides.skill, enumerable: true, configurable: true, writable: true },
+      session: { value: overrides.session, enumerable: true, configurable: true, writable: true },
+      storage: { value: overrides.storage, enumerable: true, configurable: true, writable: true },
+    })
 
     try {
       await tool.register(tracking, config.settings, makeKit(tool.id, tracking))
