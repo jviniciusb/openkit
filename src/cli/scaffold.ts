@@ -7,6 +7,9 @@ const OPEN_MARKER = "// <kit:tools>"
 /** Closing marker delimiting the generated tool entries in the barrel. */
 const CLOSE_MARKER = "// </kit:tools>"
 
+/** Valid tool ids: kebab-case, starting with a lowercase letter. */
+const TOOL_ID_RE = /^[a-z][a-z0-9-]*$/
+
 /** Converts a kebab-case id to its camelCase identifier (`my-tool` → `myTool`). */
 export function camelCase(id: string): string {
   const parts = id.split(/[^a-zA-Z0-9]+/).filter((part) => part.length > 0)
@@ -114,8 +117,15 @@ function updateBarrel(barrel: string, id: string): string {
  * @returns The absolute path of the created tool directory.
  */
 export async function scaffoldTool(root: string, toolId: string): Promise<{ dir: string }> {
+  // Validate the id before any filesystem access: a malformed id could produce a
+  // broken barrel import or, worse, escape `src/tools` via path traversal.
   if (toolId.trim().length === 0) {
     throw new Error("tool id is required")
+  }
+  if (!TOOL_ID_RE.test(toolId)) {
+    throw new Error(
+      `invalid tool id "${toolId}": expected kebab-case matching ${TOOL_ID_RE.source}`,
+    )
   }
 
   const dir = join(root, "src", "tools", toolId)
