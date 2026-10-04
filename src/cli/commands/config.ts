@@ -1,3 +1,4 @@
+import { coerceScalar } from "../../config/coerce"
 import { globalConfigPath } from "../../config/discover"
 import { setToolSetting } from "../../config/edit"
 import { loadKitConfig } from "../../config/load"
@@ -5,23 +6,8 @@ import { resolveToolConfig } from "../../config/resolve"
 import { tools } from "../../tools/index"
 import type { CliIo } from "./list"
 
-/** Matches JSON number literals (integer, fraction, and exponent forms). */
-const NUMBER_RE = /^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/
-
-/**
- * Coerces a CLI string to a JSON scalar.
- *
- * `true`/`false`/`null` and numeric literals become their typed values; every
- * other input is kept as a plain string. This is intentionally shallow — no
- * arrays or objects are parsed from the command line.
- */
-export function coerceScalar(raw: string): unknown {
-  if (raw === "true") return true
-  if (raw === "false") return false
-  if (raw === "null") return null
-  if (NUMBER_RE.test(raw)) return Number(raw)
-  return raw
-}
+// Re-exported for callers that already reach the helper through the CLI module.
+export { coerceScalar }
 
 /**
  * Handles `config get <id> <key>` and `config set <id> <key> <value>`.

@@ -25,12 +25,15 @@ export interface RegisterToolsResult {
  * other tools unaffected.
  *
  * `makeKit` is only forwarded to `register`; the registry never inspects it.
+ * It receives the tracking context, so registrations created through the
+ * `KitApi` helpers (`tool`/`command`/`skill`/`on`) are tracked and disposed
+ * like direct `ctx` transforms — one tool cannot leak past its own failure.
  */
 export async function registerTools(
   tools: KitTool[],
   resolved: Map<string, ResolvedToolConfig<unknown>>,
   ctx: KitContext,
-  makeKit: (toolId: string) => KitApi,
+  makeKit: (toolId: string, ctx: KitContext) => KitApi,
 ): Promise<RegisterToolsResult> {
   const registrations: Registration[] = []
   const degraded: DegradedTool[] = []
@@ -73,7 +76,7 @@ export async function registerTools(
     }
 
     try {
-      await tool.register(tracking, config.settings, makeKit(tool.id))
+      await tool.register(tracking, config.settings, makeKit(tool.id, tracking))
       registrations.push(...created)
     } catch (error) {
       for (const registration of created) {

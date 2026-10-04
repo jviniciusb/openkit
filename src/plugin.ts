@@ -68,8 +68,8 @@ export async function bootstrap(
     if (reason !== undefined) degraded.push({ id: tool.id, error: reason })
   }
 
-  const result = await registerTools(tools, resolved, ctx, (toolId) =>
-    createKitApi(toolId, ctx, PACKAGE_ROOT, ctx.app.version),
+  const result = await registerTools(tools, resolved, ctx, (toolId, toolCtx) =>
+    createKitApi(toolId, toolCtx, PACKAGE_ROOT, toolCtx.app.version),
   )
   degraded.push(...result.degraded)
 
@@ -225,15 +225,22 @@ export default {
     // Register the `/kit` command alongside the tool lifecycle so it is
     // disposed with everything else. It lives for the whole session (not per
     // reload generation) and drives reloads after each config mutation.
-    const command = await registerKitCommand(ctx, {
-      home: resolveHome(ctx),
-      cwd: ctx.location.directory,
-      reload: () => life.reload(),
-      stdout: (message) => console.log(message),
-    })
-    return async () => {
-      await command.dispose()
+    try {
+      const command = await registerKitCommand(ctx, {
+        home: resolveHome(ctx),
+        cwd: ctx.location.directory,
+        reload: () => life.reload(),
+        stdout: (message) => console.log(message),
+      })
+      return async () => {
+        await command.dispose()
+        await life.dispose()
+      }
+    } catch (error) {
+      // Command registration failed after tools were installed; release the
+      // lifecycle so no registrations leak, then surface the failure.
       await life.dispose()
+      throw error
     }
   },
 }

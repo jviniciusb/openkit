@@ -1,4 +1,4 @@
-import { coerceScalar } from "../cli/commands/config"
+import { coerceScalar } from "../config/coerce"
 import { discoverKitConfigFiles, globalConfigPath } from "../config/discover"
 import { setToolEnabled, setToolSetting } from "../config/edit"
 import { loadKitConfig } from "../config/load"
