@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
 import { parse } from "jsonc-parser"
 import { runCli } from "../../src/cli/index"
 
@@ -105,4 +105,19 @@ test("config get for an unset key fails", async () => {
 
   expect(code).not.toBe(0)
   expect(err()).toContain("missing")
+})
+
+test("config set on a malformed config fails gracefully without clobbering it", async () => {
+  const h = home()
+  const f = globalConfig(h)
+  mkdirSync(dirname(f), { recursive: true })
+  writeFileSync(f, "{ this is not json")
+  const { io: streams, err } = io(h)
+
+  // Must not reject out of runCli.
+  const code = await runCli(["config", "set", "hello", "greeting", "Hi"], streams)
+
+  expect(code).not.toBe(0)
+  expect(err()).toContain("malformed")
+  expect(readFileSync(f, "utf8")).toBe("{ this is not json")
 })

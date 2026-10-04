@@ -57,3 +57,25 @@ test("setToolSetting creates a new tool entry without touching others", async ()
   expect(data.tools?.a?.enabled).toBe(true)
   expect(data.tools?.b?.settings).toEqual({ name: "hi" })
 })
+
+test("setToolEnabled rejects when the target lies under a file, without overwriting", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const blocker = join(d, "blocker")
+  writeFileSync(blocker, "not a directory")
+  const f = join(blocker, "opencode-kit.jsonc")
+
+  await expect(setToolEnabled(f, "a", true)).rejects.toThrow()
+
+  // The file we could not traverse must be left byte-for-byte intact.
+  expect(readFileSync(blocker, "utf8")).toBe("not a directory")
+})
+
+test("setToolEnabled refuses to edit a malformed config and leaves it intact", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, "{ this is not json")
+
+  await expect(setToolEnabled(f, "a", true)).rejects.toThrow(/malformed/)
+
+  expect(readFileSync(f, "utf8")).toBe("{ this is not json")
+})

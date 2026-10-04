@@ -1,6 +1,14 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
 import { dirname } from "node:path"
-import { applyEdits, modify, type Edit, type ModificationOptions } from "jsonc-parser"
+import {
+  applyEdits,
+  modify,
+  parse,
+  printParseErrorCode,
+  type Edit,
+  type ModificationOptions,
+  type ParseError,
+} from "jsonc-parser"
 import type { KitConfigFile } from "./types"
 
 /** Options used when `modify` has to create a JSON property. */
@@ -11,19 +19,44 @@ const MODIFY_OPTIONS: ModificationOptions = {
 /** Seed for a brand-new config file. */
 const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {} }
 
+/** True only for a genuinely missing file (`ENOENT`). */
+function isMissingFile(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { code?: unknown }).code === "ENOENT"
+  )
+}
+
 /**
- * Reads a config file's raw text, falling back to a serialized default config.
+ * Reads a config file's raw text, defaulting only when the file is absent.
  *
  * Returning text (rather than a parsed object) is what lets `modify` preserve
- * the file's comments and formatting. Parent directories are created on write,
- * not here.
+ * the file's comments and formatting. A missing file yields the serialized
+ * default config. Any other read failure (permissions, a directory, EMFILE,
+ * ENOTDIR, …) is rethrown — we must never silently clobber a config we could
+ * not read. Existing files that fail to parse as JSONC are also rejected so a
+ * later write cannot corrupt them.
  */
 function readConfigText(path: string): string {
+  let text: string
   try {
-    return readFileSync(path, "utf8")
-  } catch {
-    return `${JSON.stringify(DEFAULT_CONFIG, null, 2)}\n`
+    text = readFileSync(path, "utf8")
+  } catch (error) {
+    if (isMissingFile(error)) return `${JSON.stringify(DEFAULT_CONFIG, null, 2)}\n`
+    throw error
   }
+
+  const errors: ParseError[] = []
+  parse(text, errors, { allowTrailingComma: true, disallowComments: false })
+  if (errors.length > 0) {
+    const details = errors
+      .map((error) => `${printParseErrorCode(error.error)} at offset ${error.offset}`)
+      .join(", ")
+    throw new Error(`refusing to edit malformed config ${path}: ${details}`)
+  }
+
+  return text
 }
 
 /** Applies `edits` to `text` and writes the result, creating parents. */

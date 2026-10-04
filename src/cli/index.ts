@@ -9,9 +9,22 @@ export type { CliIo }
  *
  * Dispatches the requested subcommand and returns a process exit code. No
  * process globals are read or written here, so callers (including tests) can
- * drive it with their own `argv` and `io`.
+ * drive it with their own `argv` and `io`. Errors thrown by a command (e.g. a
+ * config file we must not overwrite) are reported on stderr and turned into a
+ * non-zero exit code instead of escaping as an unhandled rejection.
  */
 export async function runCli(argv: string[], io: CliIo): Promise<number> {
+  try {
+    return await dispatch(argv, io)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    io.stderr(`opencode-kit: ${message}`)
+    return 1
+  }
+}
+
+/** Selects and runs the requested subcommand. */
+async function dispatch(argv: string[], io: CliIo): Promise<number> {
   const [command, ...rest] = argv
 
   switch (command) {
