@@ -57,6 +57,10 @@ tests/unit, tests/integration
   precedence, registry behavior, CLI output, and tool registration.
 - **Conventional Commits.** Use `feat:`, `fix:`, `docs:`, `test:`, `chore:`.
   Run `bun run typecheck && bun test` before committing.
+- **`dist/` is committed on purpose.** Consumers install directly from GitHub,
+  and postinstall build scripts are blocked, so `dist/plugin.js` and
+  `dist/cli.js` must be present in git. After any `src/` change, run
+  `bun run build` and commit the updated `dist/`. CI verifies it stays current.
 
 ## Configuration model (memorize this)
 
