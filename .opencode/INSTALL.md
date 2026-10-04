@@ -27,8 +27,9 @@ instead of replacing it.
 
 ## Step 1 — Add the plugin entry
 
-> **Status:** `opencode-kit` is not yet published to npm. Add the git spec below
-> until it is; once published, `"opencode-kit"` works instead.
+> **Status:** `opencode-kit` is distributed directly from GitHub (there is no npm
+> package). Add the git spec below. To pin a release, append a tag:
+> `#v0.1.0`.
 
 Add the git spec to the `plugins` array of `opencode.json(c)`:
 

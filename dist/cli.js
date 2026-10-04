@@ -437,7 +437,6 @@ var package_default = {
   bin: { "opencode-kit": "./bin/opencode-kit.js" },
   files: ["dist", "bin", "index.js", "scripts", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
   engines: { bun: ">=1.1.39", node: ">=18.0.0" },
-  publishConfig: { access: "public" },
   scripts: {
     typecheck: "tsc --noEmit",
     test: "bun test",
