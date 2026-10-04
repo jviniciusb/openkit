@@ -121,3 +121,16 @@ test("config set on a malformed config fails gracefully without clobbering it", 
   expect(err()).toContain("malformed")
   expect(readFileSync(f, "utf8")).toBe("{ this is not json")
 })
+
+test("config set seeds an empty global config", async () => {
+  const h = home()
+  const f = globalConfig(h)
+  mkdirSync(dirname(f), { recursive: true })
+  writeFileSync(f, "")
+  const { io: streams } = io(h)
+
+  const code = await runCli(["config", "set", "hello", "greeting", "Hi"], streams)
+
+  expect(code).toBe(0)
+  expect(storedTools(h).hello?.settings?.greeting).toBe("Hi")
+})

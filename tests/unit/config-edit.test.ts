@@ -79,3 +79,19 @@ test("setToolEnabled refuses to edit a malformed config and leaves it intact", a
 
   expect(readFileSync(f, "utf8")).toBe("{ this is not json")
 })
+
+test.each([
+  ["empty", ""],
+  ["whitespace-only", "  \n\t\n"],
+  ["comment-only", "// nothing here\n/* block */\n"],
+])("setToolEnabled seeds a default for a %s config", async (_name, contents) => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, contents)
+
+  await setToolEnabled(f, "a", true)
+
+  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
+  expect(data.configVersion).toBe(1)
+  expect(data.tools?.a?.enabled).toBe(true)
+})

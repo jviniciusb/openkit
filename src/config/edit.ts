@@ -48,13 +48,21 @@ function readConfigText(path: string): string {
   }
 
   const errors: ParseError[] = []
-  parse(text, errors, { allowTrailingComma: true, disallowComments: false })
+  const parsed = parse(text, errors, {
+    allowTrailingComma: true,
+    disallowComments: false,
+    allowEmptyContent: true,
+  })
   if (errors.length > 0) {
     const details = errors
       .map((error) => `${printParseErrorCode(error.error)} at offset ${error.offset}`)
       .join(", ")
     throw new Error(`refusing to edit malformed config ${path}: ${details}`)
   }
+
+  // Empty / whitespace-only / comment-only documents parse to `undefined`; treat
+  // them like an absent file so the caller seeds a default config.
+  if (parsed === undefined) return `${JSON.stringify(DEFAULT_CONFIG, null, 2)}\n`
 
   return text
 }
