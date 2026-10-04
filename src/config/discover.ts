@@ -4,7 +4,7 @@ import { dirname, join, resolve } from "node:path"
 const CONFIG_FILE_NAME = "opencode-kit.jsonc"
 
 /** Absolute path of the machine-global kit config file. */
-function globalConfigPath(home: string): string {
+export function globalConfigPath(home: string): string {
   return join(home, ".config", "opencode", CONFIG_FILE_NAME)
 }
 
