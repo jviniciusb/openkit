@@ -16,8 +16,10 @@ Prepend Bun to your `PATH` (`~/.bun/bin`) if needed.
 ```bash
 bun run typecheck   # must pass before you commit
 bun test            # must pass before you commit
-bun run compile     # bundle dist/plugin.js + dist/cli.js
 ```
+
+There is no build step: the plugin is the TypeScript source, transpiled by Bun
+at load.
 
 Run a single test file with `bun test tests/unit/<file>.test.ts`.
 
@@ -31,8 +33,8 @@ src/
   cli/                  # CLI entry and commands; scaffold.ts
   tools/<id>/index.ts   # one folder per tool
   tools/index.ts        # explicit barrel with <kit:tools> markers
-bin/opencode-kit.js     # npm bin
-index.js                # directory-form plugin entry -> dist/plugin.js
+bin/opencode-kit.js     # CLI entry (runs the TS CLI via Bun)
+index.js                # package plugin entry -> src/plugin.ts
 opencode-kit.schema.json
 tests/unit, tests/integration
 .opencode/INSTALL.md    # agent-driven install for consumers
@@ -57,10 +59,10 @@ tests/unit, tests/integration
   precedence, registry behavior, CLI output, and tool registration.
 - **Conventional Commits.** Use `feat:`, `fix:`, `docs:`, `test:`, `chore:`.
   Run `bun run typecheck && bun test` before committing.
-- **`dist/` is committed on purpose.** Consumers install directly from GitHub,
-  and postinstall build scripts are blocked, so `dist/plugin.js` and
-  `dist/cli.js` must be present in git. After any `src/` change, run
-  `bun run compile` and commit the updated `dist/`. CI verifies it stays current.
+- **No build step — the TypeScript source is the artifact.** Consumers install
+  directly from GitHub and Bun (OpenCode's runtime) transpiles `src/plugin.ts`
+  on load, so there is no `dist/`. Keep `src` in `package.json` `files`, and keep
+  `index.js`/`main` pointing at the TS entry.
 - **Do not name scripts `build`, `prepare`, `prepack`, or `postinstall`.** For
   git-installed dependencies Bun runs (and, for untrusted git deps, blocks)
   those lifecycle names, which makes `opencode plugin add <git spec>` fail with

@@ -21,16 +21,13 @@
   "author": "Jader Barbosa",
   "license": "MIT",
   "type": "module",
-  "main": "./dist/plugin.js",
+  "main": "./src/plugin.ts",
   "bin": { "opencode-kit": "./bin/opencode-kit.js" },
-  "files": ["dist", "bin", "index.js", "scripts", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
-  "engines": { "bun": ">=1.1.39", "node": ">=18.0.0" },
+  "files": ["src", "bin", "index.js", "scripts", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "engines": { "bun": ">=1.1.39" },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "bun test",
-    "compile": "bun run compile:plugin && bun run compile:cli",
-    "compile:plugin": "bun build src/plugin.ts --target=bun --outfile=dist/plugin.js",
-    "compile:cli": "bun build src/cli/index.ts --target=node --outfile=dist/cli.js --external ajv --external jsonc-parser"
+    "test": "bun test"
   },
   "dependencies": { "ajv": "^8.17.1", "jsonc-parser": "^3.3.1" },
   "devDependencies": { "@types/bun": "latest", "typescript": "^5.6.0" }

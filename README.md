@@ -235,7 +235,6 @@ See `src/tools/hello/index.ts` for a complete, working example.
 bun install
 bun run typecheck
 bun test
-bun run compile
 ```
 
 ## License

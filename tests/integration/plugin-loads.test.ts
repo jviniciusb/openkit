@@ -1,11 +1,14 @@
 import { expect, test } from "bun:test"
-import { spawnSync } from "node:child_process"
+import { readFileSync } from "node:fs"
 
-test("bun build produces dist/plugin.js exporting a plugin object", async () => {
-  const b = spawnSync("bun", ["run", "compile:plugin"], { cwd: process.cwd() })
-  expect(b.status).toBe(0)
-  // @ts-expect-error dist/plugin.js is untyped build output; runtime shape is asserted below.
-  const mod = await import("../../dist/plugin.js")
-  expect(mod.default.id).toBe("opencode-kit")
-  expect(typeof mod.default.setup).toBe("function")
+import plugin from "../../src/plugin"
+
+test("plugin entry exports { id, setup }", () => {
+  expect(plugin.id).toBe("opencode-kit")
+  expect(typeof plugin.setup).toBe("function")
+})
+
+test("root index.js re-exports the TypeScript plugin entry", () => {
+  const source = readFileSync(new URL("../../index.js", import.meta.url), "utf8")
+  expect(source).toContain("./src/plugin.ts")
 })
