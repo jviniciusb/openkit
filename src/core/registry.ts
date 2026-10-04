@@ -43,8 +43,11 @@ export async function registerTools(
     if (config?.enabled !== true) continue
 
     const created: Registration[] = []
-    const tracking: KitContext = {
-      ...ctx,
+    // Build the wrapper with `ctx` as its prototype rather than spreading it.
+    // A real V2 context may expose members through getters or on the prototype;
+    // spreading would copy only own enumerable properties and silently drop
+    // them. We override just the domains we need to track as own properties.
+    const overrides: Pick<KitContext, "tool" | "command" | "skill" | "session" | "storage"> = {
       tool: {
         async transform(callback) {
           const registration = await ctx.tool.transform(callback)
@@ -73,7 +76,9 @@ export async function registerTools(
           return registration
         },
       },
+      storage: ctx.storage,
     }
+    const tracking = Object.assign(Object.create(ctx) as KitContext, overrides)
 
     try {
       await tool.register(tracking, config.settings, makeKit(tool.id, tracking))

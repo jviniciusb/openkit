@@ -6,6 +6,42 @@ import { defineTool } from "../../src/core/tool"
 import { createLifecycle } from "../../src/plugin"
 import { createFakeContext } from "../../src/core/testing"
 
+test("a failing reload leaves no generation to double-dispose", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const proj = join(home, "proj")
+  mkdirSync(join(proj, ".opencode"), { recursive: true })
+  writeFileSync(join(proj, ".opencode", "opencode-kit.jsonc"),
+    `{ "tools": { "a": { "enabled": true } } }`)
+
+  let disposed = 0
+  const { ctx } = createFakeContext({ directory: proj,
+    onRegistration: () => ({ dispose: async () => { disposed++ } }) })
+
+  // Make the *next* bootstrap throw (via `ctx.options`) once armed.
+  const baseOptions = ctx.options
+  let explode = false
+  const failing = Object.create(ctx) as typeof ctx
+  Object.defineProperty(failing, "options", {
+    get() {
+      if (explode) throw new Error("options exploded")
+      return baseOptions
+    },
+  })
+
+  const a = defineTool({ id: "a", name: "A", description: "d", defaultSettings: {},
+    register(c) { return c.tool.transform(() => {}) } })
+
+  const life = await createLifecycle(failing, [a], {}, () => () => {})
+  expect(disposed).toBe(0)
+
+  explode = true
+  await expect(life.reload()).rejects.toThrow("options exploded")
+  expect(disposed).toBe(1) // gen1 released exactly once by the failed reload
+
+  await life.dispose()
+  expect(disposed).toBe(1) // nothing left to double-dispose
+})
+
 test("reload disposes previous registrations then re-registers", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const proj = join(home, "proj"); mkdirSync(join(proj, ".opencode"), { recursive: true })

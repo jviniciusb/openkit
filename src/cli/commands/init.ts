@@ -1,6 +1,6 @@
 import { join } from "node:path"
 
-import { globalConfigPath, projectConfigPath } from "../../config/discover"
+import { globalConfigPath, globalOpencodePath, projectConfigPath } from "../../config/discover"
 import { ensurePluginEntry, seedTools } from "../../config/edit"
 import type { ToolConfigEntry } from "../../config/types"
 import { tools } from "../../tools/index"
@@ -14,11 +14,6 @@ export interface InitOptions {
 
 /** The plugin id OpenCode should load for the whole kit. */
 const PLUGIN_ID = "opencode-kit"
-
-/** Absolute path of the global `opencode.json` (OpenCode's own config). */
-function globalOpencodePath(home: string): string {
-  return join(home, ".config", "opencode", "opencode.json")
-}
 
 /**
  * Handles `opencode-kit init [--project]`.

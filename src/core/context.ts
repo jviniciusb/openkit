@@ -81,6 +81,12 @@ export type HookHandler<Event = any> = (event: Event) => void | Promise<void>
 
 export interface SessionDomain {
   hook(name: string, handler: HookHandler): Promise<Registration>
+  /**
+   * Optional in-session output channel. When the harness exposes it, command
+   * results (e.g. `/kit list`) are delivered through it; callers fall back to
+   * their own stdout sink when absent.
+   */
+  prompt?(input: { sessionID: string; text: string }): Promise<void> | void
 }
 
 /**

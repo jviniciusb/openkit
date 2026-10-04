@@ -3,9 +3,31 @@ import { dirname, join, resolve } from "node:path"
 
 const CONFIG_FILE_NAME = "opencode-kit.jsonc"
 
+/** Environment lookup used to honor `XDG_CONFIG_HOME`. */
+export interface Env {
+  [key: string]: string | undefined
+  XDG_CONFIG_HOME?: string
+}
+
+/**
+ * Absolute path of the machine-global OpenCode config directory.
+ *
+ * Honors `XDG_CONFIG_HOME` when set (non-empty), matching OpenCode and other
+ * XDG-aware tools; otherwise falls back to `~/.config/opencode`.
+ */
+export function globalConfigDir(env: Env, home: string): string {
+  const xdg = env.XDG_CONFIG_HOME
+  return xdg !== undefined && xdg.length > 0 ? join(xdg, "opencode") : join(home, ".config", "opencode")
+}
+
 /** Absolute path of the machine-global kit config file. */
-export function globalConfigPath(home: string): string {
-  return join(home, ".config", "opencode", CONFIG_FILE_NAME)
+export function globalConfigPath(home: string, env: Env = process.env): string {
+  return join(globalConfigDir(env, home), CONFIG_FILE_NAME)
+}
+
+/** Absolute path of the machine-global OpenCode config (`opencode.json`). */
+export function globalOpencodePath(home: string, env: Env = process.env): string {
+  return join(globalConfigDir(env, home), "opencode.json")
 }
 
 /** Absolute path of the project-level kit config for `directory`. */
@@ -22,8 +44,12 @@ export function projectConfigPath(directory: string): string {
  * for `locationDirectory` and each ancestor up to the filesystem root, ordered
  * farthest → nearest so that nearer directories override farther ones.
  */
-export function discoverKitConfigFiles(locationDirectory: string, home: string): string[] {
-  const globalFile = globalConfigPath(home)
+export function discoverKitConfigFiles(
+  locationDirectory: string,
+  home: string,
+  env: Env = process.env,
+): string[] {
+  const globalFile = globalConfigPath(home, env)
 
   const ancestors: string[] = []
   let current = resolve(locationDirectory)

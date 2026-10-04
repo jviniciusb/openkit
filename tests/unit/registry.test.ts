@@ -44,3 +44,23 @@ test("a throwing tool is isolated and its partial registrations disposed", async
   expect(disposed).toBe(1)
   expect(res.registrations.length).toBe(1) // only "ok"
 })
+
+test("tracking wrapper preserves getter/prototype context members", async () => {
+  const { ctx } = createFakeContext()
+  const { app: _inherited, ...rest } = ctx
+  // `app` lives only on the prototype; a `{ ...ctx }` wrapper would drop it.
+  const proto = { get app() { return { version: "9.9.9" } } }
+  const protoCtx = Object.assign(Object.create(proto), rest) as typeof ctx
+
+  let seen: string | undefined
+  const probe = defineTool({ id: "probe", name: "Probe", description: "d", defaultSettings: {},
+    register(c) { seen = c.app.version; return c.tool.transform(() => {}) } })
+
+  await registerTools(
+    [probe],
+    new Map([["probe", { enabled: true, settings: {} }]]),
+    protoCtx,
+    () => kit,
+  )
+  expect(seen).toBe("9.9.9")
+})

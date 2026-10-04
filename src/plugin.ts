@@ -73,6 +73,12 @@ export async function bootstrap(
   )
   degraded.push(...result.degraded)
 
+  // Surface every degraded tool so a silently broken registration or invalid
+  // setting is visible in the session logs (spec §5.1/§6.3).
+  for (const entry of degraded) {
+    console.warn(`opencode-kit: tool "${entry.id}" degraded: ${entry.error}`)
+  }
+
   return {
     async dispose() {
       // Release every registration even if a disposer throws, so one faulty
@@ -192,6 +198,10 @@ export async function createLifecycle(
     return enqueue(async () => {
       if (stopped) return
       await current.dispose()
+      // Replace the disposed generation with an empty one before bootstrapping
+      // so a bootstrap rejection cannot leave `current` pointing at an
+      // already-disposed generation (which `dispose` would release twice).
+      current = { async dispose() {}, degraded: [] }
       // If disposal began while the prior generation was being released, the
       // queued disposable will collect whatever this task installs below.
       current = await bootstrap(ctx, tools, options)

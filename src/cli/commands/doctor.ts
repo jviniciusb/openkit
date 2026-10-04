@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 
-import { discoverKitConfigFiles } from "../../config/discover"
+import { discoverKitConfigFiles, globalOpencodePath } from "../../config/discover"
 import { resolveToolConfig } from "../../config/resolve"
 import type { KitConfigFile } from "../../config/types"
 import { resolveValidated } from "../../config/validate"
@@ -97,7 +97,7 @@ export async function doctorCommand(io: CliIo): Promise<number> {
 
   const candidates = [
     join(io.cwd, "opencode.json"),
-    join(io.home, ".config", "opencode", "opencode.json"),
+    globalOpencodePath(io.home),
   ]
   const active = candidates.some((path) => opencodeListsPlugin(path, "opencode-kit"))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)

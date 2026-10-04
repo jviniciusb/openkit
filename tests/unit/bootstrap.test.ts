@@ -50,6 +50,25 @@ test("explicit options layer over ctx.options without replacing it", async () =>
   await res.dispose()
 })
 
+test("bootstrap logs a warning for each degraded tool", async () => {
+  const { proj } = projectWithConfig(`{ "tools": { "a": { "enabled": true } } }`)
+  const { ctx } = createFakeContext({ directory: proj })
+  const warnings: string[] = []
+  const original = console.warn
+  console.warn = (...args: unknown[]) => {
+    warnings.push(args.map(String).join(" "))
+  }
+  try {
+    const a = defineTool({ id: "a", name: "A", description: "d", defaultSettings: {},
+      register() { throw new Error("no-register") } })
+    const res = await bootstrap(ctx, [a])
+    expect(warnings.some((w) => w.includes('tool "a" degraded') && w.includes("no-register"))).toBe(true)
+    await res.dispose()
+  } finally {
+    console.warn = original
+  }
+})
+
 test("dispose releases remaining registrations when one disposer throws", async () => {
   const { proj } = projectWithConfig(`{ "tools": { "a": { "enabled": true } } }`)
   let made = 0

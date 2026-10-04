@@ -21,6 +21,32 @@ export interface KitCommandDeps {
 /** Payload OpenCode passes to a slash command's `execute`. */
 interface KitCommandInput {
   arguments?: string
+  /** Session that invoked the command; used to route output through `prompt`. */
+  sessionID?: string
+}
+
+/**
+ * Resolves where command output goes: the session's `prompt` channel when the
+ * harness exposes one, otherwise the injected `stdout` sink (CLI/tests).
+ */
+function outputWriter(
+  ctx: KitContext,
+  deps: KitCommandDeps,
+  sessionID: string | undefined,
+): (s: string) => void {
+  const prompt = ctx.session.prompt
+  if (typeof prompt === "function" && sessionID !== undefined) {
+    return (text) => {
+      try {
+        void Promise.resolve(prompt.call(ctx.session, { sessionID, text })).catch((error) => {
+          console.warn("opencode-kit: failed to deliver /kit output", error)
+        })
+      } catch (error) {
+        console.warn("opencode-kit: failed to deliver /kit output", error)
+      }
+    }
+  }
+  return deps.stdout
 }
 
 /** Help text shown for missing or unknown subcommands. */
@@ -51,7 +77,7 @@ export async function registerKitCommand(
     editor.add({
       name: "kit",
       description: "Manage opencode-kit tools (list, enable, disable, config)",
-      execute: (input: KitCommandInput) => executeKitCommand(input, deps),
+      execute: (input: KitCommandInput) => executeKitCommand(input, ctx, deps),
     })
   })
 }
@@ -62,20 +88,25 @@ function tokenize(raw: string): string[] {
 }
 
 /** Dispatches one `/kit` invocation. */
-async function executeKitCommand(input: KitCommandInput, deps: KitCommandDeps): Promise<void> {
+async function executeKitCommand(
+  input: KitCommandInput,
+  ctx: KitContext,
+  deps: KitCommandDeps,
+): Promise<void> {
   const [sub, ...rest] = tokenize(input.arguments ?? "")
+  const scoped: KitCommandDeps = { ...deps, stdout: outputWriter(ctx, deps, input.sessionID) }
 
   switch (sub) {
     case "list":
-      return list(deps)
+      return list(scoped)
     case "enable":
-      return toggle(deps, rest[0], true)
+      return toggle(scoped, rest[0], true)
     case "disable":
-      return toggle(deps, rest[0], false)
+      return toggle(scoped, rest[0], false)
     case "config":
-      return configure(deps, rest)
+      return configure(scoped, rest)
     default:
-      deps.stdout(USAGE)
+      scoped.stdout(USAGE)
   }
 }
 

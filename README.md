@@ -163,7 +163,9 @@ If you install the plugin but neither `npx` nor a global CLI, the kit registers 
 ```
 
 Mutations edit the global config and trigger a reload, so the change takes effect
-without restarting.
+without restarting. Results are delivered through the session's `prompt`
+channel when the harness exposes one; otherwise the kit falls back to its own
+stdout sink (as when driving the command from a test harness).
 
 ## Adding a tool (authors)
 

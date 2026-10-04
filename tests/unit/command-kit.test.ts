@@ -6,6 +6,22 @@ import { registerKitCommand } from "../../src/commands/kit"
 import { createFakeContext } from "../../src/core/testing"
 import plugin from "../../src/plugin"
 
+test("`kit` routes output through session.prompt when available", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const { ctx, calls } = createFakeContext()
+  const prompts: Array<{ sessionID: string; text: string }> = []
+  ctx.session.prompt = (input) => {
+    prompts.push(input)
+  }
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: () => {} })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+  await cmd.execute({ arguments: "list", sessionID: "s1" })
+
+  expect(prompts.length).toBeGreaterThan(0)
+  expect(prompts.every((p) => p.sessionID === "s1")).toBe(true)
+  expect(prompts.some((p) => p.text.includes("hello"))).toBe(true)
+})
+
 test("`kit enable hello` writes config and triggers reload", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   let reloaded = 0
