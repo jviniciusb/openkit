@@ -1,7 +1,7 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 import { homedir } from "node:os"
 
-import { runCli } from "../dist/cli.js"
+import { runCli } from "../src/cli/index.ts"
 
 process.exit(
   await runCli(process.argv.slice(2), {
