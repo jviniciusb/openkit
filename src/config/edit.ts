@@ -154,16 +154,28 @@ function hasPluginEntry(plugins: unknown[], pluginId: string): boolean {
  * Ensures the `opencode.json` at `path` lists `pluginId` in its `plugins` array.
  *
  * The plugin id is appended only when absent, so repeated calls never duplicate
- * an entry. The file is created when missing and edited comment-preservingly via
- * `jsonc-parser`, so the surrounding `opencode.json` content is retained.
+ * an entry. A missing file (or missing `plugins` key) is created with
+ * `[pluginId]`. When `plugins` is an existing array, the element is appended via
+ * its index path so comments, trailing commas, and formatting inside the array
+ * survive. A non-array `plugins` value is refused rather than overwritten.
  */
 export async function ensurePluginEntry(path: string, pluginId: string): Promise<void> {
   const text = readEditableText(path, "{}\n")
   const parsed = parse(text, [], READ_OPTIONS) as { plugins?: unknown } | undefined
-  const plugins = Array.isArray(parsed?.plugins) ? (parsed.plugins as unknown[]) : []
+  const plugins = parsed?.plugins
 
-  if (hasPluginEntry(plugins, pluginId)) return
+  if (plugins !== undefined && !Array.isArray(plugins)) {
+    throw new Error(`refusing to edit ${path}: "plugins" is not an array`)
+  }
 
-  const edits = modify(text, ["plugins"], [...plugins, pluginId], MODIFY_OPTIONS)
+  if (Array.isArray(plugins)) {
+    if (hasPluginEntry(plugins, pluginId)) return
+    // Append through the element path so the existing array text is untouched.
+    const edits = modify(text, ["plugins", plugins.length], pluginId, MODIFY_OPTIONS)
+    applyAndWrite(path, text, edits)
+    return
+  }
+
+  const edits = modify(text, ["plugins"], [pluginId], MODIFY_OPTIONS)
   applyAndWrite(path, text, edits)
 }

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { parse } from "jsonc-parser"
 import type { KitConfigFile } from "../../src/config/types"
-import { setToolEnabled, setToolSetting } from "../../src/config/edit"
+import { setToolEnabled, setToolSetting, ensurePluginEntry } from "../../src/config/edit"
 
 function readConfig(path: string): { text: string; data: KitConfigFile } {
   const text = readFileSync(path, "utf8")
@@ -94,4 +94,48 @@ test.each([
   const data = parse(readFileSync(f, "utf8")) as KitConfigFile
   expect(data.configVersion).toBe(1)
   expect(data.tools?.a?.enabled).toBe(true)
+})
+
+test("ensurePluginEntry appends through the element path and preserves the array", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode.json")
+  writeFileSync(f, `{\n  "plugins": [\n    // keep this comment\n    "other-plugin"\n  ]\n}`)
+
+  await ensurePluginEntry(f, "opencode-kit")
+
+  const text = readFileSync(f, "utf8")
+  expect(text).toContain("// keep this comment")
+  expect(text).toContain('"other-plugin"')
+  const data = parse(text) as { plugins: unknown[] }
+  expect(data.plugins).toEqual(["other-plugin", "opencode-kit"])
+
+  // Idempotent: a second call must not duplicate the entry.
+  await ensurePluginEntry(f, "opencode-kit")
+  expect((parse(readFileSync(f, "utf8")) as { plugins: unknown[] }).plugins).toEqual([
+    "other-plugin",
+    "opencode-kit",
+  ])
+})
+
+test("ensurePluginEntry creates the plugins array when it is absent", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode.json")
+  writeFileSync(f, `{ "theme": "dark" }`)
+
+  await ensurePluginEntry(f, "opencode-kit")
+
+  const data = parse(readFileSync(f, "utf8")) as { plugins: unknown[]; theme: string }
+  expect(data.plugins).toEqual(["opencode-kit"])
+  expect(data.theme).toBe("dark")
+})
+
+test("ensurePluginEntry refuses a non-array plugins value and leaves the file intact", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode.json")
+  const original = `{ "plugins": "opencode-kit" }\n`
+  writeFileSync(f, original)
+
+  await expect(ensurePluginEntry(f, "opencode-kit")).rejects.toThrow(/not an array/)
+
+  expect(readFileSync(f, "utf8")).toBe(original)
 })

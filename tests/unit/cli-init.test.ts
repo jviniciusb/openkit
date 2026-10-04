@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { initCommand } from "../../src/cli/commands/init"
+import { runCli } from "../../src/cli/index"
 
 test("init seeds config and adds plugin entry once", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
@@ -59,4 +60,33 @@ test("init appends the plugin entry to an existing opencode.json", async () => {
   const oc = JSON.parse(readFileSync(join(dir, "opencode.json"), "utf8"))
   expect(oc.plugins).toEqual(["other-plugin", "opencode-kit"])
   expect(oc.theme).toBe("dark")
+})
+
+test("init preserves comments and other entries inside the plugins array", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = join(home, ".config", "opencode")
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(
+    join(dir, "opencode.json"),
+    '{\n  "plugins": [\n    // keep this comment\n    "other-plugin"\n  ]\n}\n',
+  )
+  const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
+  await initCommand(io, {})
+  const text = readFileSync(join(dir, "opencode.json"), "utf8")
+  expect(text).toContain("// keep this comment")
+  expect(text).toContain('"other-plugin"')
+  expect(text).toContain('"opencode-kit"')
+})
+
+test("init refuses a non-array plugins value and leaves opencode.json intact", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = join(home, ".config", "opencode")
+  mkdirSync(dir, { recursive: true })
+  const original = '{ "plugins": "opencode-kit" }\n'
+  writeFileSync(join(dir, "opencode.json"), original)
+  let err = ""
+  const io = { cwd: home, home, stdout: () => {}, stderr: (s: string) => { err += s } }
+  expect(await runCli(["init"], io)).not.toBe(0)
+  expect(err).toContain("not an array")
+  expect(readFileSync(join(dir, "opencode.json"), "utf8")).toBe(original)
 })
