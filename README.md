@@ -37,22 +37,29 @@ installs the package into OpenCode's cache and loads every tool that is enabled
 in your config. Add the same spec to the `plugins` array of your
 `opencode.json(c)` if it is not added for you.
 
-### 2. Seed a config (optional but recommended)
+### 2. Configure (optional)
 
-```bash
-npx opencode-kit init            # global config + global opencode.json
-npx opencode-kit init --project  # project config + project opencode.json
+Seeding is optional — a tool with `defaultEnabled: true` works without a config
+file. To make the effective configuration explicit, create
+`~/.config/opencode/opencode-kit.jsonc` (or
+`<project>/.opencode/opencode-kit.jsonc`):
+
+```jsonc
+{
+  "tools": {
+    "hello": { "enabled": true }
+  }
+}
 ```
 
-`init` writes every shipped tool with its declared `enabled`/`settings`, so the
-effective configuration is explicit. It is idempotent: existing entries are never
-overwritten. Restart OpenCode afterwards to pick up the new plugin entry.
+The CLI's `init` seeds this from every tool's defaults; run it from a checkout
+(see [CLI access](#cli-access)). Restart OpenCode after changing `plugins` so it
+picks up the new entry.
 
 ### 3. Verify
 
-```bash
-npx opencode-kit doctor
-```
+In a session, run `/kit list` to show every tool and its resolved state; or from
+a checkout run `bun bin/opencode-kit.js doctor` (see [CLI access](#cli-access)).
 
 `doctor` checks that your kit config files parse, that no tool is degraded, and —
 best effort — that `opencode-kit` is listed in `opencode.json`.
@@ -69,13 +76,16 @@ with `doctor`.
 
 ### CLI access
 
+The CLI lives in the repo (it is not published to npm). Run it from a clone:
+
 ```bash
-npx opencode-kit <command>     # no install required
-npm i -g opencode-kit          # permanent `opencode-kit` command
+git clone https://github.com/jviniciusb/opencode-kit.git
+cd opencode-kit && bun install
+bun bin/opencode-kit.js <command>
 ```
 
-If you install neither, the plugin also registers a `/kit` slash command you can
-use from inside a session (see [The `/kit` command](#the-kit-command)).
+The plugin also registers a `/kit` slash command for use inside a session (see
+[The `/kit` command](#the-kit-command)).
 
 ## Configuration
 
@@ -135,7 +145,7 @@ tool's defaults; the kit and every other tool keep loading.
 
 ## CLI reference
 
-Run with `npx opencode-kit <command>` (or `opencode-kit` if installed globally).
+Run from a checkout: `bun bin/opencode-kit.js <command>`.
 Edits made by `enable`, `disable`, and `config set` go to the **global** config
 and preserve comments and formatting.
 
