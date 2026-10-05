@@ -1,6 +1,5 @@
 import { watch, type FSWatcher } from "node:fs"
 import { homedir } from "node:os"
-import { fileURLToPath } from "node:url"
 
 import { registerKitCommand } from "./commands/kit"
 import { createKitApi } from "./core/kit-api"
@@ -14,9 +13,6 @@ import { resolveToolConfig } from "./config/resolve"
 import { resolveValidated } from "./config/validate"
 import type { KitConfigFile, ResolvedToolConfig } from "./config/types"
 import { tools } from "./tools/index"
-
-/** Absolute path of this package's root, used to resolve bundled scripts. */
-const PACKAGE_ROOT = fileURLToPath(new URL("..", import.meta.url))
 
 /** Home directory used for the global config: `ctx.home`, then `options.home`, then the OS home. */
 function resolveHome(ctx: KitContext): string {
@@ -69,7 +65,7 @@ export async function bootstrap(
   }
 
   const result = await registerTools(tools, resolved, ctx, (toolId, toolCtx) =>
-    createKitApi(toolId, toolCtx, PACKAGE_ROOT, toolCtx.app.version),
+    createKitApi(toolId, toolCtx, toolCtx.app.version),
   )
   degraded.push(...result.degraded)
 

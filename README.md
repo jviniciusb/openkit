@@ -221,7 +221,7 @@ export default defineTool({
       name: "my-tool",
       description: "What the agent sees.",
       input: { type: "object", properties: {}, additionalProperties: false },
-      execute: () => "result",
+      execute: async () => ({ content: "result" }),
     })
   },
 })
