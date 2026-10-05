@@ -56,6 +56,11 @@ export async function registerTools(
           created.push(registration)
           return registration
         },
+        async hook(name, handler) {
+          const registration = await ctx.tool.hook(name, handler)
+          created.push(registration)
+          return registration
+        },
       },
       command: {
         async transform(callback) {

@@ -97,3 +97,46 @@ test("tracking wrapper preserves getter/prototype context members", async () => 
   )
   expect(seen).toBe("9.9.9")
 })
+
+test("a tool's execute.before hook is tracked and disposed with the tool", async () => {
+  let disposed = 0
+  const { ctx, calls } = createFakeContext({
+    onRegistration: () => ({ dispose: async () => { disposed++ } }),
+  })
+  const hooked = defineTool({ id: "hooked", name: "Hooked", description: "d", defaultSettings: {},
+    register(c) { return c.tool.hook("execute.before", () => {}) } })
+
+  const res = await registerTools(
+    [hooked],
+    new Map([["hooked", { enabled: true, settings: {} }]]),
+    ctx,
+    () => kit,
+  )
+
+  expect(res.degraded).toEqual([])
+  expect(calls.toolHook).toEqual(["execute.before"])
+  expect(res.registrations.length).toBe(1)
+  await res.registrations[0]!.dispose()
+  expect(disposed).toBe(1)
+})
+
+test("a tool whose hook registration throws is degraded without breaking siblings", async () => {
+  const { ctx } = createFakeContext()
+  // Simulate a host whose tool domain cannot register hooks: the tool must
+  // degrade in isolation, never break the kit or its siblings.
+  ;(ctx.tool as unknown as { hook(): Promise<never> }).hook = async () => {
+    throw new Error("hook unsupported")
+  }
+  const bad = defineTool({ id: "bad", name: "Bad", description: "d", defaultSettings: {},
+    register(c) { return c.tool.hook("execute.before", () => {}) } })
+
+  const res = await registerTools(
+    [ok, bad],
+    new Map([["ok", { enabled: true, settings: {} }], ["bad", { enabled: true, settings: {} }]]),
+    ctx,
+    () => kit,
+  )
+
+  expect(res.degraded.map((d) => d.id)).toEqual(["bad"])
+  expect(res.registrations.length).toBe(1)
+})
