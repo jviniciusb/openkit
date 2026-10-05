@@ -47,6 +47,13 @@ test("ignores non-object input without throwing", async () => {
   expect(event.input).toBe("not-an-object")
 })
 
+test("leaves null, undefined, and array input untouched without throwing", async () => {
+  for (const input of [null, undefined, [1, 2]]) {
+    const event = await runHook(input)
+    expect(event.input).toBe(input)
+  }
+})
+
 test("is an opt-in tool with the expected identity", () => {
   expect(backgroundSubagents.id).toBe("background-subagents")
   expect(backgroundSubagents.defaultEnabled).toBe(false)
