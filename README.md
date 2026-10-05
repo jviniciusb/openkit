@@ -14,11 +14,12 @@ their settings through configuration, without touching the plugin itself.
 - **Isolated:** one tool failing to configure never stops the kit or the other
   tools from loading.
 
-The package ships two tools: the [`hello`](src/tools/hello/index.ts) example
-(enabled by default), and
-[`background-subagents`](src/tools/background-subagents/index.ts) (opt-in),
-which forces every subagent call to run in the background so the parent keeps
-control while a child works.
+The package ships three tools: the [`hello`](src/tools/hello/index.ts) example
+(enabled by default), [`background-subagents`](src/tools/background-subagents/index.ts)
+(opt-in; forces every subagent call to run in the background so the parent keeps
+control while a child works), and
+[`context-injections`](src/tools/context-injections/index.ts) (opt-in; injects
+configured instructions into the system prompt).
 
 ## Requirements
 
@@ -131,7 +132,8 @@ concatenated).
       "enabled": true,
       "settings": { "greeting": "Hi there" }
     },
-    "background-subagents": { "enabled": true }
+    "background-subagents": { "enabled": true },
+    "context-injections": { "enabled": true }
   }
 }
 ```

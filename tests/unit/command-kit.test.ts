@@ -39,6 +39,7 @@ test("setup disposes the lifecycle when command registration fails", async () =>
   let disposed = 0
   const { ctx } = createFakeContext({
     directory: home,
+    home,
     onRegistration: () => ({ dispose: async () => { disposed++ } }),
   })
   const broken = {

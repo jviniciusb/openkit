@@ -40,6 +40,8 @@ export interface FakeContextCalls {
   command: unknown[]
   skill: unknown[]
   hook: string[]
+  /** Session-hook handlers, in the same order as `hook`. */
+  hookHandlers: HookHandler[]
   /** Tool `execute.before`/`execute.after` hooks, by name in call order. */
   toolHook: string[]
   /** The tool-hook handlers, in the same order as `toolHook`. */
@@ -89,7 +91,7 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
   ctx: KitContext
   calls: FakeContextCalls
 } {
-  const calls: FakeContextCalls = { tool: [], command: [], skill: [], hook: [], toolHook: [], toolHookHandlers: [] }
+  const calls: FakeContextCalls = { tool: [], command: [], skill: [], hook: [], hookHandlers: [], toolHook: [], toolHookHandlers: [] }
   const makeRegistration = overrides.onRegistration ?? (() => noopRegistration)
 
   const storage: KitStorage = {
@@ -140,8 +142,9 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
       },
     },
     session: {
-      async hook(name: string, _handler: HookHandler) {
+      async hook(name: string, handler: HookHandler) {
         calls.hook.push(name)
+        calls.hookHandlers.push(handler)
         return makeRegistration()
       },
     },

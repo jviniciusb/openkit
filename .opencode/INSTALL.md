@@ -64,8 +64,9 @@ bun bin/opencode-kit.js init --project  # project config + project opencode.json
 the plugin entry.
 
 **Fallback:** create the file by hand, seeded with the shipped tools — `hello`
-(enabled by default) and `background-subagents` (opt-in; forces every subagent
-call to run in the background):
+(enabled by default), `background-subagents` (opt-in; forces every subagent
+call to run in the background), and `context-injections` (opt-in; injects
+configured instructions into the system prompt):
 
 ```jsonc
 // ~/.config/opencode/opencode-kit.jsonc
@@ -74,7 +75,8 @@ call to run in the background):
   "configVersion": 1,
   "tools": {
     "hello": { "enabled": true, "settings": { "greeting": "Hello" } },
-    "background-subagents": { "enabled": false }
+    "background-subagents": { "enabled": false },
+    "context-injections": { "enabled": false }
   }
 }
 ```
