@@ -63,8 +63,9 @@ bun bin/opencode-kit.js init --project  # project config + project opencode.json
 `init` is idempotent — it never overwrites existing tool entries or duplicates
 the plugin entry.
 
-**Fallback:** create the file by hand, seeded with the shipped `hello` tool
-(enabled by default):
+**Fallback:** create the file by hand, seeded with the shipped tools — `hello`
+(enabled by default) and `background-subagents` (opt-in; forces every subagent
+call to run in the background):
 
 ```jsonc
 // ~/.config/opencode/opencode-kit.jsonc
@@ -72,7 +73,8 @@ the plugin entry.
   "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
   "configVersion": 1,
   "tools": {
-    "hello": { "enabled": true, "settings": { "greeting": "Hello" } }
+    "hello": { "enabled": true, "settings": { "greeting": "Hello" } },
+    "background-subagents": { "enabled": false }
   }
 }
 ```
