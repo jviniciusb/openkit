@@ -23,6 +23,16 @@
       // parent keeps control while a child works.
       "enabled": false,
       "settings": {}
+    },
+    "context-injections": {
+      // Opt-in: injects each string into the system prompt before every model
+      // request. The example below is the "think in code" nudge.
+      "enabled": false,
+      "settings": {
+        "instructions": [
+          "Think in code: when a task involves analyzing, counting, filtering, comparing, searching, parsing, or transforming data, write a small program and run it with the `execute` (Code Mode) tool or `shell`, printing only the answer. Program the analysis — do not pull files, logs, or API responses into the conversation to compute over them."
+        ]
+      }
     }
     // Add further tools as `"<tool-id>": { "enabled": true, "settings": { ... } }`.
     // A disabled tool's `register` never runs, so none of its tools, commands,
