@@ -14,8 +14,11 @@ their settings through configuration, without touching the plugin itself.
 - **Isolated:** one tool failing to configure never stops the kit or the other
   tools from loading.
 
-The package ships one example tool, [`hello`](src/tools/hello/index.ts), which is
-enabled by default.
+The package ships two tools: the [`hello`](src/tools/hello/index.ts) example
+(enabled by default), and
+[`background-subagents`](src/tools/background-subagents/index.ts) (opt-in),
+which forces every subagent call to run in the background so the parent keeps
+control while a child works.
 
 ## Requirements
 
@@ -127,7 +130,8 @@ concatenated).
     "hello": {
       "enabled": true,
       "settings": { "greeting": "Hi there" }
-    }
+    },
+    "background-subagents": { "enabled": true }
   }
 }
 ```

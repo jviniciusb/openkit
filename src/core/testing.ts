@@ -32,13 +32,18 @@ export interface FakeContextOptions {
  * `tool`/`command`/`skill` collect the definitions passed to `editor.add(...)`.
  * A transform whose callback adds nothing still records an invocation marker,
  * so `.length` reflects the number of transform calls. `hook` collects the
- * registered hook names.
+ * registered session hook names; `toolHook` collects tool-execution hook names
+ * and `toolHookHandlers` the handlers, both in call order.
  */
 export interface FakeContextCalls {
   tool: unknown[]
   command: unknown[]
   skill: unknown[]
   hook: string[]
+  /** Tool `execute.before`/`execute.after` hooks, by name in call order. */
+  toolHook: string[]
+  /** The tool-hook handlers, in the same order as `toolHook`. */
+  toolHookHandlers: HookHandler[]
   [key: string]: unknown[]
 }
 
@@ -84,7 +89,7 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
   ctx: KitContext
   calls: FakeContextCalls
 } {
-  const calls: FakeContextCalls = { tool: [], command: [], skill: [], hook: [] }
+  const calls: FakeContextCalls = { tool: [], command: [], skill: [], hook: [], toolHook: [], toolHookHandlers: [] }
   const makeRegistration = overrides.onRegistration ?? (() => noopRegistration)
 
   const storage: KitStorage = {
@@ -110,6 +115,11 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
         const editor = recordingEditor<ToolDefinition>(calls.tool)
         callback(editor)
         editor.finish()
+        return makeRegistration()
+      },
+      async hook(name: string, handler: HookHandler) {
+        calls.toolHook.push(name)
+        calls.toolHookHandlers.push(handler)
         return makeRegistration()
       },
     },

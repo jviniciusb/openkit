@@ -53,6 +53,27 @@ export interface ToolEditor {
   add(definition: ToolDefinition): void
 }
 
+/** Payload of the built-in tool `execute.before` hook. `input` is mutable. */
+export interface ToolExecuteBeforeEvent {
+  /** Effective name of the tool about to run, e.g. `"subagent"`. */
+  tool: string
+  /** Mutable tool input; assign or mutate it to change what executes. */
+  input: unknown
+  /** Invocation identifiers provided by the host. */
+  sessionID: string
+  agent: string
+  messageID: string
+  id: string
+  [key: string]: unknown
+}
+
+/** Tool domain: transforms add definitions; hooks intercept execution. */
+export interface ToolDomain {
+  transform(callback: (editor: ToolEditor) => void): Promise<Registration>
+  /** Register a tool-execution hook, e.g. `"execute.before"`. */
+  hook(name: string, handler: HookHandler): Promise<Registration>
+}
+
 export interface CommandDefinition {
   name: string
   description?: string
@@ -105,9 +126,7 @@ export interface KitContext {
   readonly location: { readonly directory: string }
   readonly options: Readonly<Record<string, unknown>>
   readonly storage: KitStorage
-  readonly tool: {
-    transform(callback: (editor: ToolEditor) => void): Promise<Registration>
-  }
+  readonly tool: ToolDomain
   readonly command: {
     transform(callback: (editor: CommandEditor) => void): Promise<Registration>
   }
