@@ -2,6 +2,7 @@ import { expect, test } from "bun:test"
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
+import pkg from "../../package.json"
 import { globalConfigPath } from "../../src/config/discover"
 import { doctorCommand, versionCommand } from "../../src/cli/commands/doctor"
 import { runCli } from "../../src/cli/index"
@@ -67,7 +68,7 @@ test("version prints CLI and plugin versions", async () => {
   expect(code).toBe(0)
   expect(h.out()).toContain("CLI")
   expect(h.out()).toContain("plugin")
-  expect(h.out()).toContain("0.1.0")
+  expect(h.out()).toContain(pkg.version)
 })
 
 test("runCli dispatches init, doctor, and version", async () => {
