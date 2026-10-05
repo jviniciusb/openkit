@@ -1,5 +1,3 @@
-import { join } from "node:path"
-
 import type {
   CommandDefinition,
   CommandEditor,
@@ -40,13 +38,11 @@ function scopedLogger(toolId: string): Logger {
  * The API is scoped to `toolId`: `namespace(name)` changes the name recorded
  * for subsequently registered tools/commands/skills (defaulting to `toolId`),
  * and each helper applies the current namespace to the editor before adding
- * the definition. `scriptPath` resolves bundled scripts under the installed
- * package's `scripts/<toolId>/` directory.
+ * the definition.
  */
 export function createKitApi(
   toolId: string,
   ctx: KitContext,
-  packageRoot: string,
   version: string,
 ): KitApi {
   let namespaceName = toolId
@@ -63,9 +59,6 @@ export function createKitApi(
   return {
     namespace(name: string) {
       namespaceName = name
-    },
-    scriptPath(name: string) {
-      return join(packageRoot, "scripts", toolId, name)
     },
     storage: ctx.storage,
     log: scopedLogger(toolId),
