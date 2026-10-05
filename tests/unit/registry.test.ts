@@ -7,7 +7,6 @@ import { createFakeContext } from "../../src/core/testing"
 const noop = () => ({ dispose() {} })
 const kit: KitApi = {
   namespace() {},
-  scriptPath: (n: string) => n,
   storage: {} as KitStorage,
   log: { debug(){}, info(){}, warn(){}, error(){} },
   version: "0.0.0",

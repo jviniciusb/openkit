@@ -40,8 +40,6 @@ export interface KitTool<S = unknown> {
 export interface KitApi {
   /** Sets the namespace applied by the `tool`/`command`/`skill` helpers. */
   namespace(toolId: string): void
-  /** Absolute path to a bundled script inside the installed package. */
-  scriptPath(name: string): string
   storage: KitStorage
   log: Logger
   version: string
