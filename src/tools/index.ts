@@ -1,4 +1,5 @@
 import type { KitTool } from "../core/tool"
+import { backgroundSubagents } from "./background-subagents/index"
 import { hello } from "./hello/index"
 
 /**
@@ -10,5 +11,6 @@ import { hello } from "./hello/index"
 export const tools: KitTool[] = [
   // <kit:tools>
   hello,
+  backgroundSubagents,
   // </kit:tools>
 ]

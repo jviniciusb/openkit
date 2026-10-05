@@ -6,8 +6,10 @@ Guidance for AI agents working in the **opencode-kit** repository.
 
 `opencode-kit` is an OpenCode V2 plugin that hosts independently toggleable
 tools. The framework (config, registry, CLI, tool contract) is the product; tools
-are added on top. The only shipped tool today is `hello`
-(`src/tools/hello/index.ts`).
+are added on top. Two tools ship today: `hello` (`src/tools/hello/index.ts`, the
+enabled-by-default example) and `background-subagents`
+(`src/tools/background-subagents/index.ts`, opt-in; forces every subagent call
+to run in the background).
 
 ## Commands
 
