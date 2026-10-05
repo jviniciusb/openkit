@@ -38,7 +38,7 @@ src/
 bin/opencode-kit.js     # CLI entry (runs the TS CLI via Bun)
 index.js                # package plugin entry -> src/plugin.ts
 opencode-kit.schema.json
-tests/unit, tests/integration
+tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptance (real opencode)
 .opencode/INSTALL.md    # agent-driven install for consumers
 ```
 
