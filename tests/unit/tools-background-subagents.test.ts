@@ -37,9 +37,10 @@ test("preserves model and sessionID while forcing background", async () => {
   })
 })
 
-test("leaves other tools untouched (shell)", async () => {
-  const event = await runHook({ command: "ls -la", workdir: "/tmp" }, "shell")
-  expect(event.input).toEqual({ command: "ls -la", workdir: "/tmp" })
+test("leaves other tools untouched (shell, same reference)", async () => {
+  const shellInput = { command: "ls -la", workdir: "/tmp" }
+  const event = await runHook(shellInput, "shell")
+  expect(event.input).toBe(shellInput)
 })
 
 test("ignores non-object input without throwing", async () => {
