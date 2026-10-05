@@ -38,6 +38,16 @@ test("scaffolds a tool dir and updates the barrel", async () => {
   expect(entryAt).toBeLessThan(closeAt)
 })
 
+test("generated tool uses the V2 executor shape (async → { content })", async () => {
+  const { root } = fixture()
+  await scaffoldTool(root, "my-tool")
+
+  const source = readFileSync(join(root, "src", "tools", "my-tool", "index.ts"), "utf8")
+  // Guards against the bare-string executor that fails at runtime.
+  expect(source).toContain("execute: async () => ({ content:")
+  expect(source).toContain("kit.tool(")
+})
+
 test("refuses to overwrite an existing tool", async () => {
   const { root } = fixture()
   mkdirSync(join(root, "src", "tools", "dup"), { recursive: true })

@@ -68,7 +68,7 @@ export default defineTool<${pascalCase(id)}Settings>({
         properties: {},
         additionalProperties: false,
       },
-      execute: () => "TODO: implement ${id}.",
+      execute: async () => ({ content: "TODO: implement ${id}." }),
     })
   },
 })
