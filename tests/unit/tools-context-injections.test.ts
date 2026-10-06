@@ -72,8 +72,12 @@ test("careful-changes is accepted by the settings schema", () => {
   expect(resolveValidated(contextInjections, { enabled: true, settings }).degraded).toBeUndefined()
 })
 
-test("think-in-code prefers focused tools and source reading", () => {
+test("think-in-code prioritizes matching skills, focused tools, and source reading", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "think-in-code")!.text.toLowerCase()
+  expect(text).toContain("skill descriptions")
+  expect(text).toContain("direct match")
+  expect(text).toContain("remote possibility")
+  expect(text).toContain("prefer available tools over memory")
   expect(text).toContain("mcp")
   expect(text).toContain("relevant fields")
   expect(text).toContain("small sample")
