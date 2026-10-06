@@ -28,11 +28,12 @@ unchanged.
 ### 3.1 Improve `think-in-code`
 
 Use the most specific available MCP tool, CLI, or project script before falling
-back to shell. For bulk counting, comparison, filtering, parsing, or
-summarization, inspect a small sample first, then use a short program or pipeline
-and print only the result plus necessary evidence. Read source directly when
-semantic understanding is needed; use code to reduce mechanical processing, not
-judgment.
+back to shell. Shape reads and queries to the relevant fields, ranges, matches,
+or excerpts. When size or structure is unknown, inspect metadata or a small
+sample first and expand selectively. For bulk counting, comparison, filtering,
+parsing, or summarization, use a short program or pipeline and print only the
+result plus necessary evidence. Read source directly when semantic understanding
+is needed; use code to reduce mechanical processing, not judgment.
 
 This narrows the current instruction to write a program for any data analysis and
 adds the user's tool-first and sample-first practices.
