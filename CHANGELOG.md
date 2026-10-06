@@ -6,6 +6,18 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-06
+
+### Added
+
+- `careful-changes` context-injection rule for scoped edits and evidence-based
+  review handling.
+
+### Changed
+
+- `think-in-code` to prefer focused tools and queries, sample before bulk work,
+  and read source directly for semantic understanding.
+
 ## [0.1.0] - 2026-10-01
 
 The first release of the opencode-kit framework.
@@ -30,5 +42,6 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.4.0...v0.5.0
 [0.1.0]: https://github.com/jviniciusb/opencode-kit/releases/tag/v0.1.0
