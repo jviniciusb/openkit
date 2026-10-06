@@ -1,7 +1,7 @@
 # Context-injection personal guidance — Design Spec
 
 - **Date:** 2026-10-06
-- **Status:** Draft for review
+- **Status:** Approved
 - **Topic:** Reuse personal agent guidance through opencode-kit context injections
 
 ## 1. Summary
