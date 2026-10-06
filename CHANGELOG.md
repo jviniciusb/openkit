@@ -6,6 +6,13 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-10-06
+
+### Changed
+
+- `think-in-code` now matches skills by workflow fit, including implicit matches,
+  while skipping speculative triggers.
+
 ## [0.5.1] - 2026-10-06
 
 ### Changed
@@ -49,7 +56,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.4.0...v0.5.0
 [0.1.0]: https://github.com/jviniciusb/opencode-kit/releases/tag/v0.1.0
