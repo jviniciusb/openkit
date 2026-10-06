@@ -7,7 +7,7 @@ import { defineTool, type KitTool } from "../../core/tool"
 export const BUILT_IN_RULES = [
   {
     id: "think-in-code",
-    text: "Use the most specific available MCP tool, CLI, or project script before shell. Shape reads and queries to the relevant fields, ranges, matches, or excerpts. When size or structure is unknown, inspect metadata or a small sample first and expand selectively. For bulk counting, comparison, filtering, parsing, or summarization, use a short program or pipeline with Code Mode or shell and print only the result plus necessary evidence. Read source directly when semantic understanding is needed; use code to reduce mechanical processing, not judgment.",
+    text: "Before substantive work, check available skill descriptions for a direct match and load the best fit before acting; don't invoke skills based on a remote possibility. For current facts, repository state, or requested operations, prefer available tools over memory and use the most specific MCP tool, CLI, or project script before shell. Shape reads and queries to the relevant fields, ranges, matches, or excerpts. When size or structure is unknown, inspect metadata or a small sample first and expand selectively. For bulk counting, comparison, filtering, parsing, or summarization, use a short program or pipeline with Code Mode or shell and print only the result plus necessary evidence. Read source directly when semantic understanding is needed; use code to reduce mechanical processing, not judgment.",
   },
   {
     id: "functional-programming",
