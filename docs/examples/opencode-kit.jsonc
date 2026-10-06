@@ -10,14 +10,6 @@
   "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
   "configVersion": 1,
   "tools": {
-    // The example tool. `enabled` defaults to its declared default (true for
-    // `hello`); state it explicitly so the effective config is obvious.
-    "hello": {
-      "enabled": true,
-      "settings": {
-        "greeting": "Hello"
-      }
-    },
     "background-subagents": {
       // Opt-in: forces every `subagent` call to run in the background so the
       // parent keeps control while a child works.
