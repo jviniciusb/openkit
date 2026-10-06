@@ -19,11 +19,11 @@ test("list reflects config-driven disable", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const globalFile = globalConfigPath(home)
   mkdirSync(dirname(globalFile), { recursive: true })
-  writeFileSync(globalFile, '{ "tools": { "background-subagents": { "enabled": true } } }')
+  writeFileSync(globalFile, '{ "tools": { "background-subagents": { "enabled": false } } }')
   let out = ""
   const code = await runCli(["list"], { cwd: home, home, stdout: (s) => { out += s }, stderr: () => {} })
   expect(code).toBe(0)
-  expect(out).toMatch(/background-subagents\s+enabled/)
+  expect(out).toMatch(/background-subagents\s+disabled/)
 })
 
 test("unknown command returns non-zero and reports to stderr", async () => {
