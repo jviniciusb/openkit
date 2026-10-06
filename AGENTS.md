@@ -10,8 +10,8 @@ are added on top. Three tools ship today: `hello` (`src/tools/hello/index.ts`, t
 enabled-by-default example), `background-subagents`
 (`src/tools/background-subagents/index.ts`, opt-in; forces every subagent call
 to run in the background), and `context-injections`
-(`src/tools/context-injections/index.ts`, opt-in; injects configured
-instructions into the system prompt).
+(`src/tools/context-injections/index.ts`, opt-in; injects built-in behavioral
+rules, each individually toggleable, plus your own instructions).
 
 ## Commands
 

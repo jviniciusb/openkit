@@ -25,13 +25,14 @@
       "settings": {}
     },
     "context-injections": {
-      // Opt-in: injects each string into the system prompt before every model
-      // request. The example below is the "think in code" nudge.
+      // Opt-in: injects built-in behavioral rules before every model request.
+      // Built-in rule ids: think-in-code, functional-programming, decomposition,
+      // subagent-driven. All default to on; disable the ones you don't want and
+      // add your own strings to `extra`.
       "enabled": false,
       "settings": {
-        "instructions": [
-          "Think in code: when a task involves analyzing, counting, filtering, comparing, searching, parsing, or transforming data, write a small program and run it with the `execute` (Code Mode) tool or `shell`, printing only the answer. Program the analysis — do not pull files, logs, or API responses into the conversation to compute over them."
-        ]
+        "rules": { "subagent-driven": false },
+        "extra": ["Any additional instruction you want injected."]
       }
     }
     // Add further tools as `"<tool-id>": { "enabled": true, "settings": { ... } }`.
