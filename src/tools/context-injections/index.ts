@@ -7,7 +7,7 @@ import { defineTool, type KitTool } from "../../core/tool"
 export const BUILT_IN_RULES = [
   {
     id: "think-in-code",
-    text: "Think in code: when a task involves analyzing, counting, filtering, comparing, searching, parsing, or transforming data, write a small program and run it with the `execute` (Code Mode) tool or `shell`, printing only the answer.",
+    text: "Use the most specific available MCP tool, CLI, or project script before shell. Shape reads and queries to the relevant fields, ranges, matches, or excerpts. When size or structure is unknown, inspect metadata or a small sample first and expand selectively. For bulk counting, comparison, filtering, parsing, or summarization, use a short program or pipeline with Code Mode or shell and print only the result plus necessary evidence. Read source directly when semantic understanding is needed; use code to reduce mechanical processing, not judgment.",
   },
   {
     id: "functional-programming",
@@ -20,6 +20,10 @@ export const BUILT_IN_RULES = [
   {
     id: "subagent-driven",
     text: "Keep your context small and linear — an index of consolidated, validated results, not a workspace. Delegate exploration, research, data-heavy analysis, and independent implementation or validation to subagents, and require each to hand back only its distilled conclusion. Fan out the independent pieces of your dependency graph to run in parallel, then fan in: consolidate their results, verify them against the goal, and keep only what matters. Never pull raw exploration, logs, or transcripts into your own context — that is the subagent's job. You still own the goal and the final result; don't delegate trivial, sequential, or overlapping work.",
+  },
+  {
+    id: "careful-changes",
+    text: "Before editing, read the relevant code and trace the real flow. Re-read each target immediately before changing it, keep edits scoped to the request, and preserve unrelated or concurrent work. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
   },
 ] as const
 
@@ -51,6 +55,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
       "functional-programming": true,
       decomposition: true,
       "subagent-driven": true,
+      "careful-changes": true,
     },
     extra: [],
   },
@@ -64,6 +69,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
           "functional-programming": { type: "boolean" },
           decomposition: { type: "boolean" },
           "subagent-driven": { type: "boolean" },
+          "careful-changes": { type: "boolean" },
         },
         additionalProperties: false,
       },
