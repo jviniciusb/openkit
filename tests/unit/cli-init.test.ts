@@ -12,20 +12,22 @@ test("init seeds config and adds plugin entry once", async () => {
   await initCommand(io, {})
   const cfg = globalConfigPath(home)
   expect(existsSync(cfg)).toBe(true)
-  expect(readFileSync(cfg, "utf8")).toContain("hello")
+  expect(readFileSync(cfg, "utf8")).toContain("background-subagents")
+  expect(readFileSync(cfg, "utf8")).not.toContain("hello")
   await initCommand(io, {}) // idempotent
   const oc = JSON.parse(readFileSync(globalOpencodePath(home), "utf8"))
   expect(oc.plugins.filter((p: string) => p === "opencode-kit").length).toBe(1)
 })
 
-test("init seeds the hello tool with its default enabled state and settings", async () => {
+test("init seeds shipped tools with their opt-in defaults", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
   await initCommand(io, {})
   const cfg = JSON.parse(readFileSync(globalConfigPath(home), "utf8"))
   expect(cfg.configVersion).toBe(1)
-  expect(cfg.tools.hello.enabled).toBe(true)
-  expect(cfg.tools.hello.settings).toEqual({ greeting: "Hello" })
+  expect(cfg.tools["background-subagents"].enabled).toBe(false)
+  expect(cfg.tools["context-injections"].enabled).toBe(false)
+  expect(cfg.tools.hello).toBeUndefined()
 })
 
 test("init does not clobber existing user edits or comments", async () => {

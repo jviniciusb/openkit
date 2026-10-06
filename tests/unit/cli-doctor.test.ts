@@ -42,7 +42,7 @@ test("doctor reports degraded tools without failing", async () => {
   mkdirSync(dir, { recursive: true })
   writeFileSync(
     join(dir, "opencode-kit.jsonc"),
-    '{ "tools": { "hello": { "settings": { "greeting": 42 } } } }',
+    '{ "tools": { "context-injections": { "settings": { "extra": 42 } } } }',
   )
   const h = io(home)
   const code = await doctorCommand(h.io)
