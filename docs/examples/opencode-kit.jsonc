@@ -19,8 +19,8 @@
     "context-injections": {
       // Opt-in: injects built-in behavioral rules before every model request.
       // Built-in rule ids: think-in-code, functional-programming, decomposition,
-      // subagent-driven. All default to on; disable the ones you don't want and
-      // add your own strings to `extra`.
+      // subagent-driven, careful-changes. All default to on; disable the ones you
+      // don't want and add your own strings to `extra`.
       "enabled": false,
       "settings": {
         "rules": { "subagent-driven": false },
