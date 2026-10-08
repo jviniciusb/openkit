@@ -38,5 +38,21 @@
     // Add further tools as `"<tool-id>": { "enabled": true, "settings": { ... } }`.
     // A disabled tool's `register` never runs, so none of its tools, commands,
     // skills, or hooks exist. `enable`/`disable` and `config set` write here.
+  },
+  "skills": {
+    // Skills are declarative instruction packages (`src/skills/<id>/SKILL.md`).
+    // Unlike tools they take no `settings` — only `enabled`. Both bundled
+    // skills default to on.
+    "english-writing-assistant": {
+      // Model-visible: advertised to the model so it can use the skill on its own.
+      "enabled": true
+    },
+    "sdd-flow": {
+      // Registered with `autoinvoke: false`, so it stays off the model's
+      // advertised list; invoke it explicitly with `@sdd-flow`.
+      "enabled": true
+    }
+    // Add further skills as `"<skill-id>": { "enabled": true }`.
+    // `enable`/`disable` and the `/kit` command write here.
   }
 }

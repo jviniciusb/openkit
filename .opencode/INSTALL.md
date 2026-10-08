@@ -7,9 +7,10 @@ OpenCode V2 setup. If you can read this file, follow it.
 > *Fetch and follow instructions from
 > https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/.opencode/INSTALL.md*
 
-opencode-kit is one OpenCode V2 plugin that hosts independently toggleable tools.
-Installing it means: register the plugin, seed its config, restart OpenCode, and
-verify. Do the four steps below in order and report the result to the user.
+opencode-kit is one OpenCode V2 plugin that hosts independently toggleable tools
+and skills. Installing it means: register the plugin, seed its config, restart
+OpenCode, and verify. Do the four steps below in order and report the result to
+the user.
 
 ## Before you start
 
@@ -51,9 +52,9 @@ The kit reads `opencode-kit.jsonc` from the global
 (`~/.config/opencode/opencode-kit.jsonc`) and/or project
 (`<project>/.opencode/opencode-kit.jsonc`) locations.
 
-**Preferred:** in an OpenCode session, use `/kit list` (and `/kit enable <tool>`)
-to see and toggle tools. To seed a config file from every tool's defaults, run
-the CLI from a checkout:
+**Preferred:** in an OpenCode session, use `/kit list` (and `/kit enable <id>`,
+`/kit disable <id>`) to see and toggle tools and skills. To seed a config file
+from every tool's and skill's defaults, run the CLI from a checkout:
 
 ```bash
 bun bin/opencode-kit.js init            # global config + global opencode.json
@@ -77,12 +78,22 @@ built-in behavioral rules, each individually toggleable, plus your own):
     "hello": { "enabled": true, "settings": { "greeting": "Hello" } },
     "background-subagents": { "enabled": false },
     "context-injections": { "enabled": false }
+  },
+  "skills": {
+    "english-writing-assistant": { "enabled": true },
+    "sdd-flow": { "enabled": true }
   }
 }
 ```
 
-Do not create a config if the user already has one; merge missing tool entries
-into it instead.
+The kit also ships two **skills**, both enabled by default:
+`english-writing-assistant` (model-visible) and `sdd-flow` (invoked explicitly
+with `@sdd-flow`). Skills take no `settings` — only `enabled`. Disable one with
+`/kit disable <skill-id>` in a session, or
+`bun bin/opencode-kit.js disable <skill-id>` from a checkout.
+
+Do not create a config if the user already has one; merge missing tool and skill
+entries into it instead.
 
 A project file only needs the values that differ from global. Settings
 deep-merge; `enabled` and arrays replace. Precedence, low → high:
@@ -116,6 +127,7 @@ Success looks like:
 ```text
 config: ok (1 file)
 tools: ok
+skills: ok
 plugin: active
 ```
 
@@ -123,21 +135,23 @@ plugin: active
   user.
 - `tool: degraded …` means a tool's settings failed validation. The kit still
   loads and that tool uses its defaults; report it, and fix the settings.
+- `skill: error …` means a bundled skill's `SKILL.md` could not be loaded; the
+  kit still loads the other skills. Report it (doctor exits non-zero).
 - `plugin: not listed (best effort)` means no `opencode.json` in the project or
   global location lists `opencode-kit`. If you added the entry, confirm the file
   path and restart.
 
 You can also run `/kit list` in a session, or `bun bin/opencode-kit.js list` from
-a checkout, to show every tool and its enabled state.
+a checkout, to show every tool and skill and its enabled state.
 
 ## Fallback: the `/kit` command
 
 The plugin exposes these operations from inside a session (no CLI needed):
 
 ```text
-/kit list                        # show tools and their state
-/kit enable <tool>               # enable a tool (global config)
-/kit disable <tool>              # disable a tool (global config)
+/kit list                        # show tools and skills, and their state
+/kit enable <id>                 # enable a tool or skill (global config)
+/kit disable <id>                # disable a tool or skill (global config)
 /kit config <tool> <key> <value> # set a tool setting (global config)
 ```
 
@@ -151,4 +165,4 @@ Tell the user, concisely:
 1. Which `opencode.json(c)` you edited and that `opencode-kit` was added.
 2. Which config file you created or updated.
 3. That OpenCode needs a restart (done or pending).
-4. The `doctor` output showing config/tools/plugin status.
+4. The `doctor` output showing config/tools/skills/plugin status.
