@@ -184,6 +184,9 @@ function updateSkillBarrel(barrel: string, id: string): string {
   if (!/^export const skills\b/m.test(barrel)) {
     throw new Error(`src/skills/index.ts is missing the skills export`)
   }
+  if (!barrel.includes("import { defineSkill")) {
+    throw new Error(`src/skills/index.ts is missing the defineSkill import`)
+  }
 
   const entry = `\n  defineSkill({ id: "${id}", dir: new URL("./${id}/", import.meta.url) }),`
   return barrel.replace(SKILL_OPEN_MARKER, `${SKILL_OPEN_MARKER}${entry}`)

@@ -25,6 +25,17 @@ test("list reflects config-driven disable", async () => {
   expect(out).toMatch(/hello\s+disabled/)
 })
 
+test("list reflects config-driven skill disable", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const globalFile = globalConfigPath(home)
+  mkdirSync(dirname(globalFile), { recursive: true })
+  writeFileSync(globalFile, '{ "skills": { "sdd-flow": { "enabled": false } } }')
+  let out = ""
+  const code = await runCli(["list"], { cwd: home, home, stdout: (s) => { out += s }, stderr: () => {} })
+  expect(code).toBe(0)
+  expect(out).toMatch(/sdd-flow\s+disabled/)
+})
+
 test("list prints a tools section and a skills section", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   let out = ""

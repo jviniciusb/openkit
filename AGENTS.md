@@ -57,9 +57,10 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
   flags that are not implemented. Implemented CLI subcommands: `init`, `list`,
   `enable`, `disable`, `config get|set`, `new`, `new-skill`, `doctor`,
   `version`.
-- **Isolation is a hard requirement.** Every tool's `register` runs in try/catch;
-  failures become `degraded` entries and partial registrations are disposed.
-  Never let one tool break the kit or its siblings.
+- **Isolation is a hard requirement.** Every tool's and skill's registration runs
+  in try/catch; failures become `degraded` entries and a tool's partial
+  registrations are disposed. Never let one tool or skill break the kit or its
+  siblings.
 - **Config edits preserve comments.** Use the `jsonc-parser` helpers in
   `src/config/edit.ts`. Do not rewrite config with `JSON.stringify`.
 - **Explicit registration.** Tools and skills are discovered from typed barrels
