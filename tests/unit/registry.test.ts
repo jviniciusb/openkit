@@ -1,7 +1,12 @@
 import { expect, test } from "bun:test"
+import { mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
 import { defineTool, type KitApi } from "../../src/core/tool"
 import { type KitContext, type KitStorage } from "../../src/core/context"
-import { registerTools } from "../../src/core/registry"
+import { defineSkill, type KitSkill } from "../../src/core/skill"
+import { registerTools, registerSkills } from "../../src/core/registry"
 import { createFakeContext } from "../../src/core/testing"
 
 const noop = () => ({ dispose() {} })
@@ -139,4 +144,41 @@ test("a tool whose hook registration throws is degraded without breaking sibling
 
   expect(res.degraded.map((d) => d.id)).toEqual(["bad"])
   expect(res.registrations.length).toBe(1)
+})
+
+function skillDir(id: string, md: string | null): KitSkill {
+  const dir = mkdtempSync(join(tmpdir(), "skill-"))
+  if (md !== null) writeFileSync(join(dir, "SKILL.md"), md)
+  return defineSkill({ id, dir: pathToFileURL(`${dir}/`) })
+}
+
+test("registerSkills registers enabled skills and skips disabled ones", async () => {
+  const { ctx, calls } = createFakeContext()
+  const res = await registerSkills(
+    [skillDir("on", "---\nname: On\n---\nx"), skillDir("off", "---\nname: Off\n---\nx")],
+    new Map([["on", { enabled: true }], ["off", { enabled: false }]]),
+    ctx,
+  )
+  expect(calls.skill.length).toBe(1)
+  expect(res.degraded).toEqual([])
+  expect(res.registrations.length).toBe(1)
+})
+
+test("a skill missing SKILL.md degrades only itself, tagged kind: skill", async () => {
+  const { ctx, calls } = createFakeContext()
+  const res = await registerSkills(
+    [skillDir("good", "---\nname: Good\n---\nx"), skillDir("broken", null)],
+    new Map([["good", { enabled: true }], ["broken", { enabled: true }]]),
+    ctx,
+  )
+  expect(calls.skill.length).toBe(1)
+  expect(res.degraded).toEqual([{ kind: "skill", id: "broken", error: expect.any(String) }])
+})
+
+test("registerTools tags degraded entries kind: tool", async () => {
+  const { ctx } = createFakeContext()
+  const bad = defineTool({ id: "bad", name: "Bad", description: "d", defaultSettings: {},
+    register() { throw new Error("nope") } })
+  const res = await registerTools([bad], new Map([["bad", { enabled: true, settings: {} }]]), ctx, () => kit)
+  expect(res.degraded).toEqual([{ kind: "tool", id: "bad", error: "nope" }])
 })

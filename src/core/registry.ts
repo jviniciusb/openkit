@@ -1,9 +1,11 @@
 import type { KitContext, Registration } from "./context"
 import type { KitApi, KitTool } from "./tool"
-import type { ResolvedToolConfig } from "../config/types"
+import { registerSkill, type KitSkill } from "./skill"
+import type { ResolvedSkillConfig, ResolvedToolConfig } from "../config/types"
 
-/** A tool whose `register` threw; its partial registrations were disposed. */
-export interface DegradedTool {
+/** A tool or skill whose registration failed; its partial registrations were disposed. */
+export interface DegradedItem {
+  kind: "tool" | "skill"
   id: string
   error: string
 }
@@ -12,7 +14,7 @@ export interface RegisterToolsResult {
   /** Disposables created by tools that registered successfully, in tool order. */
   registrations: Registration[]
   /** Tools that failed to register, in the order they were attempted. */
-  degraded: DegradedTool[]
+  degraded: DegradedItem[]
 }
 
 /**
@@ -36,7 +38,7 @@ export async function registerTools(
   makeKit: (toolId: string, ctx: KitContext) => KitApi,
 ): Promise<RegisterToolsResult> {
   const registrations: Registration[] = []
-  const degraded: DegradedTool[] = []
+  const degraded: DegradedItem[] = []
 
   for (const tool of tools) {
     const config = resolved.get(tool.id)
@@ -105,7 +107,49 @@ export async function registerTools(
         }
       }
       degraded.push({
+        kind: "tool",
         id: tool.id,
+        error: error instanceof Error ? error.message : String(error),
+      })
+    }
+  }
+
+  return { registrations, degraded }
+}
+
+export interface RegisterSkillsResult {
+  /** Disposables created by skills that registered successfully, in skill order. */
+  registrations: Registration[]
+  /** Skills that failed to register, in the order they were attempted. */
+  degraded: DegradedItem[]
+}
+
+/**
+ * Registers every enabled skill, isolating failures per skill.
+ *
+ * A skill is skipped unless `resolved` contains it with `enabled: true`. Each
+ * enabled skill's `registerSkill` runs in array order. Unlike tools, a skill
+ * creates exactly one registration, so a throw leaves nothing partial to
+ * dispose; the skill is reported in `degraded` and its siblings are unaffected.
+ */
+export async function registerSkills(
+  skills: KitSkill[],
+  resolved: Map<string, ResolvedSkillConfig>,
+  ctx: KitContext,
+): Promise<RegisterSkillsResult> {
+  const registrations: Registration[] = []
+  const degraded: DegradedItem[] = []
+
+  for (const skill of skills) {
+    const config = resolved.get(skill.id)
+    if (config?.enabled !== true) continue
+
+    try {
+      registrations.push(await registerSkill(ctx, skill))
+    } catch (error) {
+      degraded.push({
+        kind: "skill",
+        id: skill.id,
         error: error instanceof Error ? error.message : String(error),
       })
     }
