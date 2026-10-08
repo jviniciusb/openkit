@@ -1,5 +1,18 @@
 import { expect, test } from "bun:test"
-import { readSkillFrontmatter, stripFrontmatter } from "../../src/core/skill"
+import { mkdtempSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { pathToFileURL } from "node:url"
+import {
+  defineSkill,
+  loadSkill,
+  readSkillFrontmatter,
+  registerSkill,
+  skillDescription,
+  stripFrontmatter,
+  type KitSkill,
+} from "../../src/core/skill"
+import { createFakeContext } from "../../src/core/testing"
 
 test("parses plain and quoted scalars and strips the frontmatter block", () => {
   const text = `---\nname: my-skill\ndescription: "A short line"\n---\n\n# Body\n`
@@ -39,4 +52,54 @@ test("malformed or unterminated frontmatter never throws", () => {
 
   expect(readSkillFrontmatter(`---\n: : :\nnot valid\n  indented\n---\nbody`)).toEqual({})
   expect(stripFrontmatter("")).toBe("")
+})
+
+function tempSkill(id: string, md: string): KitSkill {
+  const dir = mkdtempSync(join(tmpdir(), "skill-"))
+  writeFileSync(join(dir, "SKILL.md"), md)
+  return defineSkill({ id, dir: pathToFileURL(`${dir}/`) })
+}
+
+test("defineSkill defaults defaultEnabled to true", () => {
+  expect(defineSkill({ id: "s", dir: new URL("file:///x/") }).defaultEnabled).toBe(true)
+})
+
+test("loadSkill returns stripped content and a real absolute path", () => {
+  const md = `---\nname: s\ndescription: d\n---\n\n# Body\n`
+  const skill = tempSkill("s", md)
+  const info = loadSkill(skill)
+  expect(info.id).toBe("s")
+  expect(info.name).toBe("s")
+  expect(info.description).toBe("d")
+  expect(info.content).not.toContain("---")
+  expect(info.path.endsWith(join("SKILL.md"))).toBe(true)
+  expect(info.path.startsWith("/")).toBe(true)
+})
+
+test("loadSkill marks autoinvoke:false and omits it otherwise", () => {
+  expect(loadSkill(tempSkill("a", `---\ndisable-model-invocation: true\n---\nx`)).autoinvoke).toBe(false)
+  expect("autoinvoke" in loadSkill(tempSkill("b", `---\nname: b\n---\nx`))).toBe(false)
+})
+
+test("skillDescription returns description or empty string without throwing", () => {
+  expect(skillDescription(tempSkill("s", `---\ndescription: hi\n---\nx`))).toBe("hi")
+  const missing = defineSkill({ id: "gone", dir: new URL("file:///nonexistent-dir/") })
+  expect(skillDescription(missing)).toBe("")
+})
+
+test("the barrel autoinvoke override wins over frontmatter", () => {
+  const dir = mkdtempSync(join(tmpdir(), "skill-"))
+  writeFileSync(join(dir, "SKILL.md"), "---\nname: s\n---\nx")
+  const skill = defineSkill({ id: "s", dir: pathToFileURL(`${dir}/`), autoinvoke: false })
+  expect(loadSkill(skill).autoinvoke).toBe(false)
+})
+
+test("registerSkill adds the loaded info through ctx.skill.transform", async () => {
+  const { ctx, calls } = createFakeContext()
+  await registerSkill(ctx, tempSkill("s", `---\nname: S\ndescription: D\n---\nbody`))
+  const info = calls.skill[0] as { id: string; name: string; description: string; content: string }
+  expect(info.id).toBe("s")
+  expect(info.name).toBe("S")
+  expect(info.description).toBe("D")
+  expect(info.content).toBe("body")
 })
