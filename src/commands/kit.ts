@@ -3,10 +3,12 @@ import { discoverKitConfigFiles, globalConfigPath } from "../config/discover"
 import { setToolEnabled, setToolSetting } from "../config/edit"
 import { buildConfigLayers, resolveEffective, valuesEqual } from "../config/effective"
 import { loadKitConfig } from "../config/load"
-import { resolveToolConfig } from "../config/resolve"
+import { resolveSkillConfig, resolveToolConfig } from "../config/resolve"
 import type { KitConfigFile } from "../config/types"
 import { resolveValidated } from "../config/validate"
 import type { KitContext, Registration } from "../core/context"
+import { skillDescription } from "../core/skill"
+import { skills } from "../skills/index"
 import { tools } from "../tools/index"
 
 /** Injected environment for the `/kit` command (home, cwd, reload, output). */
@@ -114,14 +116,21 @@ async function executeKitCommand(
   }
 }
 
-/** Prints every shipped tool with its resolved enabled state. */
+/** Prints every shipped tool and skill with its resolved enabled state. */
 async function list(deps: KitCommandDeps): Promise<void> {
   const paths = discoverKitConfigFiles(deps.cwd, deps.home)
   const sources = await loadKitConfig(paths)
 
+  deps.stdout("tools:\n")
   for (const tool of tools) {
     const { enabled } = resolveToolConfig(tool, sources)
-    deps.stdout(`${tool.id}\t${enabled ? "enabled" : "disabled"}\t${tool.description}`)
+    deps.stdout(`${tool.id}\t${enabled ? "enabled" : "disabled"}\t${tool.description}\n`)
+  }
+
+  deps.stdout("skills:\n")
+  for (const skill of skills) {
+    const { enabled } = resolveSkillConfig(skill, sources)
+    deps.stdout(`${skill.id}\t${enabled ? "enabled" : "disabled"}\t${skillDescription(skill)}\n`)
   }
 }
 

@@ -69,6 +69,17 @@ test("`kit config` warns through its output when the write degrades the tool", a
   expect(out).toContain("hello")
 })
 
+test("`kit list` includes skills", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let out = ""
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+  await cmd.execute({ arguments: "list", sessionID: "s" })
+  expect(out).toContain("skills:")
+  expect(out).toContain("sdd-flow")
+})
+
 test("`kit enable` warns when plugin options override the global write", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   let out = ""
