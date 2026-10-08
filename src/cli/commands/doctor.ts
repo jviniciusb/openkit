@@ -6,6 +6,8 @@ import { discoverKitConfigFiles, globalOpencodePath } from "../../config/discove
 import { resolveToolConfig } from "../../config/resolve"
 import type { KitConfigFile } from "../../config/types"
 import { resolveValidated } from "../../config/validate"
+import { loadSkill, type KitSkill } from "../../core/skill"
+import { skills as shippedSkills } from "../../skills/index"
 import { tools } from "../../tools/index"
 import pkg from "../../../package.json"
 import type { CliIo } from "./list"
@@ -72,11 +74,18 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
  * Handles `opencode-kit doctor`.
  *
  * Reports whether every discovered kit config parses, which tools are degraded
- * (invalid settings), and — best effort — whether the `opencode-kit` plugin is
- * listed in the relevant `opencode.json`. Only genuine config errors make the
- * command return non-zero; a missing plugin entry is advisory.
+ * (invalid settings), whether each shipped skill's `SKILL.md` loads, and — best
+ * effort — whether the `opencode-kit` plugin is listed in the relevant
+ * `opencode.json`. Config parse errors and skill load errors make the command
+ * return non-zero; degraded tools and a missing plugin entry are advisory.
+ *
+ * `skills` is injectable so tests can exercise load failures without touching
+ * the shipped set; it defaults to the barrel.
  */
-export async function doctorCommand(io: CliIo): Promise<number> {
+export async function doctorCommand(
+  io: CliIo,
+  skills: KitSkill[] = shippedSkills,
+): Promise<number> {
   const { configs, errors } = scanConfigs(io)
 
   if (errors.length === 0) {
@@ -95,6 +104,18 @@ export async function doctorCommand(io: CliIo): Promise<number> {
   }
   if (degraded === 0) io.stdout("tools: ok")
 
+  let skillErrors = 0
+  for (const skill of skills) {
+    try {
+      loadSkill(skill)
+    } catch (error) {
+      skillErrors += 1
+      const message = error instanceof Error ? error.message : String(error)
+      io.stdout(`skill: error ${skill.id} ${message}`)
+    }
+  }
+  if (skillErrors === 0) io.stdout("skills: ok")
+
   const candidates = [
     join(io.cwd, "opencode.json"),
     globalOpencodePath(io.home),
@@ -102,7 +123,7 @@ export async function doctorCommand(io: CliIo): Promise<number> {
   const active = candidates.some((path) => opencodeListsPlugin(path, "opencode-kit"))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)
 
-  return errors.length > 0 ? 1 : 0
+  return errors.length > 0 || skillErrors > 0 ? 1 : 0
 }
 
 /** Handles `opencode-kit version`: prints the CLI and plugin versions. */
