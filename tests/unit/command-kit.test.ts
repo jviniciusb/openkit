@@ -36,18 +36,23 @@ test("`kit enable hello` writes config and triggers reload", async () => {
 
 test("setup disposes the lifecycle when command registration fails", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
+  let made = 0
   let disposed = 0
   const { ctx } = createFakeContext({
     directory: home,
     home,
-    onRegistration: () => ({ dispose: async () => { disposed++ } }),
+    onRegistration: () => {
+      made++
+      return { dispose: async () => { disposed++ } }
+    },
   })
   const broken = {
     ...ctx,
     command: { async transform() { throw new Error("boom") } },
   }
   await expect(plugin.setup(broken)).rejects.toThrow("boom")
-  expect(disposed).toBe(1)
+  // The tool(s) and skill(s) registered during bootstrap were all released.
+  expect(disposed).toBe(made)
 })
 
 test("`kit config` warns through its output when the write degrades the tool", async () => {
