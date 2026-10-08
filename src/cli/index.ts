@@ -3,6 +3,7 @@ import { doctorCommand, versionCommand } from "./commands/doctor"
 import { initCommand } from "./commands/init"
 import { listCommand, type CliIo } from "./commands/list"
 import { newCommand } from "./commands/new"
+import { newSkillCommand } from "./commands/new-skill"
 import { toggleCommand } from "./commands/toggle"
 
 export type { CliIo }
@@ -41,6 +42,8 @@ async function dispatch(argv: string[], io: CliIo): Promise<number> {
       return listCommand(io)
     case "new":
       return newCommand(io, rest[0])
+    case "new-skill":
+      return newSkillCommand(io, rest[0])
     case "enable":
       return toggleCommand(io, rest[0], true)
     case "disable":
