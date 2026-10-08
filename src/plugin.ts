@@ -3,7 +3,7 @@ import { homedir } from "node:os"
 
 import { registerKitCommand } from "./commands/kit"
 import { createKitApi } from "./core/kit-api"
-import { registerTools, type DegradedTool } from "./core/registry"
+import { registerTools, type DegradedItem } from "./core/registry"
 import type { KitContext } from "./core/context"
 import type { KitTool } from "./core/tool"
 import { discoverKitConfigFiles } from "./config/discover"
@@ -27,7 +27,7 @@ export interface BootstrapResult {
   /** Disposes every registration created during bootstrap. */
   dispose(): Promise<void>
   /** Tools that could not be fully configured (invalid settings or failed registration). */
-  degraded: DegradedTool[]
+  degraded: DegradedItem[]
 }
 
 /**
@@ -56,12 +56,12 @@ export async function bootstrap(
   ]
 
   const resolved = new Map<string, ResolvedToolConfig<unknown>>()
-  const degraded: DegradedTool[] = []
+  const degraded: DegradedItem[] = []
 
   for (const tool of tools) {
     const { config, degraded: reason } = resolveValidated(tool, resolveToolConfig(tool, sources))
     resolved.set(tool.id, config as ResolvedToolConfig<unknown>)
-    if (reason !== undefined) degraded.push({ id: tool.id, error: reason })
+    if (reason !== undefined) degraded.push({ kind: "tool", id: tool.id, error: reason })
   }
 
   const result = await registerTools(tools, resolved, ctx, (toolId, toolCtx) =>
@@ -72,7 +72,7 @@ export async function bootstrap(
   // Surface every degraded tool so a silently broken registration or invalid
   // setting is visible in the session logs (spec §5.1/§6.3).
   for (const entry of degraded) {
-    console.warn(`opencode-kit: tool "${entry.id}" degraded: ${entry.error}`)
+    console.warn(`opencode-kit: ${entry.kind} "${entry.id}" degraded: ${entry.error}`)
   }
 
   return {
@@ -144,7 +144,7 @@ export interface Lifecycle {
   /** Disposes the current registrations and stops watching. */
   dispose(): Promise<void>
   /** Tools degraded in the current generation. */
-  degraded(): DegradedTool[]
+  degraded(): DegradedItem[]
 }
 
 /**
