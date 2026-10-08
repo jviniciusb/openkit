@@ -6,8 +6,12 @@ import { join } from "node:path"
 const OPEN_MARKER = "// <kit:tools>"
 /** Closing marker delimiting the generated tool entries in the barrel. */
 const CLOSE_MARKER = "// </kit:tools>"
+/** Opening marker delimiting the generated skill entries in the skills barrel. */
+const SKILL_OPEN_MARKER = "// <kit:skills>"
+/** Closing marker delimiting the generated skill entries in the skills barrel. */
+const SKILL_CLOSE_MARKER = "// </kit:skills>"
 
-/** Valid tool ids: kebab-case, starting with a lowercase letter. */
+/** Valid tool and skill ids: kebab-case, starting with a lowercase letter. */
 const TOOL_ID_RE = /^[a-z][a-z0-9-]*$/
 
 /** Converts a kebab-case id to its camelCase identifier (`my-tool` → `myTool`). */
@@ -81,6 +85,20 @@ function pascalCase(id: string): string {
   return camel.charAt(0).toUpperCase() + camel.slice(1)
 }
 
+/** Builds the `src/skills/<id>/SKILL.md` source for a new skill. */
+function renderSkill(id: string): string {
+  const name = displayName(id) || id
+  return `---
+name: ${name}
+description: "TODO: describe when and why to use the ${id} skill."
+---
+
+# ${name}
+
+TODO: describe what this skill does and how to use it.
+`
+}
+
 /**
  * Inserts the new tool's import and barrel entry into `src/tools/index.ts`.
  *
@@ -147,6 +165,71 @@ export async function scaffoldTool(root: string, toolId: string): Promise<{ dir:
 
   await mkdir(dir, { recursive: true })
   await writeFile(join(dir, "index.ts"), renderTool(toolId), "utf8")
+  await writeFile(barrelPath, updatedBarrel, "utf8")
+
+  return { dir }
+}
+
+/**
+ * Inserts the new skill's entry into `src/skills/index.ts`.
+ *
+ * The entry is placed immediately after the `// <kit:skills>` marker, keeping
+ * both markers intact. `defineSkill` is already imported by the barrel, so no
+ * import line is added.
+ */
+function updateSkillBarrel(barrel: string, id: string): string {
+  if (!barrel.includes(SKILL_OPEN_MARKER) || !barrel.includes(SKILL_CLOSE_MARKER)) {
+    throw new Error(`src/skills/index.ts is missing the <kit:skills> markers`)
+  }
+  if (!/^export const skills\b/m.test(barrel)) {
+    throw new Error(`src/skills/index.ts is missing the skills export`)
+  }
+
+  const entry = `\n  defineSkill({ id: "${id}", dir: new URL("./${id}/", import.meta.url) }),`
+  return barrel.replace(SKILL_OPEN_MARKER, `${SKILL_OPEN_MARKER}${entry}`)
+}
+
+/**
+ * Scaffolds a new kit skill under `root`.
+ *
+ * Creates `src/skills/<id>/SKILL.md` from the standard template and registers
+ * it in `src/skills/index.ts` between the `<kit:skills>` markers. Refuses to
+ * touch an existing skill directory so an in-progress skill is never
+ * overwritten.
+ *
+ * @returns The absolute path of the created skill directory.
+ */
+export async function scaffoldSkill(root: string, skillId: string): Promise<{ dir: string }> {
+  // Validate the id before any filesystem access: a malformed id could produce a
+  // broken barrel entry or, worse, escape `src/skills` via path traversal.
+  if (skillId.trim().length === 0) {
+    throw new Error("skill id is required")
+  }
+  if (!TOOL_ID_RE.test(skillId)) {
+    throw new Error(
+      `invalid skill id "${skillId}": expected kebab-case matching ${TOOL_ID_RE.source}`,
+    )
+  }
+
+  const dir = join(root, "src", "skills", skillId)
+  if (existsSync(dir)) {
+    throw new Error(`skill "${skillId}" already exists at ${dir}`)
+  }
+
+  const barrelPath = join(root, "src", "skills", "index.ts")
+  let barrel: string
+  try {
+    barrel = await readFile(barrelPath, "utf8")
+  } catch {
+    throw new Error(`cannot read ${barrelPath}`)
+  }
+
+  // Validate and compute the barrel update before writing anything, so a bad
+  // barrel never leaves a half-scaffolded skill behind.
+  const updatedBarrel = updateSkillBarrel(barrel, skillId)
+
+  await mkdir(dir, { recursive: true })
+  await writeFile(join(dir, "SKILL.md"), renderSkill(skillId), "utf8")
   await writeFile(barrelPath, updatedBarrel, "utf8")
 
   return { dir }
