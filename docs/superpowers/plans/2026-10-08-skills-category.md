@@ -126,6 +126,8 @@ git commit -m "feat: add skill frontmatter reader"
     id: string
     dir: URL
     defaultEnabled?: boolean
+    /** Kit-packaging override; wins over the SKILL.md frontmatter value. */
+    autoinvoke?: boolean
   }
   export function defineSkill(skill: KitSkill): KitSkill   // fills defaultEnabled: true
   export interface SkillInfo {
@@ -185,6 +187,13 @@ test("skillDescription returns description or empty string without throwing", ()
   expect(skillDescription(missing)).toBe("")
 })
 
+test("the barrel autoinvoke override wins over frontmatter", () => {
+  const dir = mkdtempSync(join(tmpdir(), "skill-"))
+  writeFileSync(join(dir, "SKILL.md"), "---\nname: s\n---\nx")
+  const skill = defineSkill({ id: "s", dir: pathToFileURL(`${dir}/`), autoinvoke: false })
+  expect(loadSkill(skill).autoinvoke).toBe(false)
+})
+
 test("registerSkill adds the loaded info through ctx.skill.transform", async () => {
   const { ctx, calls } = createFakeContext()
   await registerSkill(ctx, tempSkill("s", `---\nname: S\ndescription: D\n---\nbody`))
@@ -203,7 +212,7 @@ Expected: FAIL — `defineSkill`/`loadSkill`/`registerSkill` are not exported.
 
 - [ ] **Step 3: Implement the loader and registration**
 
-`loadSkill` reads `fileURLToPath(new URL("SKILL.md", skill.dir))` with `node:fs` `readFileSync` (throws if missing) and returns `{ id: skill.id, name: frontmatter.name ?? skill.id, description: frontmatter.description, path, content: stripFrontmatter(text) }`, adding `autoinvoke: false` only when the frontmatter says so. `skillDescription` wraps `loadSkill` in try/catch returning `description ?? ""`. `registerSkill` loads then calls `ctx.skill.transform((editor) => editor.add(info))` and returns the registration. Add `autoinvoke?: boolean` to `SkillDefinition` in `src/core/context.ts`.
+`loadSkill` reads `fileURLToPath(new URL("SKILL.md", skill.dir))` with `node:fs` `readFileSync` (throws if missing) and returns `{ id: skill.id, name: frontmatter.name ?? skill.id, description: frontmatter.description, path, content: stripFrontmatter(text) }`. Compute the effective autoinvoke as `skill.autoinvoke ?? frontmatter.autoinvoke`, adding `autoinvoke: false` only when that effective value is `false`. `skillDescription` wraps `loadSkill` in try/catch returning `description ?? ""`. `registerSkill` loads then calls `ctx.skill.transform((editor) => editor.add(info))` and returns the registration. Add `autoinvoke?: boolean` to `SkillDefinition` in `src/core/context.ts`.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -255,7 +264,7 @@ import { defineSkill, type KitSkill } from "../core/skill"
 export const skills: KitSkill[] = [
   // <kit:skills>
   defineSkill({ id: "english-writing-assistant", dir: new URL("./english-writing-assistant/", import.meta.url) }),
-  defineSkill({ id: "sdd-flow", dir: new URL("./sdd-flow/", import.meta.url) }),
+  defineSkill({ id: "sdd-flow", dir: new URL("./sdd-flow/", import.meta.url), autoinvoke: false }),
   // </kit:skills>
 ]
 ```
