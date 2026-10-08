@@ -144,6 +144,8 @@ export interface KitSkill {
   dir: URL
   /** Bundled skills default ON so installing the kit makes them available. */
   defaultEnabled?: boolean
+  /** Kit-packaging override for auto-invocation; wins over the frontmatter value. */
+  autoinvoke?: boolean
 }
 
 /** Normalizes the default: bundled skills are enabled unless they opt out. */
@@ -169,8 +171,11 @@ export const skills: KitSkill[] = [
 ### 5.1 Frontmatter reader
 
 `SKILL.md` is the single source of truth for `name`, `description`, and
-`autoinvoke` (portable, no duplication in the barrel). A small, tested reader
-(`readSkillFrontmatter(text)`) extracts only the fields the kit needs:
+`autoinvoke` (portable, no duplication in the barrel). A barrel-level
+`KitSkill.autoinvoke` overrides the frontmatter value, so a kit-packaging decision
+(such as sdd-flow's `false`) lives in the barrel and the vendored `SKILL.md` stays
+verbatim. A small, tested reader (`readSkillFrontmatter(text)`) extracts only the
+fields the kit needs:
 
 - `name`: plain or single/double-quoted single-line scalar.
 - `description`: plain/quoted single-line, or a folded (`>` / `>-`) or literal (`|` /
@@ -211,8 +216,9 @@ export async function registerSkill(ctx: KitContext, skill: KitSkill): Promise<R
   sample — required for sdd-flow's relative references.
 - `content` is the body with the leading frontmatter block removed, so the harness does
   not render frontmatter.
-- `autoinvoke` is set on the definition only when frontmatter says `false` (or
-  `disable-model-invocation: true`); omitted otherwise.
+- `autoinvoke` is set on the definition only when the effective value (the barrel's
+  `skill.autoinvoke` when present, otherwise the frontmatter's) is `false`; omitted
+  otherwise.
 - `SkillDefinition` in `src/core/context.ts` gains an optional `autoinvoke?: boolean`
   field for typing.
 
