@@ -440,17 +440,19 @@ Known content caveats, deliberately **not** rewritten here:
 - `BootstrapResult.degraded` gains a `kind` field; internals/tests updated accordingly
   (not a public API).
 
-## 15. Open questions
+## 15. Resolved decisions
 
-1. **Frontmatter reader scope.** Confirm the focused subset reader is acceptable versus
-   adding a YAML dependency. Recommendation: subset reader now; revisit only if richer
-   frontmatter appears.
-2. **`list` format.** Confirm `tools:` / `skills:` section headers are preferred over a
-   flat list (headers change existing output/tests).
-3. **sdd-flow invocation.** Confirm `@sdd-flow` (no kit command). If a real
-   `/sdd-flow` command is wanted, that is a follow-up scope.
-4. **Adapting vendored content.** Confirm shipping sdd-flow verbatim (external skill
-   references intact) rather than adapting it for OpenCode.
+Decided at spec review:
+
+1. **Frontmatter reader:** use the focused subset reader (`readSkillFrontmatter`), not a
+   YAML dependency. Revisit only if richer frontmatter appears.
+2. **`list` format:** use `tools:` / `skills:` section headers (existing output/tests
+   updated).
+3. **sdd-flow invocation:** `@sdd-flow` only; no kit-registered `/sdd-flow` command.
+4. **Vendored content:** ship sdd-flow verbatim, external skill references intact.
+
+Deferred follow-ups (not in scope): a real `/sdd-flow` command; adapting vendored
+sdd-flow content for OpenCode-resident companion skills.
 
 ## 16. Success criteria
 
