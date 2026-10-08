@@ -10,8 +10,14 @@ import {
 import { loadKitConfig } from "../../config/load"
 import { resolveToolConfig } from "../../config/resolve"
 import { resolveValidated } from "../../config/validate"
+import { skills } from "../../skills/index"
 import { tools } from "../../tools/index"
 import type { CliIo } from "./list"
+
+/** True when `id` names a shipped skill (which carries no settings). */
+function isSkillId(id: string | undefined): boolean {
+  return id !== undefined && skills.some((skill) => skill.id === id)
+}
 
 // Re-exported for callers that already reach the helper through the CLI module.
 export { coerceScalar }
@@ -34,6 +40,10 @@ export async function configCommand(io: CliIo, args: string[]): Promise<number> 
 async function configGet(io: CliIo, toolId: string | undefined, key: string | undefined): Promise<number> {
   const tool = tools.find((t) => t.id === toolId)
   if (tool === undefined) {
+    if (isSkillId(toolId)) {
+      io.stderr(`opencode-kit: skills have no settings: "${toolId}"`)
+      return 1
+    }
     io.stderr(`opencode-kit: unknown tool "${toolId ?? ""}"`)
     return 1
   }
@@ -63,6 +73,10 @@ async function configSet(
 ): Promise<number> {
   const tool = tools.find((t) => t.id === toolId)
   if (tool === undefined) {
+    if (isSkillId(toolId)) {
+      io.stderr(`opencode-kit: skills have no settings: "${toolId}"`)
+      return 1
+    }
     io.stderr(`opencode-kit: unknown tool "${toolId ?? ""}"`)
     return 1
   }

@@ -1,7 +1,12 @@
 import { coerceScalar } from "../config/coerce"
 import { discoverKitConfigFiles, globalConfigPath } from "../config/discover"
-import { setToolEnabled, setToolSetting } from "../config/edit"
-import { buildConfigLayers, resolveEffective, valuesEqual } from "../config/effective"
+import { setSkillEnabled, setToolEnabled, setToolSetting } from "../config/edit"
+import {
+  buildConfigLayers,
+  resolveEffective,
+  resolveSkillEffective,
+  valuesEqual,
+} from "../config/effective"
 import { loadKitConfig } from "../config/load"
 import { resolveSkillConfig, resolveToolConfig } from "../config/resolve"
 import type { KitConfigFile } from "../config/types"
@@ -67,10 +72,12 @@ const USAGE = [
  *
  * Supported forms:
  * - `list` — print every shipped tool with its resolved enabled state;
- * - `enable <id>` / `disable <id>` — write `tools[id].enabled` to the global
- *   kit config, then reload;
+ * - `enable <id>` / `disable <id>` — write `tools[id].enabled` (or, for a
+ *   shipped skill id, `skills[id].enabled`) to the global kit config, then
+ *   reload;
  * - `config <id> <key> <value>` — write `tools[id].settings[key]` to the global
- *   kit config (scalar coercion, comment-preserving), then reload.
+ *   kit config (scalar coercion, comment-preserving), then reload. Skill ids
+ *   are rejected: skills have no settings.
  *
  * The returned registration disposes the command; the caller owns its lifetime.
  */
@@ -134,7 +141,7 @@ async function list(deps: KitCommandDeps): Promise<void> {
   }
 }
 
-/** Enables or disables a known tool in the global config, then reloads. */
+/** Enables or disables a known tool or skill in the global config, then reloads. */
 async function toggle(
   deps: KitCommandDeps,
   toolId: string | undefined,
@@ -147,21 +154,37 @@ async function toggle(
     deps.stdout(`kit: ${verb} requires a tool id`)
     return
   }
+
   const tool = tools.find((candidate) => candidate.id === toolId)
-  if (tool === undefined) {
+  const skill = skills.find((candidate) => candidate.id === toolId)
+  if (tool === undefined && skill === undefined) {
     deps.stdout(`kit: unknown tool "${toolId}"`)
     return
   }
 
-  await setToolEnabled(globalConfigPath(deps.home), toolId, enabled)
-  deps.stdout(`${toolId} ${enabled ? "enabled" : "disabled"}`)
+  if (tool !== undefined) {
+    await setToolEnabled(globalConfigPath(deps.home), toolId, enabled)
+    deps.stdout(`${toolId} ${enabled ? "enabled" : "disabled"}`)
 
-  const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, pluginOptions)
-  const effective = resolveEffective(tool, layers)
-  if (effective.enabled !== enabled) {
-    deps.stdout(
-      `kit: warning: "${toolId}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
-    )
+    // Resolve after the write so the global layer reflects the new value.
+    const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, pluginOptions)
+    const effective = resolveEffective(tool, layers)
+    if (effective.enabled !== enabled) {
+      deps.stdout(
+        `kit: warning: "${toolId}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
+      )
+    }
+  } else if (skill !== undefined) {
+    await setSkillEnabled(globalConfigPath(deps.home), toolId, enabled)
+    deps.stdout(`${toolId} ${enabled ? "enabled" : "disabled"}`)
+
+    const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, pluginOptions)
+    const effective = resolveSkillEffective(skill, layers)
+    if (effective.enabled !== enabled) {
+      deps.stdout(
+        `kit: warning: "${toolId}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
+      )
+    }
   }
 
   await deps.reload()
@@ -181,6 +204,10 @@ async function configure(
   }
   const tool = tools.find((candidate) => candidate.id === toolId)
   if (tool === undefined) {
+    if (skills.some((skill) => skill.id === toolId)) {
+      deps.stdout(`kit: skills have no settings: "${toolId}"`)
+      return
+    }
     deps.stdout(`kit: unknown tool "${toolId}"`)
     return
   }
