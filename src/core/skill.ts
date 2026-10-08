@@ -7,6 +7,10 @@
  * Every other key is ignored. Malformed input never throws.
  */
 
+import { readFileSync } from "node:fs"
+import { fileURLToPath } from "node:url"
+import type { KitContext, Registration } from "./context"
+
 export interface SkillFrontmatter {
   name?: string
   description?: string
@@ -172,4 +176,71 @@ function parseBlock(block: string): SkillFrontmatter {
     result.autoinvoke = !disableInvocation
   }
   return result
+}
+
+/** A skill packaged by the kit: an id and the directory holding its `SKILL.md`. */
+export interface KitSkill {
+  id: string
+  dir: URL
+  defaultEnabled?: boolean
+  /** Kit-packaging override; wins over the SKILL.md frontmatter value. */
+  autoinvoke?: boolean
+}
+
+/** Normalizes a {@link KitSkill}, defaulting `defaultEnabled` to `true`. */
+export function defineSkill(skill: KitSkill): KitSkill {
+  return { ...skill, defaultEnabled: skill.defaultEnabled ?? true }
+}
+
+/** A loaded skill: frontmatter fields plus the real path and stripped body. */
+export interface SkillInfo {
+  id: string
+  name: string
+  description?: string
+  path: string
+  content: string
+  autoinvoke?: boolean
+}
+
+/**
+ * Reads a skill's `SKILL.md` into a {@link SkillInfo}.
+ *
+ * Throws only when the file is missing or unreadable; malformed frontmatter
+ * falls back to defaults (via {@link readSkillFrontmatter}). `path` is the real
+ * absolute path, so later tasks can resolve supporting files relative to it.
+ */
+export function loadSkill(skill: KitSkill): SkillInfo {
+  const path = fileURLToPath(new URL("SKILL.md", skill.dir))
+  const text = readFileSync(path, "utf8")
+  const frontmatter = readSkillFrontmatter(text)
+  const info: SkillInfo = {
+    id: skill.id,
+    name: frontmatter.name ?? skill.id,
+    description: frontmatter.description,
+    path,
+    content: stripFrontmatter(text),
+  }
+  const autoinvoke = skill.autoinvoke ?? frontmatter.autoinvoke
+  if (autoinvoke === false) info.autoinvoke = false
+  return info
+}
+
+/** Best-effort description read; returns `""` when the skill cannot be loaded. */
+export function skillDescription(skill: KitSkill): string {
+  try {
+    return loadSkill(skill).description ?? ""
+  } catch {
+    return ""
+  }
+}
+
+/** Loads a skill and registers its info through `ctx.skill.transform`. */
+export async function registerSkill(
+  ctx: KitContext,
+  skill: KitSkill,
+): Promise<Registration> {
+  const info = loadSkill(skill)
+  // Spread into a fresh literal: object literals satisfy the index signature
+  // `SkillDefinition` requires, while the `SkillInfo` interface does not.
+  return ctx.skill.transform((editor) => editor.add({ ...info }))
 }

@@ -92,6 +92,7 @@ export interface SkillDefinition {
   description?: string
   path?: string
   content?: string
+  autoinvoke?: boolean
   [key: string]: unknown
 }
 
