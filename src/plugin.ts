@@ -39,8 +39,9 @@ export interface BootstrapResult {
  * precedence, then `ctx.options`, then any explicit `options`), resolves and
  * validates each tool's effective config, then registers every enabled tool,
  * followed by every enabled skill. Per-item failures are isolated and reported
- * in `degraded`; the returned `dispose` releases every registration made, tools
- * first and then skills, in registration order.
+ * in `degraded`; the returned `dispose` releases every registration made
+ * concurrently via `Promise.allSettled`, so one failing disposer cannot block
+ * the rest.
  */
 export async function bootstrap(
   ctx: KitContext,
@@ -81,8 +82,8 @@ export async function bootstrap(
   const skillResult = await registerSkills(skills, resolvedSkills, ctx)
   degraded.push(...skillResult.degraded)
 
-  // Tools and skills share one ordered registration list so `dispose` releases
-  // them together (tools first, then skills) in registration order.
+  // Tools and skills share one registration list so `dispose` releases them
+  // together; disposal is concurrent and order-independent.
   const registrations = [...result.registrations, ...skillResult.registrations]
 
   // Surface every degraded item so a silently broken registration or invalid

@@ -52,6 +52,7 @@ test("setup disposes the lifecycle when command registration fails", async () =>
   }
   await expect(plugin.setup(broken)).rejects.toThrow("boom")
   // The tool(s) and skill(s) registered during bootstrap were all released.
+  expect(made).toBeGreaterThan(0)
   expect(disposed).toBe(made)
 })
 

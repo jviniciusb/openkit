@@ -61,7 +61,7 @@ bun bin/opencode-kit.js init            # global config + global opencode.json
 bun bin/opencode-kit.js init --project  # project config + project opencode.json
 ```
 
-`init` is idempotent — it never overwrites existing tool entries or duplicates
+`init` is idempotent — it never overwrites existing tool and skill entries or duplicates
 the plugin entry.
 
 **Fallback:** create the file by hand, seeded with the shipped tools — `hello`

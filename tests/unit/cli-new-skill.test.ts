@@ -47,6 +47,15 @@ test("refuses an existing skill and invalid ids without writing", async () => {
   }
 })
 
+test("refuses a barrel missing the defineSkill import", async () => {
+  const root = mkdtempSync(join(tmpdir(), "kit-"))
+  mkdirSync(join(root, "src", "skills"), { recursive: true })
+  const barrelPath = join(root, "src", "skills", "index.ts")
+  writeFileSync(barrelPath, `export const skills = [\n  // <kit:skills>\n  // </kit:skills>\n]\n`)
+  await expect(scaffoldSkill(root, "my-skill")).rejects.toThrow(/defineSkill/)
+  expect(existsSync(join(root, "src", "skills", "my-skill"))).toBe(false)
+})
+
 test("runCli dispatches new-skill", async () => {
   const { root } = fixture()
   const io = { cwd: root, home: root, stdout: () => {}, stderr: () => {} }

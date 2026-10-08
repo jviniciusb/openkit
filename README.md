@@ -223,7 +223,8 @@ and preserve comments and formatting.
 
 `enable`/`disable` resolve the id against tools first, then skills. `config
 get`/`config set` address tool settings only — skills expose just `enabled`.
-Unknown commands, unknown tool or skill ids, and malformed config exit non-zero.
+Unknown commands and unknown tool or skill ids exit non-zero; `doctor` and
+config-mutating commands fail on malformed config (`list` skips malformed files).
 
 ## The `/kit` command
 

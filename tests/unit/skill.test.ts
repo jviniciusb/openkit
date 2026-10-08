@@ -20,6 +20,14 @@ test("parses plain and quoted scalars and strips the frontmatter block", () => {
   expect(stripFrontmatter(text)).toBe("\n# Body\n")
 })
 
+test("CRLF line endings are normalized so frontmatter is detected and stripped", () => {
+  const text = `---\r\nname: s\r\ndescription: hi\r\n---\r\n\r\nbody\r\n`
+  expect(readSkillFrontmatter(text)).toEqual({ name: "s", description: "hi" })
+  const body = stripFrontmatter(text)
+  expect(body).not.toContain("---")
+  expect(body).toContain("body")
+})
+
 test("joins a folded (>-) description into one line", () => {
   const text = `---\nname: s\ndescription: >-\n  first line\n  second line\n---\nbody`
   expect(readSkillFrontmatter(text).description).toBe("first line second line")

@@ -32,10 +32,13 @@ function isIndented(line: string): boolean {
 
 /** Splits `---` fenced frontmatter from the body. Never throws. */
 function splitFrontmatter(text: string): FrontmatterSplit {
-  const lines = text.split("\n")
-  if (lines[0] !== DELIMITER) return { body: text }
+  // Normalize CRLF/CR so a `---\r` line is still recognized as the delimiter
+  // and the returned body is consistent across operating systems.
+  const normalized = text.replace(/\r\n?/g, "\n")
+  const lines = normalized.split("\n")
+  if (lines[0] !== DELIMITER) return { body: normalized }
   const end = lines.indexOf(DELIMITER, 1)
-  if (end === -1) return { body: text }
+  if (end === -1) return { body: normalized }
   return {
     block: lines.slice(1, end).join("\n"),
     body: lines.slice(end + 1).join("\n"),

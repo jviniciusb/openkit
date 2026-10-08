@@ -3,7 +3,11 @@ import type { KitApi, KitTool } from "./tool"
 import { registerSkill, type KitSkill } from "./skill"
 import type { ResolvedSkillConfig, ResolvedToolConfig } from "../config/types"
 
-/** A tool or skill whose registration failed; its partial registrations were disposed. */
+/**
+ * A tool or skill whose registration failed. Tools dispose any partial
+ * registrations they created before failing; skills create a single
+ * registration and therefore have none to dispose.
+ */
 export interface DegradedItem {
   kind: "tool" | "skill"
   id: string

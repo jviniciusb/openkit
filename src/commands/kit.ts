@@ -65,6 +65,7 @@ const USAGE = [
   "kit enable <id>",
   "kit disable <id>",
   "kit config <id> <key> <value>",
+  "<id> is a tool or skill id; config applies to tools only.",
 ].join("\n")
 
 /**
@@ -88,7 +89,7 @@ export async function registerKitCommand(
   return ctx.command.transform((editor) => {
     editor.add({
       name: "kit",
-      description: "Manage opencode-kit tools (list, enable, disable, config)",
+      description: "Manage opencode-kit tools and skills (list, enable, disable, config)",
       execute: (input: KitCommandInput) => executeKitCommand(input, ctx, deps),
     })
   })

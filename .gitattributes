@@ -1,0 +1,2 @@
+# Keep skill packages LF so the frontmatter reader and relative supporting files behave identically on every OS.
+src/skills/** text eol=lf
