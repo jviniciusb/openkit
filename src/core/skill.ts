@@ -42,21 +42,9 @@ function splitFrontmatter(text: string): FrontmatterSplit {
   }
 }
 
-/**
- * Removes a leading frontmatter block, returning the full text when absent.
- *
- * When a valid block exists, bare `---` lines are also dropped from the body:
- * a bare fence has no meaning in an injected skill, and some vendored bodies
- * use `---` purely as a section separator. Text with no valid block is
- * returned untouched.
- */
+/** Removes only the leading frontmatter block; the body is returned unchanged. */
 export function stripFrontmatter(text: string): string {
-  const { block, body } = splitFrontmatter(text)
-  if (block === undefined) return body
-  return body
-    .split("\n")
-    .filter((line) => line !== DELIMITER)
-    .join("\n")
+  return splitFrontmatter(text).body
 }
 
 /** Reads the supported frontmatter fields; returns `{}` on missing/malformed input. */
