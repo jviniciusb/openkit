@@ -91,3 +91,12 @@ test("init refuses a non-array plugins value and leaves opencode.json intact", a
   expect(err).toContain("not an array")
   expect(readFileSync(join(dir, "opencode.json"), "utf8")).toBe(original)
 })
+
+test("init seeds every skill with its declared default", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
+  await initCommand(io, {})
+  const cfg = JSON.parse(readFileSync(globalConfigPath(home), "utf8"))
+  expect(cfg.skills["english-writing-assistant"].enabled).toBe(true)
+  expect(cfg.skills["sdd-flow"].enabled).toBe(true)
+})
