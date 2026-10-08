@@ -9,7 +9,7 @@ import {
   type ModificationOptions,
   type ParseError,
 } from "jsonc-parser"
-import type { KitConfigFile, ToolConfigEntry } from "./types"
+import type { KitConfigFile, SkillConfigEntry, ToolConfigEntry } from "./types"
 
 /** Options used when `modify` has to create a JSON property. */
 const MODIFY_OPTIONS: ModificationOptions = {
@@ -17,7 +17,7 @@ const MODIFY_OPTIONS: ModificationOptions = {
 }
 
 /** Seed for a brand-new config file. */
-const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {} }
+const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {}, skills: {} }
 
 /** Parses JSONC options shared by every read in this module. */
 const READ_OPTIONS = {
@@ -82,6 +82,31 @@ function applyAndWrite(path: string, text: string, edits: Edit[]): void {
   writeFileSync(path, next)
 }
 
+/** Top-level config maps whose ids carry an entry object (`tools`, `skills`). */
+type EntryCategory = "tools" | "skills"
+
+/** An entry value that may live under an {@link EntryCategory} map. */
+type CategoryEntry = ToolConfigEntry | SkillConfigEntry
+
+/**
+ * Sets `<category>[id].enabled` in the config at `path`.
+ *
+ * The file is read as raw text (creating a default config when absent) and
+ * edited with `jsonc-parser`'s `modify`/`applyEdits`, so existing comments,
+ * key order, and indentation survive the round-trip. Missing intermediate
+ * objects (`category`, the entry) are created.
+ */
+async function setEntryEnabled(
+  path: string,
+  category: EntryCategory,
+  id: string,
+  enabled: boolean,
+): Promise<void> {
+  const text = readConfigText(path)
+  const edits = modify(text, [category, id, "enabled"], enabled, MODIFY_OPTIONS)
+  applyAndWrite(path, text, edits)
+}
+
 /**
  * Sets `tools[toolId].enabled` in the config at `path`.
  *
@@ -91,9 +116,21 @@ function applyAndWrite(path: string, text: string, edits: Edit[]): void {
  * objects (`tools`, the tool entry) are created.
  */
 export async function setToolEnabled(path: string, toolId: string, enabled: boolean): Promise<void> {
-  const text = readConfigText(path)
-  const edits = modify(text, ["tools", toolId, "enabled"], enabled, MODIFY_OPTIONS)
-  applyAndWrite(path, text, edits)
+  return setEntryEnabled(path, "tools", toolId, enabled)
+}
+
+/**
+ * Sets `skills[skillId].enabled` in the config at `path`.
+ *
+ * Shares {@link setEntryEnabled}'s comment-preserving read/modify/write and
+ * malformed-config refusal; missing `skills`/entry objects are created.
+ */
+export async function setSkillEnabled(
+  path: string,
+  skillId: string,
+  enabled: boolean,
+): Promise<void> {
+  return setEntryEnabled(path, "skills", skillId, enabled)
 }
 
 /**
@@ -113,10 +150,35 @@ export async function setToolSetting(
   applyAndWrite(path, text, edits)
 }
 
-/** True when a config document already declares `tools[toolId]`. */
-function hasToolEntry(text: string, toolId: string): boolean {
+/** True when a config document already declares `<category>[id]`. */
+function hasEntry(text: string, category: EntryCategory, id: string): boolean {
   const parsed = parse(text, [], READ_OPTIONS) as KitConfigFile | undefined
-  return parsed?.tools?.[toolId] !== undefined
+  return parsed?.[category]?.[id] !== undefined
+}
+
+/**
+ * Seeds entries into the kit config at `path` under `category`.
+ *
+ * Each seed is written only when `category[id]` is absent, so re-running
+ * `init` (and any hand-edited entry) is left untouched. Edits still go through
+ * `modify`/`applyEdits`, preserving comments and formatting; a missing file is
+ * created from the default config seed.
+ */
+async function seedEntries(
+  path: string,
+  category: EntryCategory,
+  seeds: Record<string, CategoryEntry>,
+): Promise<void> {
+  const text = readConfigText(path)
+
+  let next = text
+  for (const [id, entry] of Object.entries(seeds)) {
+    if (hasEntry(next, category, id)) continue
+    next = applyEdits(next, modify(next, [category, id], entry, MODIFY_OPTIONS))
+  }
+
+  mkdirSync(dirname(path), { recursive: true })
+  writeFileSync(path, next)
 }
 
 /**
@@ -131,16 +193,20 @@ export async function seedTools(
   path: string,
   seeds: Record<string, ToolConfigEntry>,
 ): Promise<void> {
-  const text = readConfigText(path)
+  return seedEntries(path, "tools", seeds)
+}
 
-  let next = text
-  for (const [toolId, entry] of Object.entries(seeds)) {
-    if (hasToolEntry(next, toolId)) continue
-    next = applyEdits(next, modify(next, ["tools", toolId], entry, MODIFY_OPTIONS))
-  }
-
-  mkdirSync(dirname(path), { recursive: true })
-  writeFileSync(path, next)
+/**
+ * Seeds skill entries into the kit config at `path`.
+ *
+ * Shares {@link seedEntries}'s add-only-when-missing semantics, so an existing
+ * `skills[id]` (including a disabled one) is never overwritten.
+ */
+export async function seedSkills(
+  path: string,
+  seeds: Record<string, SkillConfigEntry>,
+): Promise<void> {
+  return seedEntries(path, "skills", seeds)
 }
 
 /** Whether `plugins` already references `pluginId` (as a string or `[id, opts]`). */

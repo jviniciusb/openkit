@@ -4,7 +4,13 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { parse } from "jsonc-parser"
 import type { KitConfigFile } from "../../src/config/types"
-import { setToolEnabled, setToolSetting, ensurePluginEntry } from "../../src/config/edit"
+import {
+  setToolEnabled,
+  setToolSetting,
+  setSkillEnabled,
+  seedSkills,
+  ensurePluginEntry,
+} from "../../src/config/edit"
 
 function readConfig(path: string): { text: string; data: KitConfigFile } {
   const text = readFileSync(path, "utf8")
@@ -138,4 +144,32 @@ test("ensurePluginEntry refuses a non-array plugins value and leaves the file in
   await expect(ensurePluginEntry(f, "opencode-kit")).rejects.toThrow(/not an array/)
 
   expect(readFileSync(f, "utf8")).toBe(original)
+})
+
+test("setSkillEnabled flips value under skills and preserves comments", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, `{\n  // keep me\n  "skills": { "sdd-flow": { "enabled": true } },\n}`)
+  await setSkillEnabled(f, "sdd-flow", false)
+  const text = readFileSync(f, "utf8")
+  expect(text).toContain("// keep me")
+  expect((parse(text) as KitConfigFile).skills?.["sdd-flow"]?.enabled).toBe(false)
+})
+
+test("setSkillEnabled refuses to edit a malformed config and leaves it intact", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, "{ not json")
+  await expect(setSkillEnabled(f, "s", false)).rejects.toThrow(/malformed/)
+  expect(readFileSync(f, "utf8")).toBe("{ not json")
+})
+
+test("seedSkills only adds missing entries", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, `{ "skills": { "a": { "enabled": false } } }`)
+  await seedSkills(f, { a: { enabled: true }, b: { enabled: true } })
+  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
+  expect(data.skills?.a?.enabled).toBe(false)
+  expect(data.skills?.b?.enabled).toBe(true)
 })
