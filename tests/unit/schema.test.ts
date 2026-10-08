@@ -28,3 +28,10 @@ test("unknown top-level key is invalid (additionalProperties: false)", () => {
   }
   expect(validate(config)).toBe(false)
 })
+
+test("a skills section with enabled is valid", () => {
+  expect(validate({ configVersion: 1, skills: { "sdd-flow": { enabled: false } } })).toBe(true)
+})
+test("skill settings are not allowed", () => {
+  expect(validate({ configVersion: 1, skills: { s: { settings: {} } } })).toBe(false)
+})
