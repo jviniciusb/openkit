@@ -1,8 +1,9 @@
 import { join } from "node:path"
 
 import { globalConfigPath, globalOpencodePath, projectConfigPath } from "../../config/discover"
-import { ensurePluginEntry, seedTools } from "../../config/edit"
-import type { ToolConfigEntry } from "../../config/types"
+import { ensurePluginEntry, seedSkills, seedTools } from "../../config/edit"
+import type { SkillConfigEntry, ToolConfigEntry } from "../../config/types"
+import { skills } from "../../skills/index"
 import { tools } from "../../tools/index"
 import type { CliIo } from "./list"
 
@@ -19,10 +20,11 @@ const PLUGIN_ID = "opencode-kit"
  * Handles `opencode-kit init [--project]`.
  *
  * Creates the kit config (global by default, project with `--project`) and seeds
- * every shipped tool with its declared default `enabled`/`settings`. It also
+ * every shipped tool with its declared default `enabled`/`settings` and every
+ * shipped skill with its declared default `enabled`. It also
  * ensures the matching `opencode.json` lists `"opencode-kit"` in `plugins`,
- * creating that file when absent. Both writes are idempotent: existing tool
- * entries and plugin entries are never overwritten or duplicated.
+ * creating that file when absent. Both writes are idempotent: existing tool and
+ * skill entries, and plugin entries, are never overwritten or duplicated.
  */
 export async function initCommand(io: CliIo, options: InitOptions = {}): Promise<number> {
   const project = options.project ?? false
@@ -38,7 +40,13 @@ export async function initCommand(io: CliIo, options: InitOptions = {}): Promise
     }
   }
 
+  const skillSeeds: Record<string, SkillConfigEntry> = {}
+  for (const skill of skills) {
+    skillSeeds[skill.id] = { enabled: skill.defaultEnabled ?? true }
+  }
+
   await seedTools(configPath, seeds)
+  await seedSkills(configPath, skillSeeds)
   await ensurePluginEntry(opencodePath, PLUGIN_ID)
 
   io.stdout(`${project ? "project" : "global"} config ready: ${configPath}`)
