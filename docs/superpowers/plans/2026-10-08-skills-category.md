@@ -296,7 +296,9 @@ test("sdd-flow registers autoinvoke:false with a real directory and resolvable f
   const skill = skills.find((s) => s.id === "sdd-flow")!
   const info = loadSkill(skill)
   expect(info.autoinvoke).toBe(false)
-  expect(info.content).not.toContain("---")
+  expect(info.content).toContain("# SDD Flow")
+  expect(info.content).not.toContain("name: sdd-flow")
+  expect(info.content).toContain("\n---\n")
   for (const file of ["SKILL.md", "spec-template.md", "step-format.md", "update-refs.sh"]) {
     expect(existsSync(new URL(file, skill.dir))).toBe(true)
   }
