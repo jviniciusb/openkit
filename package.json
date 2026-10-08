@@ -8,7 +8,8 @@
     "opencode-v2",
     "ai",
     "coding-agent",
-    "tools"
+    "tools",
+    "skills"
   ],
   "homepage": "https://github.com/jviniciusb/opencode-kit#readme",
   "repository": {

@@ -5,13 +5,17 @@ Guidance for AI agents working in the **opencode-kit** repository.
 ## What this repo is
 
 `opencode-kit` is an OpenCode V2 plugin that hosts independently toggleable
-tools. The framework (config, registry, CLI, tool contract) is the product; tools
-are added on top. Three tools ship today: `hello` (`src/tools/hello/index.ts`, the
-enabled-by-default example), `background-subagents`
-(`src/tools/background-subagents/index.ts`, opt-in; forces every subagent call
-to run in the background), and `context-injections`
+tools and skills. The framework (config, registry, CLI, tool and skill contracts)
+is the product; tools and skills are added on top. Three tools ship today:
+`hello` (`src/tools/hello/index.ts`, the enabled-by-default example),
+`background-subagents` (`src/tools/background-subagents/index.ts`, opt-in; forces
+every subagent call to run in the background), and `context-injections`
 (`src/tools/context-injections/index.ts`, opt-in; injects built-in behavioral
-rules, each individually toggleable, plus your own instructions).
+rules, each individually toggleable, plus your own instructions). Two skills ship
+today, both enabled by default: `english-writing-assistant`
+(`src/skills/english-writing-assistant/SKILL.md`, model-visible) and `sdd-flow`
+(`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
+`@sdd-flow`).
 
 ## Commands
 
@@ -33,10 +37,12 @@ Run a single test file with `bun test tests/unit/<file>.test.ts`.
 src/
   plugin.ts             # Plugin.define + bootstrap/lifecycle orchestration
   config/               # discover, load, merge, resolve, validate, edit, types
-  core/                 # tool contract, registry, kit API, context, testing fakes
-  cli/                  # CLI entry and commands; scaffold.ts
+  core/                 # tool + skill contracts, registry, kit API, context, testing fakes
+  cli/                  # CLI entry and commands; scaffold.ts (tools and skills)
   tools/<id>/index.ts   # one folder per tool
   tools/index.ts        # explicit barrel with <kit:tools> markers
+  skills/<id>/SKILL.md  # one folder per skill (+ optional support files)
+  skills/index.ts       # explicit barrel with <kit:skills> markers
 bin/opencode-kit.js     # CLI entry (runs the TS CLI via Bun)
 index.js                # package plugin entry -> src/plugin.ts
 opencode-kit.schema.json
@@ -49,15 +55,17 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 - **Match the real behavior.** `README.md` and `.opencode/INSTALL.md` must
   describe what `src/` actually does. Do not document commands or commands'
   flags that are not implemented. Implemented CLI subcommands: `init`, `list`,
-  `enable`, `disable`, `config get|set`, `new`, `doctor`, `version`.
+  `enable`, `disable`, `config get|set`, `new`, `new-skill`, `doctor`,
+  `version`.
 - **Isolation is a hard requirement.** Every tool's `register` runs in try/catch;
   failures become `degraded` entries and partial registrations are disposed.
   Never let one tool break the kit or its siblings.
 - **Config edits preserve comments.** Use the `jsonc-parser` helpers in
   `src/config/edit.ts`. Do not rewrite config with `JSON.stringify`.
-- **Explicit registration.** Tools are discovered from the typed barrel
-  (`src/tools/index.ts`), not runtime globbing. Keep the `<kit:tools>` markers
-  intact; `opencode-kit new` inserts between them.
+- **Explicit registration.** Tools and skills are discovered from typed barrels
+  (`src/tools/index.ts`, `src/skills/index.ts`), not runtime globbing. Keep the
+  `<kit:tools>` and `<kit:skills>` markers intact; `opencode-kit new` and
+  `new-skill` insert between them.
 - **Tests accompany behavior.** Use `createFakeContext` from
   `src/core/testing.ts` for harness-style assertions. Add tests for new config
   precedence, registry behavior, CLI output, and tool registration.
@@ -97,5 +105,18 @@ tool.defaultSettings < global config < project config (farther→nearer)
 3. Add tests.
 4. Add an example entry to `docs/examples/opencode-kit.jsonc`.
 5. `bun run typecheck && bun test`.
+
+## Adding a skill
+
+1. `opencode-kit new-skill my-skill` (run from the repo root).
+2. Write `src/skills/my-skill/SKILL.md` (frontmatter `name`/`description` plus
+   the instruction body; add support files beside it as needed).
+3. Add tests.
+4. Add an example entry to `docs/examples/opencode-kit.jsonc`.
+5. `bun run typecheck && bun test`.
+
+A skill is declarative: a directory plus one barrel line, no code. `defineSkill`
+defaults `defaultEnabled` to `true`; pass `autoinvoke: false` to hide it from the
+model's advertised list while keeping it loadable by id (`@my-skill`).
 
 See `CONTRIBUTING.md` for the full contributor workflow.
