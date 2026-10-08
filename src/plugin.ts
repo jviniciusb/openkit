@@ -3,16 +3,18 @@ import { homedir } from "node:os"
 
 import { registerKitCommand } from "./commands/kit"
 import { createKitApi } from "./core/kit-api"
-import { registerTools, type DegradedItem } from "./core/registry"
+import { registerSkills, registerTools, type DegradedItem } from "./core/registry"
 import type { KitContext } from "./core/context"
+import type { KitSkill } from "./core/skill"
 import type { KitTool } from "./core/tool"
 import { discoverKitConfigFiles } from "./config/discover"
 import { loadKitConfig } from "./config/load"
 import { deepMerge } from "./config/merge"
-import { resolveToolConfig } from "./config/resolve"
+import { resolveSkillConfig, resolveToolConfig } from "./config/resolve"
 import { resolveValidated } from "./config/validate"
-import type { KitConfigFile, ResolvedToolConfig } from "./config/types"
+import type { KitConfigFile, ResolvedSkillConfig, ResolvedToolConfig } from "./config/types"
 import { tools } from "./tools/index"
+import { skills } from "./skills/index"
 
 /** Home directory used for the global config: `ctx.home`, then `options.home`, then the OS home. */
 function resolveHome(ctx: KitContext): string {
@@ -26,7 +28,7 @@ function resolveHome(ctx: KitContext): string {
 export interface BootstrapResult {
   /** Disposes every registration created during bootstrap. */
   dispose(): Promise<void>
-  /** Tools that could not be fully configured (invalid settings or failed registration). */
+  /** Tools or skills that could not be fully configured (invalid settings or failed registration). */
   degraded: DegradedItem[]
 }
 
@@ -35,13 +37,15 @@ export interface BootstrapResult {
  *
  * Discovers global + project config files, loads and merges them (low → high
  * precedence, then `ctx.options`, then any explicit `options`), resolves and
- * validates each tool's effective config, then registers every enabled tool. Per-tool failures are
- * isolated and reported in `degraded`; the returned `dispose` releases every
- * registration made.
+ * validates each tool's effective config, then registers every enabled tool,
+ * followed by every enabled skill. Per-item failures are isolated and reported
+ * in `degraded`; the returned `dispose` releases every registration made, tools
+ * first and then skills, in registration order.
  */
 export async function bootstrap(
   ctx: KitContext,
   tools: KitTool[],
+  skills: KitSkill[],
   options?: Record<string, unknown>,
 ): Promise<BootstrapResult> {
   const home = resolveHome(ctx)
@@ -69,7 +73,19 @@ export async function bootstrap(
   )
   degraded.push(...result.degraded)
 
-  // Surface every degraded tool so a silently broken registration or invalid
+  const resolvedSkills = new Map<string, ResolvedSkillConfig>()
+  for (const skill of skills) {
+    resolvedSkills.set(skill.id, resolveSkillConfig(skill, sources))
+  }
+
+  const skillResult = await registerSkills(skills, resolvedSkills, ctx)
+  degraded.push(...skillResult.degraded)
+
+  // Tools and skills share one ordered registration list so `dispose` releases
+  // them together (tools first, then skills) in registration order.
+  const registrations = [...result.registrations, ...skillResult.registrations]
+
+  // Surface every degraded item so a silently broken registration or invalid
   // setting is visible in the session logs (spec §5.1/§6.3).
   for (const entry of degraded) {
     console.warn(`opencode-kit: ${entry.kind} "${entry.id}" degraded: ${entry.error}`)
@@ -78,8 +94,8 @@ export async function bootstrap(
   return {
     async dispose() {
       // Release every registration even if a disposer throws, so one faulty
-      // tool cannot leave the rest registered.
-      const settled = await Promise.allSettled(result.registrations.map((r) => r.dispose()))
+      // item cannot leave the rest registered.
+      const settled = await Promise.allSettled(registrations.map((r) => r.dispose()))
       for (const outcome of settled) {
         if (outcome.status === "rejected") {
           console.warn("opencode-kit: a registration disposer threw", outcome.reason)
@@ -143,7 +159,7 @@ export interface Lifecycle {
   reload(): Promise<void>
   /** Disposes the current registrations and stops watching. */
   dispose(): Promise<void>
-  /** Tools degraded in the current generation. */
+  /** Items degraded in the current generation. */
   degraded(): DegradedItem[]
 }
 
@@ -161,10 +177,11 @@ export interface Lifecycle {
 export async function createLifecycle(
   ctx: KitContext,
   tools: KitTool[],
+  skills: KitSkill[],
   options?: Record<string, unknown>,
   watch: WatchFactory = defaultWatch,
 ): Promise<Lifecycle> {
-  let current = await bootstrap(ctx, tools, options)
+  let current = await bootstrap(ctx, tools, skills, options)
   let stopped = false
 
   /** Tail of the serialized operation chain; always settles, never rejects. */
@@ -200,7 +217,7 @@ export async function createLifecycle(
       current = { async dispose() {}, degraded: [] }
       // If disposal began while the prior generation was being released, the
       // queued disposable will collect whatever this task installs below.
-      current = await bootstrap(ctx, tools, options)
+      current = await bootstrap(ctx, tools, skills, options)
     })
   }
 
@@ -227,7 +244,7 @@ export async function createLifecycle(
 export default {
   id: "opencode-kit",
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
-    const life = await createLifecycle(ctx, tools, ctx.options as Record<string, unknown>)
+    const life = await createLifecycle(ctx, tools, skills, ctx.options as Record<string, unknown>)
     // Register the `/kit` command alongside the tool lifecycle so it is
     // disposed with everything else. It lives for the whole session (not per
     // reload generation) and drives reloads after each config mutation.
