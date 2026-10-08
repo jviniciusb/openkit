@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test"
 import { defineTool } from "../../src/core/tool"
-import { resolveToolConfig } from "../../src/config/resolve"
+import { defineSkill, type KitSkill } from "../../src/core/skill"
+import { resolveToolConfig, resolveSkillConfig } from "../../src/config/resolve"
 
 const tool = defineTool({ id: "t", name: "T", description: "d",
   defaultEnabled: false, defaultSettings: { n: 1, list: ["a"] }, register() {} })
@@ -18,4 +19,20 @@ test("higher source overrides lower; unknown ids ignored", () => {
 test("empty settings/entry does not null defaults", () => {
   expect(resolveToolConfig(tool, [{ tools: { t: {} } }]))
     .toEqual({ enabled: false, settings: { n: 1, list: ["a"] } })
+})
+
+const skill: KitSkill = defineSkill({ id: "s", dir: new URL("file:///x/") })
+
+test("skill defaults to enabled with no sources (missing skills key)", () => {
+  expect(resolveSkillConfig(skill, [{ tools: { t: { enabled: true } } }])).toEqual({ enabled: true })
+})
+test("skill enable is replaced by the highest source; unknown ids ignored", () => {
+  expect(resolveSkillConfig(skill, [
+    { skills: { s: { enabled: false }, ghost: { enabled: true } } },
+    { skills: { s: { enabled: true } } },
+  ])).toEqual({ enabled: true })
+})
+test("defineSkill respects an explicit defaultEnabled:false", () => {
+  const off = defineSkill({ id: "o", dir: new URL("file:///x/"), defaultEnabled: false })
+  expect(resolveSkillConfig(off, [])).toEqual({ enabled: false })
 })

@@ -3,6 +3,7 @@ import { join } from "node:path"
 import { parse } from "jsonc-parser"
 
 import type { KitTool } from "../core/tool"
+import type { KitSkill } from "../core/skill"
 import {
   discoverKitConfigFiles,
   globalConfigPath,
@@ -150,4 +151,31 @@ export function resolveEffective<S>(tool: KitTool<S>, layers: ConfigLayer[]): Ef
   }
 
   return { enabled, settings, enabledLayer, settingLayers }
+}
+
+/**
+ * Resolves a skill's effective `enabled` across `layers`.
+ *
+ * Layer order is low → high: `enabled` is replaced, starting from the skill
+ * default (`defaultEnabled`, or `true` when unset). The returned bookkeeping
+ * identifies which layer last set `enabled`, so callers can name an overriding
+ * layer.
+ */
+export function resolveSkillEffective(
+  skill: KitSkill,
+  layers: ConfigLayer[],
+): { enabled: boolean; enabledLayer?: ConfigLayer } {
+  let enabled = skill.defaultEnabled ?? true
+  let enabledLayer: ConfigLayer | undefined
+
+  for (const layer of layers) {
+    const entry = layer.config.skills?.[skill.id]
+    if (entry === undefined) continue
+    if (entry.enabled !== undefined) {
+      enabled = entry.enabled
+      enabledLayer = layer
+    }
+  }
+
+  return { enabled, enabledLayer }
 }
