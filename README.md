@@ -26,12 +26,13 @@ schema, and lifecycle layers do not change. See
 - **Isolated:** one item failing to configure never stops the kit or the other
   items from loading.
 
-The package ships three tools: the [`hello`](src/tools/hello/index.ts) example
-(enabled by default), [`background-subagents`](src/tools/background-subagents/index.ts)
+The package ships two tools: [`background-subagents`](src/tools/background-subagents/index.ts)
 (opt-in; forces every subagent call to run in the background so the parent keeps
-control while a child works), and
+control while a child works) and
 [`context-injections`](src/tools/context-injections/index.ts) (opt-in; injects
 built-in behavioral rules — each individually toggleable — plus your own).
+[`hello`](src/tools/hello/index.ts) remains as an authoring example, but is not
+registered or exposed at runtime.
 
 It also ships two skills, both enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
@@ -68,15 +69,16 @@ opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit
 
 ### 2. Configure (optional)
 
-Seeding is optional — an item that defaults to enabled (every bundled skill
-does) works without a config file. To make the effective configuration explicit,
-create `~/.config/opencode/opencode-kit.jsonc` (or
+Seeding is optional — an item that defaults to enabled works without a config
+file (every bundled skill does; the shipped tools are opt-in). To make the
+effective configuration explicit, create
+`~/.config/opencode/opencode-kit.jsonc` (or
 `<project>/.opencode/opencode-kit.jsonc`):
 
 ```jsonc
 {
   "tools": {
-    "hello": { "enabled": true }
+    "background-subagents": { "enabled": true }
   }
 }
 ```
@@ -170,10 +172,6 @@ concatenated). Settings apply only to settings-bearing categories (`tools` and
   "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
   "configVersion": 1,
   "tools": {
-    "hello": {
-      "enabled": true,
-      "settings": { "greeting": "Hi there" }
-    },
     "background-subagents": { "enabled": true },
     "context-injections": { "enabled": true }
   },
@@ -191,7 +189,7 @@ A project file only needs what differs:
 // <project>/.opencode/opencode-kit.jsonc
 {
   "tools": {
-    "hello": { "settings": { "greeting": "Hello, project" } }
+    "background-subagents": { "enabled": false }
   }
 }
 ```
