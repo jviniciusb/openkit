@@ -1,9 +1,6 @@
-import { discoverKitConfigFiles } from "../../config/discover"
-import { loadKitConfig } from "../../config/load"
-import { resolveSkillConfig, resolveToolConfig } from "../../config/resolve"
-import { skillDescription } from "../../core/skill"
-import { skills } from "../../skills/index"
-import { tools } from "../../tools/index"
+import { categories } from "../../catalog"
+import { readPluginOptions } from "../../config/effective"
+import { listOperation, type OperationDeps } from "../../operations/index"
 
 /** Filesystem and stream handles the CLI needs, injected for testability. */
 export interface CliIo {
@@ -16,29 +13,31 @@ export interface CliIo {
 }
 
 /**
- * Prints every shipped tool and skill with its resolved enabled state.
+ * Builds the shared operation environment from the CLI's injected I/O.
  *
- * Enabled state is config-driven: config files are discovered from `io.cwd`
- * and `io.home`, loaded low → high precedence, and folded into each tool's
- * defaults via `resolveToolConfig` (and each skill's via `resolveSkillConfig`).
- * Output is a `tools:` section followed by a `skills:` section, one
- * `<id>\t<enabled|disabled>\t<description>` line each.
+ * The CLI has no live plugin context, so the highest-precedence layer is
+ * re-read from `opencode.json` on disk; the CLI never re-bootstraps the kit, so
+ * no `reload` is supplied.
+ */
+export function cliOperationDeps(io: CliIo): OperationDeps {
+  return {
+    cwd: io.cwd,
+    home: io.home,
+    options: readPluginOptions(io.cwd, io.home),
+    out: io.stdout,
+    err: io.stderr,
+  }
+}
+
+/**
+ * Prints every shipped item with its resolved enabled state.
+ *
+ * Delegates to `listOperation`, which discovers config files from `io.cwd` and
+ * `io.home`, loads them low → high precedence, and prints a `<label>:` section
+ * per non-empty category followed by one
+ * `<id>\t<enabled|disabled>\t<description>` line per item.
  */
 export async function listCommand(io: CliIo): Promise<number> {
-  const paths = discoverKitConfigFiles(io.cwd, io.home)
-  const sources = await loadKitConfig(paths)
-
-  io.stdout("tools:\n")
-  for (const tool of tools) {
-    const { enabled } = resolveToolConfig(tool, sources)
-    io.stdout(`${tool.id}\t${enabled ? "enabled" : "disabled"}\t${tool.description}\n`)
-  }
-
-  io.stdout("skills:\n")
-  for (const skill of skills) {
-    const { enabled } = resolveSkillConfig(skill, sources)
-    io.stdout(`${skill.id}\t${enabled ? "enabled" : "disabled"}\t${skillDescription(skill)}\n`)
-  }
-
-  return 0
+  const result = await listOperation(categories, cliOperationDeps(io))
+  return result.exitCode
 }
