@@ -36,6 +36,7 @@ test("loads a git reference; repository required, branch optional", () => {
   const noBranch = ref("g2", `{ "type": "git", "repository": "https://x/y" }`)
   expect(loadReference(noBranch).source).toEqual({ type: "git", repository: "https://x/y" })
   expect(() => loadReference(ref("bad", `{ "type": "git" }`))).toThrow()
+  expect(() => loadReference(ref("badBranch", `{ "type": "git", "repository": "https://x/y", "branch": 1 }`))).toThrow()
 })
 
 test("settings cannot override the file's reference type", async () => {

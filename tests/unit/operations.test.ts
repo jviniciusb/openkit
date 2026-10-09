@@ -1,10 +1,13 @@
 import { expect, test } from "bun:test"
-import { mkdtempSync, readFileSync } from "node:fs"
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { pathToFileURL } from "node:url"
 import { parse } from "jsonc-parser"
 import { listOperation, toggleOperation, configSetOperation, configGetOperation } from "../../src/operations/index"
 import { globalConfigPath } from "../../src/config/discover"
+import { defineReference } from "../../src/core/reference"
+import { referenceCategory } from "../../src/categories/reference"
 import type { KitCategory } from "../../src/core/category"
 import { categories } from "../../src/catalog"
 
@@ -85,4 +88,20 @@ test("configSet warns via the category inspect hook when the write degrades a to
   expect(await configSetOperation(categories, x.d, "background-subagents", "count", ["42"])).toEqual({ exitCode: 0 })
   expect(x.err()).toContain("warning")
   expect(x.err()).toContain("invalid")
+})
+
+test("configSet warns when an invalid reference override degrades the reference", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const x = deps(home)
+  // A temp reference whose source is a valid local path; writing a non-string
+  // `path` makes the merged source invalid, so `category.inspect` reports it.
+  const dir = mkdtempSync(join(tmpdir(), "ref-"))
+  writeFileSync(join(dir, "reference.json"), `{ "type": "local", "path": "./docs" }`)
+  const temp = defineReference({ id: "temp-ref", dir: pathToFileURL(`${dir}/`) })
+  const refs: KitCategory<unknown> = { ...referenceCategory, items: [temp] }
+
+  expect(await configSetOperation([refs], x.d, "temp-ref", "path", ["123"])).toEqual({ exitCode: 0 })
+  expect((parse(readFileSync(globalConfigPath(home), "utf8")) as any).references["temp-ref"].settings.path).toBe(123)
+  expect(x.err()).toContain("warning")
+  expect(x.err()).toContain("path")
 })
