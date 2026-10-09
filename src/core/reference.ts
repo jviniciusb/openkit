@@ -29,12 +29,18 @@ export interface LoadedReference {
   source: ReferenceSource
 }
 
-/** Validates a parsed `reference.json` body into a {@link ReferenceSource}. */
-function parseSource(data: unknown): ReferenceSource {
-  if (typeof data !== "object" || data === null) {
-    throw new Error("reference.json must be a JSON object")
+/**
+ * Validates an unknown value into a {@link ReferenceSource}, returning a clean
+ * object (unknown keys are dropped).
+ *
+ * Throws when the value is not an object, has an unknown `type`, or a `local`
+ * source lacks a string `path` / a `git` source lacks a string `repository`.
+ */
+export function validateReferenceSource(source: unknown): ReferenceSource {
+  if (typeof source !== "object" || source === null) {
+    throw new Error("reference source must be an object")
   }
-  const record = data as Record<string, unknown>
+  const record = source as Record<string, unknown>
   if (record.type === "local") {
     if (typeof record.path !== "string") {
       throw new Error('local reference requires a string "path"')
@@ -45,11 +51,25 @@ function parseSource(data: unknown): ReferenceSource {
     if (typeof record.repository !== "string") {
       throw new Error('git reference requires a string "repository"')
     }
-    const source: ReferenceSource = { type: "git", repository: record.repository }
-    if (typeof record.branch === "string") source.branch = record.branch
-    return source
+    const result: ReferenceSource = { type: "git", repository: record.repository }
+    if (typeof record.branch === "string") result.branch = record.branch
+    return result
   }
-  throw new Error('reference.json "type" must be "local" or "git"')
+  throw new Error('reference source "type" must be "local" or "git"')
+}
+
+/**
+ * Merges `settings` over a validated `source`, forcing `type` from the file so
+ * a setting can never turn a `local` reference into a `git` source.
+ *
+ * The result is not validated here; callers pass it through
+ * {@link validateReferenceSource} before registering it.
+ */
+export function mergeReferenceSource(
+  source: ReferenceSource,
+  settings?: Record<string, unknown>,
+): ReferenceSource {
+  return { ...source, ...settings, type: source.type } as ReferenceSource
 }
 
 /**
@@ -61,7 +81,7 @@ function parseSource(data: unknown): ReferenceSource {
 export function loadReference(ref: KitReference): LoadedReference {
   const path = fileURLToPath(new URL("reference.json", ref.dir))
   const data: unknown = JSON.parse(readFileSync(path, "utf8"))
-  const source = parseSource(data)
+  const source = validateReferenceSource(data)
   const description = (data as Record<string, unknown>).description
   return typeof description === "string"
     ? { id: ref.id, description, source }
@@ -81,7 +101,9 @@ export function referenceDescription(ref: KitReference): string {
  * Loads a reference, merges `settings` over its source, and registers it
  * through `ctx.reference.transform`. `settings` override only the source's
  * `path`/`repository`/`branch`; `type` is always taken from the loaded file, so
- * a setting cannot turn a `local` reference into an invalid `git` source.
+ * a setting cannot turn a `local` reference into an invalid `git` source. The
+ * merged source is re-validated, so a setting that makes it invalid throws here
+ * (and is reported by `doctor`/`config set`).
  */
 export async function registerReference(
   ctx: KitContext,
@@ -89,6 +111,6 @@ export async function registerReference(
   settings?: Record<string, unknown>,
 ): Promise<Registration> {
   const { source } = loadReference(ref)
-  const merged = { ...source, ...settings, type: source.type } as ReferenceSource
+  const merged = validateReferenceSource(mergeReferenceSource(source, settings))
   return ctx.reference.transform((editor) => editor.add(ref.id, merged))
 }

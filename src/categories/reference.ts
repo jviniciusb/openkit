@@ -1,4 +1,11 @@
-import { loadReference, referenceDescription, registerReference, type KitReference } from "../core/reference"
+import {
+  loadReference,
+  mergeReferenceSource,
+  referenceDescription,
+  registerReference,
+  validateReferenceSource,
+  type KitReference,
+} from "../core/reference"
 import type { KitCategory } from "../core/category"
 import { references } from "../references/index"
 import { referenceScaffold } from "./scaffold"
@@ -8,9 +15,10 @@ import { referenceScaffold } from "./scaffold"
  *
  * Settings-bearing and opt-in by default. `registerItem` loads the reference's
  * `reference.json`, merges the resolved settings over its source, and registers
- * it through `ctx.reference.transform`; a missing or unreadable file throws and
- * the engine degrades only that reference. `inspect` reports that same load
- * failure (or `undefined` when the file is readable).
+ * it through `ctx.reference.transform`; a missing or unreadable file, or a
+ * settings override that makes the merged source invalid, throws and the engine
+ * degrades only that reference. `inspect` reports that same load/merge failure
+ * (or `undefined` when the file is readable and the merged source is valid).
  */
 export const referenceCategory: KitCategory<KitReference> = {
   key: "references",
@@ -22,9 +30,10 @@ export const referenceCategory: KitCategory<KitReference> = {
   defaultSettings: () => ({}),
   scaffold: referenceScaffold,
   describe: referenceDescription,
-  inspect: (reference) => {
+  inspect: (reference, resolved) => {
     try {
-      loadReference(reference)
+      const loaded = loadReference(reference)
+      validateReferenceSource(mergeReferenceSource(loaded.source, resolved.settings))
       return undefined
     } catch (error) {
       return error instanceof Error ? error.message : String(error)
