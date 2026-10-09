@@ -9,7 +9,13 @@ import {
   type ModificationOptions,
   type ParseError,
 } from "jsonc-parser"
-import type { KitConfigFile, SkillConfigEntry, ToolConfigEntry } from "./types"
+import {
+  categoryEntries,
+  type CategoryEntry,
+  type KitConfigFile,
+  type SkillConfigEntry,
+  type ToolConfigEntry,
+} from "./types"
 
 /** Options used when `modify` has to create a JSON property. */
 const MODIFY_OPTIONS: ModificationOptions = {
@@ -17,7 +23,7 @@ const MODIFY_OPTIONS: ModificationOptions = {
 }
 
 /** Seed for a brand-new config file. */
-const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {}, skills: {} }
+const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {}, skills: {}, references: {} }
 
 /** Parses JSONC options shared by every read in this module. */
 const READ_OPTIONS = {
@@ -82,23 +88,18 @@ function applyAndWrite(path: string, text: string, edits: Edit[]): void {
   writeFileSync(path, next)
 }
 
-/** Top-level config maps whose ids carry an entry object (`tools`, `skills`). */
-type EntryCategory = "tools" | "skills"
-
-/** An entry value that may live under an {@link EntryCategory} map. */
-type CategoryEntry = ToolConfigEntry | SkillConfigEntry
-
 /**
  * Sets `<category>[id].enabled` in the config at `path`.
  *
- * The file is read as raw text (creating a default config when absent) and
+ * `category` is the top-level config map key (`tools`, `skills`, `references`,
+ * …). The file is read as raw text (creating a default config when absent) and
  * edited with `jsonc-parser`'s `modify`/`applyEdits`, so existing comments,
  * key order, and indentation survive the round-trip. Missing intermediate
  * objects (`category`, the entry) are created.
  */
-async function setEntryEnabled(
+export async function setEntryEnabled(
   path: string,
-  category: EntryCategory,
+  category: string,
   id: string,
   enabled: boolean,
 ): Promise<void> {
@@ -134,6 +135,25 @@ export async function setSkillEnabled(
 }
 
 /**
+ * Sets `<category>[id].settings[key]` in the config at `path`.
+ *
+ * `category` is the top-level config map key (`tools`, `skills`, `references`,
+ * …). Same comment-preserving read/modify/write as {@link setEntryEnabled};
+ * missing `category`, entry, or `settings` objects are created as needed.
+ */
+export async function setEntrySetting(
+  path: string,
+  category: string,
+  id: string,
+  key: string,
+  value: unknown,
+): Promise<void> {
+  const text = readConfigText(path)
+  const edits = modify(text, [category, id, "settings", key], value, MODIFY_OPTIONS)
+  applyAndWrite(path, text, edits)
+}
+
+/**
  * Sets `tools[toolId].settings[key]` in the config at `path`.
  *
  * Same comment-preserving read/modify/write as {@link setToolEnabled}; missing
@@ -145,15 +165,13 @@ export async function setToolSetting(
   key: string,
   value: unknown,
 ): Promise<void> {
-  const text = readConfigText(path)
-  const edits = modify(text, ["tools", toolId, "settings", key], value, MODIFY_OPTIONS)
-  applyAndWrite(path, text, edits)
+  return setEntrySetting(path, "tools", toolId, key, value)
 }
 
 /** True when a config document already declares `<category>[id]`. */
-function hasEntry(text: string, category: EntryCategory, id: string): boolean {
+function hasEntry(text: string, category: string, id: string): boolean {
   const parsed = parse(text, [], READ_OPTIONS) as KitConfigFile | undefined
-  return parsed?.[category]?.[id] !== undefined
+  return parsed !== undefined && categoryEntries(parsed, category)?.[id] !== undefined
 }
 
 /**
@@ -164,9 +182,9 @@ function hasEntry(text: string, category: EntryCategory, id: string): boolean {
  * `modify`/`applyEdits`, preserving comments and formatting; a missing file is
  * created from the default config seed.
  */
-async function seedEntries(
+export async function seedEntries(
   path: string,
-  category: EntryCategory,
+  category: string,
   seeds: Record<string, CategoryEntry>,
 ): Promise<void> {
   const text = readConfigText(path)
