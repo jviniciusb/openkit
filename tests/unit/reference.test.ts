@@ -3,7 +3,13 @@ import { mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
-import { defineReference, loadReference, referenceDescription, registerReference } from "../../src/core/reference"
+import {
+  defineReference,
+  loadReference,
+  mergeReferenceSource,
+  referenceDescription,
+  registerReference,
+} from "../../src/core/reference"
 import { createFakeContext } from "../../src/core/testing"
 
 function ref(id: string, json: string) {
@@ -46,4 +52,17 @@ test("invalid or missing reference files throw; description never throws", () =>
   expect(() => loadReference(ref("bad", `{ "type": "local" }`))).toThrow()
   const missing = defineReference({ id: "gone", dir: new URL("file:///no-such-ref/") })
   expect(referenceDescription(missing)).toBe("")
+})
+
+test("an invalid settings override makes registerReference throw", async () => {
+  const r = ref("r", `{ "type": "local", "path": "./docs" }`)
+  const { ctx } = createFakeContext()
+  await expect(registerReference(ctx, r, { path: 123 })).rejects.toThrow()
+})
+
+test("mergeReferenceSource forces type from the file", () => {
+  expect(mergeReferenceSource({ type: "local", path: "./docs" }, { type: "git" })).toEqual({
+    type: "local",
+    path: "./docs",
+  })
 })

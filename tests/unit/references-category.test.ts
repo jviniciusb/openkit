@@ -39,6 +39,19 @@ test("inspect returns a reason for a missing reference.json", () => {
   expect(reason).toBeTruthy()
 })
 
+test("inspect reports a settings override that makes the merged source invalid", () => {
+  const dir = mkdtempSync(join(tmpdir(), "ref-"))
+  writeFileSync(join(dir, "reference.json"), `{ "type": "local", "path": "./docs" }`)
+  const ref = defineReference({ id: "bad", dir: pathToFileURL(`${dir}/`) })
+
+  const reason = referenceCategory.inspect?.(ref, { enabled: true, settings: { path: 123 } })
+  expect(typeof reason).toBe("string")
+  expect(reason).toBeTruthy()
+
+  expect(referenceCategory.inspect?.(ref, { enabled: true, settings: { path: "./other" } })).toBeUndefined()
+  expect(referenceCategory.inspect?.(ref, { enabled: true, settings: {} })).toBeUndefined()
+})
+
 test("references barrel is empty and catalog includes the reference category", async () => {
   const { references } = await import("../../src/references/index")
   const { categories } = await import("../../src/catalog")
