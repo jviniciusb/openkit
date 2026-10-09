@@ -2,6 +2,7 @@ import type { ConfigLayer } from "../config/effective"
 import { deepMerge } from "../config/merge"
 import { categoryEntries, type KitConfigFile } from "../config/types"
 import type { KitCategory, ResolvedEntry } from "./category"
+import type { KitContext, Registration } from "./context"
 
 /** A category item whose registration failed, isolated from its siblings. */
 export interface DegradedItem {
@@ -95,4 +96,49 @@ export function resolveCategoryEffective<T>(
   return category.hasSettings
     ? { enabled, enabledLayer, settings, settingLayers }
     : { enabled, enabledLayer }
+}
+
+/**
+ * Registers every enabled item across `categories`, isolating failures per item.
+ *
+ * Categories and their items are visited in array order. An item is skipped
+ * unless `resolveCategoryEntry` yields `enabled: true`. Each enabled item's
+ * `registerItem` runs in a try/catch; its `registrations` are collected and a
+ * non-empty `degraded` reason (or a thrown error) becomes a tagged
+ * {@link DegradedItem}, leaving the item's siblings and other categories
+ * unaffected. Partial registrations a `registerItem` created before throwing
+ * are that hook's to dispose — `registerItem` receives `ctx` directly and
+ * returns the registrations it wants tracked.
+ */
+export async function registerCategories(
+  categories: readonly KitCategory<unknown>[],
+  sources: KitConfigFile[],
+  ctx: KitContext,
+): Promise<{ registrations: Registration[]; degraded: DegradedItem[] }> {
+  const registrations: Registration[] = []
+  const degraded: DegradedItem[] = []
+
+  for (const category of categories) {
+    for (const item of category.items) {
+      const id = itemId(item)
+      const resolved = resolveCategoryEntry(category, item, sources)
+      if (resolved.enabled !== true) continue
+
+      try {
+        const result = await category.registerItem(item, resolved, ctx)
+        registrations.push(...result.registrations)
+        if (result.degraded !== undefined) {
+          degraded.push({ category: category.key, id, error: result.degraded })
+        }
+      } catch (error) {
+        degraded.push({
+          category: category.key,
+          id,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+    }
+  }
+
+  return { registrations, degraded }
 }
