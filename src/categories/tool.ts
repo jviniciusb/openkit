@@ -21,12 +21,14 @@ import { toolScaffold } from "./scaffold"
 export const toolCategory: KitCategory<KitTool> = {
   key: "tools",
   label: "tools",
+  singular: "tool",
   items: tools,
   defaultEnabled: (tool) => tool.defaultEnabled ?? false,
   hasSettings: true,
   defaultSettings: (tool) => tool.defaultSettings as Record<string, unknown>,
   scaffold: toolScaffold,
   describe: (tool) => tool.description,
+  inspectFatal: false,
   inspect: (tool, resolved) =>
     resolveValidated(tool, { enabled: resolved.enabled, settings: resolved.settings ?? {} })
       .degraded,

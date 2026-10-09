@@ -52,6 +52,8 @@ export interface KitCategory<TItem> {
   key: string
   /** Human label for list/doctor sections, e.g. `"tools"`. */
   label: string
+  /** Singular noun for doctor messages, e.g. `"tool"`. */
+  singular: string
   /** Shipped items, from the category barrel. */
   items: readonly TItem[]
   /** Default enabled state when config is silent. */
@@ -66,6 +68,8 @@ export interface KitCategory<TItem> {
   describe?(item: TItem): string
   /** Doctor check; returns an error reason or undefined. */
   inspect?(item: TItem, resolved: ResolvedEntry): string | undefined
+  /** Whether an `inspect` reason folds into doctor's exit code; default true. */
+  inspectFatal?: boolean
   /** Scaffolder metadata. */
   scaffold?: CategoryScaffold
 }

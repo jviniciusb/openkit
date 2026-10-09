@@ -14,6 +14,7 @@ import { skillScaffold } from "./scaffold"
 export const skillCategory: KitCategory<KitSkill> = {
   key: "skills",
   label: "skills",
+  singular: "skill",
   items: skills,
   defaultEnabled: (skill) => skill.defaultEnabled ?? true,
   hasSettings: false,

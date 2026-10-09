@@ -11,14 +11,14 @@ import type { KitCategory } from "../../src/core/category"
 
 type Fake = { id: string; defaultEnabled?: boolean; defaults?: Record<string, unknown> }
 const widgets: KitCategory<Fake> = {
-  key: "tools", label: "widgets", items: [],
+  key: "tools", label: "widgets", singular: "widget", items: [],
   defaultEnabled: (i) => i.defaultEnabled ?? false,
   hasSettings: true,
   defaultSettings: (i) => i.defaults ?? {},
   async registerItem() { return { registrations: [] } },
 }
 const plain: KitCategory<Fake> = {
-  key: "skills", label: "plain", items: [],
+  key: "skills", label: "plain", singular: "plain", items: [],
   defaultEnabled: (i) => i.defaultEnabled ?? true,
   hasSettings: false,
   async registerItem() { return { registrations: [] } },
@@ -53,7 +53,7 @@ function cat(
   items: Array<{ id: string }>,
   registerItem: KitCategory<{ id: string }>["registerItem"],
 ): KitCategory<{ id: string }> {
-  return { key, label: key, items, defaultEnabled: () => true, hasSettings: false, registerItem }
+  return { key, label: key, singular: key, items, defaultEnabled: () => true, hasSettings: false, registerItem }
 }
 
 test("registerCategories skips disabled, registers enabled, isolates throws", async () => {
