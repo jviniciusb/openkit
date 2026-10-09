@@ -29,7 +29,7 @@ export const toolCategory: KitCategory<KitTool> = {
     const { ctx: tracked, created } = createTrackingContext(ctx)
     const { config, degraded } = resolveValidated(tool, {
       enabled: resolved.enabled,
-      settings: resolved.settings ?? tool.defaultSettings,
+      settings: resolved.settings,
     })
     try {
       await tool.register(tracked, config.settings, createKitApi(tool.id, tracked, ctx.app.version))
