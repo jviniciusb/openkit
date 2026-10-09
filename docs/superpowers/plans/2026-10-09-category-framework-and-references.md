@@ -872,6 +872,8 @@ git commit -m "refactor: seed every category from init"
 ### Task 13: `doctor` generic over categories
 
 **Files:**
+- Modify: `src/core/category.ts` (add `singular`, `inspectFatal?` to `KitCategory`)
+- Modify: `src/categories/tool.ts`, `skill.ts`, `reference.ts` (set `singular`; `toolCategory` sets `inspectFatal: false`)
 - Modify: `src/cli/commands/doctor.ts`
 - Test: `tests/unit/cli-doctor.test.ts`
 
@@ -898,7 +900,7 @@ Expected: FAIL — no `references` line.
 
 - [ ] **Step 3: Implement**
 
-In `doctorCommand`, iterate `categories` (accept an injectable `categories` parameter defaulting to the catalog): for each item, resolve, and call `category.inspect?.(item, resolved)`; collect reasons; print `<label>: ok` or `<category>: error <id> <reason>`; fold any error into the exit code. Preserve config-parse and plugin checks. Update the existing doctor tests from the skills work that passed a bare `[skill]` as the second argument — they must now pass category descriptors (e.g. `[{ ...skillCategory, items: [skill] }]`).
+Add `singular: string` and `inspectFatal?: boolean` (default `true`) to `KitCategory` in `src/core/category.ts`; set `singular` on each descriptor (`"tool"`, `"skill"`, `"reference"`) and `inspectFatal: false` on `toolCategory` (invalid settings are advisory, not fatal). In `doctorCommand`, iterate `categories` (accept an injectable `categories` parameter defaulting to the catalog): for each item, resolve and call `category.inspect?.(item, resolved)`; collect `{ id, reason, fatal }`; print `<label>: ok` when a category has no issues, else `<singular>: <degraded|error> <id>: <reason>` per issue; fold only fatal reasons into the exit code. Preserve config-parse and plugin checks. Update the existing doctor tests from the skills work that passed a bare `[skill]` as the second argument — they must now pass category descriptors (e.g. `[{ ...skillCategory, items: [skill] }]`).
 
 - [ ] **Step 4: Run test to verify it passes**
 

@@ -184,6 +184,8 @@ export interface KitCategory<TItem> {
   key: string
   /** Human label for list/doctor sections, e.g. "tools". */
   label: string
+  /** Singular noun for doctor messages, e.g. "tool". */
+  singular: string
   /** Shipped items, from the category barrel. */
   items: readonly TItem[]
   /** Default enabled state when config is silent. */
@@ -196,8 +198,10 @@ export interface KitCategory<TItem> {
   registerItem(item: TItem, resolved: ResolvedEntry, ctx: KitContext): Promise<RegisterItemResult>
   /** One-line description for list; may throw — callers tolerate. */
   describe?(item: TItem): string
-  /** Doctor check; returns an error reason or undefined. */
+  /** Doctor check; returns a reason or undefined. */
   inspect?(item: TItem, resolved: ResolvedEntry): string | undefined
+  /** Whether an `inspect` reason is fatal (folds into the doctor exit code); default true. */
+  inspectFatal?: boolean
   /** Scaffolder metadata. */
   scaffold?: CategoryScaffold
 }
@@ -322,7 +326,10 @@ export async function configSetOperation(categories, deps, id, key, valueParts):
 - `init` and `doctor` stay CLI-only but iterate `categories`:
   `init` seeds `{ enabled: defaultEnabled(item) }` (plus default settings for
   `hasSettings` categories) per category; `doctor` runs each category's
-  `inspect` and reports `<label>: ok` / `<category>: error <id> <reason>`.
+  `inspect` and reports `<label>: ok` when healthy, or
+  `<singular>: <degraded|error> <id>: <reason>` per issue — `inspectFatal`
+  (default true) selects `error` (folds into the exit code) vs `degraded`
+  (advisory, like invalid tool settings).
 - Scaffolding unifies to `new <category> <id>` (`new tool x`, `new skill x`,
   `new reference x`); `new` and `new-skill` remain aliases for
   `new tool` / `new skill`. An unknown category is a user error.
