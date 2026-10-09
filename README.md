@@ -196,8 +196,12 @@ A project file only needs what differs:
 
 More in [`docs/examples/opencode-kit.jsonc`](docs/examples/opencode-kit.jsonc).
 
-If a settings-bearing item's settings fail validation, the kit logs a warning and
-uses that item's defaults; the kit and every other item keep loading.
+If a **tool**'s settings fail validation, the kit logs a warning and falls back
+to that tool's defaults, and the tool still registers. An invalid
+`references.<id>.settings` override is different: the merged source fails
+validation, so the reference is not registered at all and is reported
+`degraded` (`doctor` treats it as fatal). Either way, the kit and every other
+item keep loading.
 
 ## Skills
 

@@ -33,8 +33,9 @@ export interface LoadedReference {
  * Validates an unknown value into a {@link ReferenceSource}, returning a clean
  * object (unknown keys are dropped).
  *
- * Throws when the value is not an object, has an unknown `type`, or a `local`
- * source lacks a string `path` / a `git` source lacks a string `repository`.
+ * Throws when the value is not an object, has an unknown `type`, a `local`
+ * source lacks a string `path`, a `git` source lacks a string `repository`, or
+ * a present `branch` is not a string.
  */
 export function validateReferenceSource(source: unknown): ReferenceSource {
   if (typeof source !== "object" || source === null) {
@@ -50,6 +51,9 @@ export function validateReferenceSource(source: unknown): ReferenceSource {
   if (record.type === "git") {
     if (typeof record.repository !== "string") {
       throw new Error('git reference requires a string "repository"')
+    }
+    if (record.branch !== undefined && typeof record.branch !== "string") {
+      throw new Error('git reference "branch" must be a string')
     }
     const result: ReferenceSource = { type: "git", repository: record.repository }
     if (typeof record.branch === "string") result.branch = record.branch
