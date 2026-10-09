@@ -5,6 +5,7 @@ import { join } from "node:path"
 
 import { createFakeContext } from "../../src/core/testing"
 import { bootstrap } from "../../src/plugin"
+import { toolCategory } from "../../src/categories/tool"
 import { backgroundSubagents } from "../../src/tools/background-subagents"
 
 const tempDirs: string[] = []
@@ -25,7 +26,7 @@ function projectWithConfig(json: string): string {
 test("enabling the tool registers exactly one execute.before hook", async () => {
   const proj = projectWithConfig(`{ "tools": { "background-subagents": { "enabled": true } } }`)
   const { ctx, calls } = createFakeContext({ directory: proj })
-  const res = await bootstrap(ctx, [backgroundSubagents], [])
+  const res = await bootstrap(ctx, [{ ...toolCategory, items: [backgroundSubagents] }])
   expect(res.degraded).toEqual([])
   expect(calls.toolHook).toEqual(["execute.before"])
   await res.dispose()
@@ -34,7 +35,7 @@ test("enabling the tool registers exactly one execute.before hook", async () => 
 test("disabling the tool registers nothing", async () => {
   const proj = projectWithConfig(`{ "tools": { "background-subagents": { "enabled": false } } }`)
   const { ctx, calls } = createFakeContext({ directory: proj })
-  const res = await bootstrap(ctx, [backgroundSubagents], [])
+  const res = await bootstrap(ctx, [{ ...toolCategory, items: [backgroundSubagents] }])
   expect(calls.toolHook).toEqual([])
   await res.dispose()
 })
