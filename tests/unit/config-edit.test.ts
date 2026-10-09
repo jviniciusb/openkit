@@ -9,6 +9,9 @@ import {
   setToolSetting,
   setSkillEnabled,
   seedSkills,
+  setEntryEnabled,
+  setEntrySetting,
+  seedEntries,
   ensurePluginEntry,
 } from "../../src/config/edit"
 
@@ -172,4 +175,72 @@ test("seedSkills only adds missing entries", async () => {
   const data = parse(readFileSync(f, "utf8")) as KitConfigFile
   expect(data.skills?.a?.enabled).toBe(false)
   expect(data.skills?.b?.enabled).toBe(true)
+})
+
+test("setEntryEnabled flips enabled under an arbitrary category and preserves comments", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, `{\n  // keep me\n  "tools": { "a": { "enabled": false } },\n}`)
+
+  await setEntryEnabled(f, "tools", "a", true)
+
+  const text = readFileSync(f, "utf8")
+  expect(text).toContain("// keep me")
+  expect((parse(text) as KitConfigFile).tools?.a?.enabled).toBe(true)
+})
+
+test("setEntryEnabled works for the skills category", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+
+  await setEntryEnabled(f, "skills", "sdd-flow", false)
+
+  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
+  expect(data.skills?.["sdd-flow"]?.enabled).toBe(false)
+})
+
+test("setEntrySetting writes a nested setting for any settings category", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, `{ "references": { "r": { "enabled": true } } }`)
+  await setEntrySetting(f, "references", "r", "branch", "main")
+  expect((parse(readFileSync(f, "utf8")) as KitConfigFile).references?.r?.settings).toEqual({ branch: "main" })
+})
+
+test("setEntrySetting keeps the existing enabled value and comments", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, `{\n  // keep me\n  "references": { "r": { "enabled": false } },\n}`)
+
+  await setEntrySetting(f, "references", "r", "branch", "main")
+
+  const { text, data } = readConfig(f)
+  expect(text).toContain("// keep me")
+  expect(data.references?.r?.settings).toEqual({ branch: "main" })
+  expect(data.references?.r?.enabled).toBe(false)
+})
+
+test("seedEntries only adds missing entries under an arbitrary category", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, `{ "references": { "a": { "enabled": false } } }`)
+
+  await seedEntries(f, "references", { a: { enabled: true }, b: { enabled: true } })
+
+  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
+  expect(data.references?.a?.enabled).toBe(false)
+  expect(data.references?.b?.enabled).toBe(true)
+})
+
+test("setEntryEnabled seeds a default config that includes a references map", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+
+  await setEntryEnabled(f, "references", "r", true)
+
+  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
+  expect(data.configVersion).toBe(1)
+  expect(data.tools).toEqual({})
+  expect(data.skills).toEqual({})
+  expect(data.references?.r?.enabled).toBe(true)
 })
