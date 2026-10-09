@@ -83,8 +83,8 @@ export async function registerTools(
         },
       },
       session: {
-        async hook(name, handler) {
-          const registration = await ctx.session.hook(name, handler)
+        async hook(name, handler, opts) {
+          const registration = await ctx.session.hook(name, handler, opts)
           created.push(registration)
           return registration
         },
