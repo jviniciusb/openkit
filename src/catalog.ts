@@ -1,3 +1,4 @@
+import { referenceCategory } from "./categories/reference"
 import { skillCategory } from "./categories/skill"
 import { toolCategory } from "./categories/tool"
 import type { KitCategory } from "./core/category"
@@ -8,4 +9,8 @@ import type { KitCategory } from "./core/category"
  * Descriptors are consumed through `KitCategory<unknown>`; method bivariance
  * keeps the concretely-typed descriptors assignable.
  */
-export const categories: readonly KitCategory<unknown>[] = [toolCategory, skillCategory]
+export const categories: readonly KitCategory<unknown>[] = [
+  toolCategory,
+  skillCategory,
+  referenceCategory,
+]
