@@ -9,13 +9,7 @@ import {
   type ModificationOptions,
   type ParseError,
 } from "jsonc-parser"
-import {
-  categoryEntries,
-  type CategoryEntry,
-  type KitConfigFile,
-  type SkillConfigEntry,
-  type ToolConfigEntry,
-} from "./types"
+import { categoryEntries, type CategoryEntry, type KitConfigFile } from "./types"
 
 /** Options used when `modify` has to create a JSON property. */
 const MODIFY_OPTIONS: ModificationOptions = {
@@ -111,32 +105,6 @@ export async function setEntryEnabled(
 }
 
 /**
- * Sets `tools[toolId].enabled` in the config at `path`.
- *
- * The file is read as raw text (creating a default config when absent) and
- * edited with `jsonc-parser`'s `modify`/`applyEdits`, so existing comments,
- * key order, and indentation survive the round-trip. Missing intermediate
- * objects (`tools`, the tool entry) are created.
- */
-export async function setToolEnabled(path: string, toolId: string, enabled: boolean): Promise<void> {
-  return setEntryEnabled(path, "tools", toolId, enabled)
-}
-
-/**
- * Sets `skills[skillId].enabled` in the config at `path`.
- *
- * Shares {@link setEntryEnabled}'s comment-preserving read/modify/write and
- * malformed-config refusal; missing `skills`/entry objects are created.
- */
-export async function setSkillEnabled(
-  path: string,
-  skillId: string,
-  enabled: boolean,
-): Promise<void> {
-  return setEntryEnabled(path, "skills", skillId, enabled)
-}
-
-/**
  * Sets `<category>[id].settings[key]` in the config at `path`.
  *
  * `category` is the top-level config map key (`tools`, `skills`, `references`,
@@ -153,21 +121,6 @@ export async function setEntrySetting(
   const text = readConfigText(path)
   const edits = modify(text, [category, id, "settings", key], value, MODIFY_OPTIONS)
   applyAndWrite(path, text, edits)
-}
-
-/**
- * Sets `tools[toolId].settings[key]` in the config at `path`.
- *
- * Same comment-preserving read/modify/write as {@link setToolEnabled}; missing
- * `tools`, tool, or `settings` objects are created as needed.
- */
-export async function setToolSetting(
-  path: string,
-  toolId: string,
-  key: string,
-  value: unknown,
-): Promise<void> {
-  return setEntrySetting(path, "tools", toolId, key, value)
 }
 
 /** True when a config document already declares `<category>[id]`. */
@@ -200,34 +153,6 @@ export async function seedEntries(
 
   mkdirSync(dirname(path), { recursive: true })
   writeFileSync(path, next)
-}
-
-/**
- * Seeds tool entries into the kit config at `path`.
- *
- * Each seed is written only when `tools[id]` is absent, so re-running `init`
- * (and any hand-edited entry) is left untouched. Edits still go through
- * `modify`/`applyEdits`, preserving comments and formatting; a missing file is
- * created from the default config seed.
- */
-export async function seedTools(
-  path: string,
-  seeds: Record<string, ToolConfigEntry>,
-): Promise<void> {
-  return seedEntries(path, "tools", seeds)
-}
-
-/**
- * Seeds skill entries into the kit config at `path`.
- *
- * Shares {@link seedEntries}'s add-only-when-missing semantics, so an existing
- * `skills[id]` (including a disabled one) is never overwritten.
- */
-export async function seedSkills(
-  path: string,
-  seeds: Record<string, SkillConfigEntry>,
-): Promise<void> {
-  return seedEntries(path, "skills", seeds)
 }
 
 /** Whether `plugins` already references `pluginId` (as a string or `[id, opts]`). */

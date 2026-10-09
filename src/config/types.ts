@@ -1,22 +1,7 @@
+import type { CategoryEntry } from "../core/category"
+
 /** Per-item entry inside a kit config file, shared by every category. */
-export interface CategoryEntry {
-  /** Explicit on/off switch for the item. */
-  enabled?: boolean
-  /** User-supplied settings, deep-merged over the item's defaults. */
-  settings?: Record<string, unknown>
-}
-
-/**
- * @deprecated Collapsed into {@link CategoryEntry}; kept for callers that have
- * not yet migrated to the generic category engine.
- */
-export type ToolConfigEntry = CategoryEntry
-
-/**
- * @deprecated Collapsed into {@link CategoryEntry}; kept for callers that have
- * not yet migrated to the generic category engine.
- */
-export type SkillConfigEntry = CategoryEntry
+export type { CategoryEntry }
 
 /** Shape of a single `opencode-kit.json[c]` file. */
 export interface KitConfigFile {
@@ -30,11 +15,6 @@ export interface KitConfigFile {
 export interface ResolvedToolConfig<S> {
   enabled: boolean
   settings: S
-}
-
-/** A skill's fully resolved configuration after applying all sources. */
-export interface ResolvedSkillConfig {
-  enabled: boolean
 }
 
 /**
