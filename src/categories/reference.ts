@@ -15,6 +15,7 @@ import { referenceScaffold } from "./scaffold"
 export const referenceCategory: KitCategory<KitReference> = {
   key: "references",
   label: "references",
+  singular: "reference",
   items: references,
   defaultEnabled: (reference) => reference.defaultEnabled ?? false,
   hasSettings: true,

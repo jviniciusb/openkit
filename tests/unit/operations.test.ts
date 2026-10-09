@@ -50,6 +50,7 @@ test("list tolerates a throwing describe, printing an empty description", async 
   const throwing: KitCategory<{ id: string }> = {
     key: "tools",
     label: "widgets",
+    singular: "widget",
     items: [{ id: "w" }],
     defaultEnabled: () => true,
     hasSettings: false,

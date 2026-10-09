@@ -2,13 +2,11 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 
+import { categories as catalogCategories } from "../../catalog"
 import { discoverKitConfigFiles, globalOpencodePath } from "../../config/discover"
-import { resolveToolConfig } from "../../config/resolve"
 import type { KitConfigFile } from "../../config/types"
-import { resolveValidated } from "../../config/validate"
-import { loadSkill, type KitSkill } from "../../core/skill"
-import { skills as shippedSkills } from "../../skills/index"
-import { tools } from "../../tools/index"
+import type { KitCategory } from "../../core/category"
+import { resolveCategoryEntry } from "../../core/engine"
 import pkg from "../../../package.json"
 import type { CliIo } from "./list"
 
@@ -19,6 +17,13 @@ const READ_OPTIONS = { allowTrailingComma: true, disallowComments: false } as co
 interface ConfigScan {
   configs: KitConfigFile[]
   errors: string[]
+}
+
+/** One item whose category `inspect` returned a reason. */
+interface CategoryIssue {
+  id: string
+  reason: string
+  fatal: boolean
 }
 
 /**
@@ -73,18 +78,20 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
 /**
  * Handles `opencode-kit doctor`.
  *
- * Reports whether every discovered kit config parses, which tools are degraded
- * (invalid settings), whether each shipped skill's `SKILL.md` loads, and — best
- * effort — whether the `opencode-kit` plugin is listed in the relevant
- * `opencode.json`. Config parse errors and skill load errors make the command
- * return non-zero; degraded tools and a missing plugin entry are advisory.
+ * Reports whether every discovered kit config parses, runs each category's
+ * `inspect` over its shipped items (invalid tool settings degrade, a skill or
+ * reference whose file is missing errors), and — best effort — whether the
+ * `opencode-kit` plugin is listed in the relevant `opencode.json`. Config parse
+ * errors and fatal inspect reasons make the command return non-zero; a
+ * non-fatal reason (e.g. invalid tool settings) and a missing plugin entry are
+ * advisory.
  *
- * `skills` is injectable so tests can exercise load failures without touching
- * the shipped set; it defaults to the barrel.
+ * `categories` is injectable so tests can exercise a category without touching
+ * the shipped catalog; it defaults to the catalog.
  */
 export async function doctorCommand(
   io: CliIo,
-  skills: KitSkill[] = shippedSkills,
+  categories: readonly KitCategory<unknown>[] = catalogCategories,
 ): Promise<number> {
   const { configs, errors } = scanConfigs(io)
 
@@ -94,27 +101,27 @@ export async function doctorCommand(
     for (const error of errors) io.stdout(`config: error ${error}`)
   }
 
-  let degraded = 0
-  for (const tool of tools) {
-    const { degraded: reason } = resolveValidated(tool, resolveToolConfig(tool, configs))
-    if (reason !== undefined) {
-      degraded += 1
-      io.stdout(`tool: degraded ${reason}`)
+  let fatal = 0
+  for (const category of categories) {
+    const issues: CategoryIssue[] = []
+    for (const item of category.items) {
+      const resolved = resolveCategoryEntry(category, item, configs)
+      const reason = category.inspect?.(item, resolved)
+      if (reason === undefined) continue
+      issues.push({ id: (item as { id: string }).id, reason, fatal: category.inspectFatal ?? true })
     }
-  }
-  if (degraded === 0) io.stdout("tools: ok")
 
-  let skillErrors = 0
-  for (const skill of skills) {
-    try {
-      loadSkill(skill)
-    } catch (error) {
-      skillErrors += 1
-      const message = error instanceof Error ? error.message : String(error)
-      io.stdout(`skill: error ${skill.id} ${message}`)
+    if (issues.length === 0) {
+      io.stdout(`${category.label}: ok`)
+      continue
+    }
+
+    for (const issue of issues) {
+      if (issue.fatal) fatal += 1
+      const state = issue.fatal ? "error" : "degraded"
+      io.stdout(`${category.singular}: ${state} ${issue.id}: ${issue.reason}`)
     }
   }
-  if (skillErrors === 0) io.stdout("skills: ok")
 
   const candidates = [
     join(io.cwd, "opencode.json"),
@@ -123,7 +130,7 @@ export async function doctorCommand(
   const active = candidates.some((path) => opencodeListsPlugin(path, "opencode-kit"))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)
 
-  return errors.length > 0 || skillErrors > 0 ? 1 : 0
+  return errors.length > 0 || fatal > 0 ? 1 : 0
 }
 
 /** Handles `opencode-kit version`: prints the CLI and plugin versions. */
