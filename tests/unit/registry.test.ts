@@ -176,6 +176,28 @@ test("a skill missing SKILL.md degrades only itself, tagged kind: skill", async 
   expect(res.degraded).toEqual([{ kind: "skill", id: "broken", error: expect.any(String) }])
 })
 
+test("tracking wrapper forwards session hook opts to the real context", async () => {
+  const { ctx, calls } = createFakeContext()
+  // Simulate `createKitApi`: the `on` helper forwards to the tracking context's
+  // `session.hook`, which must pass `opts` through to the underlying context.
+  const forwardingKit = (_toolId: string, c: KitContext): KitApi => ({
+    ...kit,
+    async on(kind, handler, opts) { return c.session.hook(kind, handler, opts) },
+  })
+  const tool = defineTool({ id: "opts", name: "Opts", description: "d", defaultSettings: {},
+    register(_c, _s, k) { return k.on("context", () => {}, { providerID: "openai" }) } })
+
+  const res = await registerTools(
+    [tool],
+    new Map([["opts", { enabled: true, settings: {} }]]),
+    ctx,
+    forwardingKit,
+  )
+
+  expect(res.degraded).toEqual([])
+  expect(calls.hookOpts).toEqual([{ providerID: "openai" }])
+})
+
 test("registerTools tags degraded entries kind: tool", async () => {
   const { ctx } = createFakeContext()
   const bad = defineTool({ id: "bad", name: "Bad", description: "d", defaultSettings: {},
