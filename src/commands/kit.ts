@@ -1,20 +1,12 @@
-import { coerceScalar } from "../config/coerce"
-import { discoverKitConfigFiles, globalConfigPath } from "../config/discover"
-import { setSkillEnabled, setToolEnabled, setToolSetting } from "../config/edit"
-import {
-  buildConfigLayers,
-  resolveEffective,
-  resolveSkillEffective,
-  valuesEqual,
-} from "../config/effective"
-import { loadKitConfig } from "../config/load"
-import { resolveSkillConfig, resolveToolConfig } from "../config/resolve"
+import { categories } from "../catalog"
 import type { KitConfigFile } from "../config/types"
-import { resolveValidated } from "../config/validate"
 import type { KitContext, Registration } from "../core/context"
-import { skillDescription } from "../core/skill"
-import { skills } from "../skills/index"
-import { tools } from "../tools/index"
+import {
+  configSetOperation,
+  listOperation,
+  toggleOperation,
+  type OperationDeps,
+} from "../operations/index"
 
 /** Injected environment for the `/kit` command (home, cwd, reload, output). */
 export interface KitCommandDeps {
@@ -80,6 +72,10 @@ const USAGE = [
  *   kit config (scalar coercion, comment-preserving), then reload. Skill ids
  *   are rejected: skills have no settings.
  *
+ * Each form delegates to the shared operations so `/kit` and the CLI never
+ * diverge; this adapter only owns I/O routing and the `/kit`-specific usage and
+ * positional guards.
+ *
  * The returned registration disposes the command; the caller owns its lifetime.
  */
 export async function registerKitCommand(
@@ -100,136 +96,55 @@ function tokenize(raw: string): string[] {
   return raw.trim().length === 0 ? [] : raw.trim().split(/\s+/)
 }
 
-/** Dispatches one `/kit` invocation. */
+/** Dispatches one `/kit` invocation to the shared operations. */
 async function executeKitCommand(
   input: KitCommandInput,
   ctx: KitContext,
   deps: KitCommandDeps,
 ): Promise<void> {
   const [sub, ...rest] = tokenize(input.arguments ?? "")
-  const scoped: KitCommandDeps = { ...deps, stdout: outputWriter(ctx, deps, input.sessionID) }
-  const pluginOptions = ctx.options as KitConfigFile
+  const writer = outputWriter(ctx, deps, input.sessionID)
+  const opDeps: OperationDeps = {
+    cwd: deps.cwd,
+    home: deps.home,
+    options: ctx.options as KitConfigFile,
+    out: writer,
+    err: writer,
+    reload: deps.reload,
+  }
 
   switch (sub) {
     case "list":
-      return list(scoped)
+      await listOperation(categories, opDeps)
+      return
     case "enable":
-      return toggle(scoped, rest[0], true, pluginOptions)
+      await toggleOperation(categories, opDeps, rest[0], true)
+      return
     case "disable":
-      return toggle(scoped, rest[0], false, pluginOptions)
+      await toggleOperation(categories, opDeps, rest[0], false)
+      return
     case "config":
-      return configure(scoped, rest, pluginOptions)
+      await configure(opDeps, rest)
+      return
     default:
-      scoped.stdout(USAGE)
+      writer(USAGE)
   }
 }
 
-/** Prints every shipped tool and skill with its resolved enabled state. */
-async function list(deps: KitCommandDeps): Promise<void> {
-  const paths = discoverKitConfigFiles(deps.cwd, deps.home)
-  const sources = await loadKitConfig(paths)
-
-  deps.stdout("tools:\n")
-  for (const tool of tools) {
-    const { enabled } = resolveToolConfig(tool, sources)
-    deps.stdout(`${tool.id}\t${enabled ? "enabled" : "disabled"}\t${tool.description}\n`)
-  }
-
-  deps.stdout("skills:\n")
-  for (const skill of skills) {
-    const { enabled } = resolveSkillConfig(skill, sources)
-    deps.stdout(`${skill.id}\t${enabled ? "enabled" : "disabled"}\t${skillDescription(skill)}\n`)
-  }
-}
-
-/** Enables or disables a known tool or skill in the global config, then reloads. */
-async function toggle(
-  deps: KitCommandDeps,
-  toolId: string | undefined,
-  enabled: boolean,
-  pluginOptions: KitConfigFile,
-): Promise<void> {
-  const verb = enabled ? "enable" : "disable"
-
-  if (toolId === undefined || toolId.length === 0) {
-    deps.stdout(`kit: ${verb} requires a tool id`)
-    return
-  }
-
-  const tool = tools.find((candidate) => candidate.id === toolId)
-  const skill = skills.find((candidate) => candidate.id === toolId)
-  if (tool === undefined && skill === undefined) {
-    deps.stdout(`kit: unknown tool "${toolId}"`)
-    return
-  }
-
-  if (tool !== undefined) {
-    await setToolEnabled(globalConfigPath(deps.home), toolId, enabled)
-    deps.stdout(`${toolId} ${enabled ? "enabled" : "disabled"}`)
-
-    // Resolve after the write so the global layer reflects the new value.
-    const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, pluginOptions)
-    const effective = resolveEffective(tool, layers)
-    if (effective.enabled !== enabled) {
-      deps.stdout(
-        `kit: warning: "${toolId}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
-      )
-    }
-  } else if (skill !== undefined) {
-    await setSkillEnabled(globalConfigPath(deps.home), toolId, enabled)
-    deps.stdout(`${toolId} ${enabled ? "enabled" : "disabled"}`)
-
-    const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, pluginOptions)
-    const effective = resolveSkillEffective(skill, layers)
-    if (effective.enabled !== enabled) {
-      deps.stdout(
-        `kit: warning: "${toolId}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
-      )
-    }
-  }
-
-  await deps.reload()
-}
-
-/** Sets a tool setting in the global config, then reloads. */
-async function configure(
-  deps: KitCommandDeps,
-  parts: string[],
-  pluginOptions: KitConfigFile,
-): Promise<void> {
+/**
+ * Guards `/kit`'s positional `config` form, then delegates to the shared
+ * setter.
+ *
+ * `/kit` keeps its own arity message (rather than the operation's) so a bare
+ * `config` reads as usage error, not as an unknown empty id.
+ */
+async function configure(deps: OperationDeps, parts: string[]): Promise<void> {
   const [toolId, key, ...valueParts] = parts
 
   if (toolId === undefined || key === undefined || valueParts.length === 0) {
-    deps.stdout("kit: config requires <id> <key> <value>")
-    return
-  }
-  const tool = tools.find((candidate) => candidate.id === toolId)
-  if (tool === undefined) {
-    if (skills.some((skill) => skill.id === toolId)) {
-      deps.stdout(`kit: skills have no settings: "${toolId}"`)
-      return
-    }
-    deps.stdout(`kit: unknown tool "${toolId}"`)
+    deps.out("kit: config requires <id> <key> <value>")
     return
   }
 
-  const value = coerceScalar(valueParts.join(" "))
-  await setToolSetting(globalConfigPath(deps.home), toolId, key, value)
-  deps.stdout(`${toolId}.${key} = ${JSON.stringify(value)}`)
-
-  const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, pluginOptions)
-  const effective = resolveEffective(tool, layers)
-  const { degraded } = resolveValidated(tool, { enabled: effective.enabled, settings: effective.settings })
-  if (degraded !== undefined) {
-    deps.stdout(`kit: warning: ${degraded}`)
-  }
-
-  const effectiveValue = effective.settings[key]
-  if (!valuesEqual(effectiveValue, value)) {
-    deps.stdout(
-      `kit: warning: "${toolId}.${key}" is effectively ${JSON.stringify(effectiveValue)}; your change is overridden by ${effective.settingLayers[key]?.label ?? "a higher-precedence layer"}`,
-    )
-  }
-
-  await deps.reload()
+  await configSetOperation(categories, deps, toolId, key, valueParts)
 }
