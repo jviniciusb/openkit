@@ -190,6 +190,8 @@ export interface KitCategory<TItem> {
   defaultEnabled(item: TItem): boolean
   /** Whether the category carries settings (drives config get/set + resolution). */
   hasSettings: boolean
+  /** Default settings base for settings-bearing categories; tools return tool.defaultSettings. */
+  defaultSettings?(item: TItem): Record<string, unknown>
   /** The only truly per-category behavior. */
   registerItem(item: TItem, resolved: ResolvedEntry, ctx: KitContext): Promise<RegisterItemResult>
   /** One-line description for list; may throw — callers tolerate. */
@@ -254,7 +256,9 @@ only that item.
   explicit, unchanged precedence).
 - One generic entry type `CategoryEntry { enabled?, settings? }`. `hasSettings`
   decides whether settings are resolved/merged/validated and whether
-  `config get|set` accepts the id.
+  `config get|set` accepts the id. For settings-bearing categories the generic
+  resolver seeds settings from `category.defaultSettings?.(item) ?? {}` before
+  deep-merging sources; settings-less categories ignore both.
 - `references.<id>.settings` deep-merge over the descriptor file's source
   (per-project overrides of `path`/`repository`/`branch`).
 - `src/config/types.ts` adds `references?: Record<string, CategoryEntry>`; the
