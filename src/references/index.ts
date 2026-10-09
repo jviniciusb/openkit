@@ -1,3 +1,4 @@
+import { defineReference } from "../core/reference"
 import type { KitReference } from "../core/reference"
 
 /**
