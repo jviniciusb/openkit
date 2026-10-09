@@ -2,8 +2,6 @@ import { existsSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import { parse } from "jsonc-parser"
 
-import type { KitTool } from "../core/tool"
-import type { KitSkill } from "../core/skill"
 import {
   discoverKitConfigFiles,
   globalConfigPath,
@@ -25,16 +23,6 @@ export interface ConfigLayer {
   /** Human-readable label naming where the layer came from. */
   label: string
   config: KitConfigFile
-}
-
-/** A tool's effective config plus the layers responsible for each decision. */
-export interface EffectiveConfig {
-  enabled: boolean
-  settings: Record<string, unknown>
-  /** Layer that set the effective `enabled`, if any (not the tool default). */
-  enabledLayer?: ConfigLayer
-  /** Highest-precedence layer that set each settings key. */
-  settingLayers: Record<string, ConfigLayer>
 }
 
 /** True when two resolved values are equivalent for advisory comparisons. */
@@ -123,59 +111,3 @@ export function readPluginOptions(
   return merged
 }
 
-/**
- * Resolves a tool's effective `enabled`/`settings` across `layers`.
- *
- * Layer order is low → high: `enabled` is replaced, `settings` deep-merge. The
- * returned bookkeeping identifies which layer last set `enabled` and which layer
- * supplied each settings key, so callers can name an overriding layer.
- */
-export function resolveEffective<S>(tool: KitTool<S>, layers: ConfigLayer[]): EffectiveConfig {
-  let enabled = tool.defaultEnabled ?? false
-  let enabledLayer: ConfigLayer | undefined
-  let settings = { ...(tool.defaultSettings as Record<string, unknown>) }
-  const settingLayers: Record<string, ConfigLayer> = {}
-
-  for (const layer of layers) {
-    const entry = layer.config.tools?.[tool.id]
-    if (entry === undefined) continue
-
-    if (entry.enabled !== undefined) {
-      enabled = entry.enabled
-      enabledLayer = layer
-    }
-    if (entry.settings !== undefined) {
-      for (const key of Object.keys(entry.settings)) settingLayers[key] = layer
-      settings = deepMerge(settings, entry.settings) as Record<string, unknown>
-    }
-  }
-
-  return { enabled, settings, enabledLayer, settingLayers }
-}
-
-/**
- * Resolves a skill's effective `enabled` across `layers`.
- *
- * Layer order is low → high: `enabled` is replaced, starting from the skill
- * default (`defaultEnabled`, or `true` when unset). The returned bookkeeping
- * identifies which layer last set `enabled`, so callers can name an overriding
- * layer.
- */
-export function resolveSkillEffective(
-  skill: KitSkill,
-  layers: ConfigLayer[],
-): { enabled: boolean; enabledLayer?: ConfigLayer } {
-  let enabled = skill.defaultEnabled ?? true
-  let enabledLayer: ConfigLayer | undefined
-
-  for (const layer of layers) {
-    const entry = layer.config.skills?.[skill.id]
-    if (entry === undefined) continue
-    if (entry.enabled !== undefined) {
-      enabled = entry.enabled
-      enabledLayer = layer
-    }
-  }
-
-  return { enabled, enabledLayer }
-}

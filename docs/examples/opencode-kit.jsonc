@@ -54,5 +54,16 @@
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.
     // `enable`/`disable` and the `/kit` command write here.
+  },
+  "references": {
+    // References are declarative content sources (`src/references/<id>/reference.json`)
+    // exposed to the session through `ctx.reference`. They are opt-in and
+    // settings-bearing; `settings` override the source's `path`/`repository`/`branch`.
+    // The category ships empty today — add one with `opencode-kit new reference <id>`.
+    //
+    // "project-docs": {
+    //   "enabled": true,
+    //   "settings": { "path": "./docs/v2" }
+    // }
   }
 }

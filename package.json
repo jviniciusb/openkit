@@ -1,7 +1,7 @@
 {
   "name": "opencode-kit",
   "version": "0.4.0",
-  "description": "A framework of toggleable, configurable tools and skills for OpenCode V2",
+  "description": "A framework of toggleable, configurable tools, skills, and references for OpenCode V2",
   "keywords": [
     "opencode",
     "opencode-plugin",
@@ -9,7 +9,8 @@
     "ai",
     "coding-agent",
     "tools",
-    "skills"
+    "skills",
+    "references"
   ],
   "homepage": "https://github.com/jviniciusb/opencode-kit#readme",
   "repository": {
