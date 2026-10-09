@@ -79,8 +79,9 @@ export function referenceDescription(ref: KitReference): string {
 
 /**
  * Loads a reference, merges `settings` over its source, and registers it
- * through `ctx.reference.transform`. `settings` only override source fields
- * (e.g. a different `path`); `type` is preserved from the loaded file.
+ * through `ctx.reference.transform`. `settings` override only the source's
+ * `path`/`repository`/`branch`; `type` is always taken from the loaded file, so
+ * a setting cannot turn a `local` reference into an invalid `git` source.
  */
 export async function registerReference(
   ctx: KitContext,
@@ -88,6 +89,6 @@ export async function registerReference(
   settings?: Record<string, unknown>,
 ): Promise<Registration> {
   const { source } = loadReference(ref)
-  const merged = { ...source, ...settings } as ReferenceSource
+  const merged = { ...source, ...settings, type: source.type } as ReferenceSource
   return ctx.reference.transform((editor) => editor.add(ref.id, merged))
 }

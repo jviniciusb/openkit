@@ -19,7 +19,9 @@ async function report(io: CliIo, scaffold: () => Promise<{ dir: string }>): Prom
 /**
  * Handles `opencode-kit new <category> <id>`, `new <id>`, and their aliases.
  *
- * `new <id>` (one argument) is an alias for `new tool <id>`; two arguments are
+ * `new <id>` (one argument) is an alias for `new tool <id>`, except that a lone
+ * category name (`tool`/`tools`, `skill`/`skills`, `reference`/`references`) is
+ * rejected as a missing id rather than scaffolded as a tool. Two arguments are
  * read as `new <category> <id>` where the category is a category key or its
  * singular (`tool`, `skill`, `reference`). A missing id, an unknown category, or
  * extra arguments is a user error; a thrown scaffolder error (e.g. an existing
@@ -32,8 +34,13 @@ export async function newCommand(io: CliIo, args: string[]): Promise<number> {
     return 1
   }
 
-  // `new <id>` stays an alias for `new tool <id>`.
+  // A lone category name (key or singular) is a missing-id error, not a tool id.
   if (rest.length === 0) {
+    if (categories.some((category) => category.key === first || category.singular === first)) {
+      io.stderr("opencode-kit: new <category> requires an id")
+      return 1
+    }
+    // `new <id>` stays an alias for `new tool <id>`.
     return report(io, () => scaffoldTool(io.cwd, first))
   }
 

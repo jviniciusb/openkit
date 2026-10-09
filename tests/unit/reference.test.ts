@@ -21,6 +21,27 @@ test("loads a local reference and applies settings overrides on register", async
   expect((calls.reference[0] as { source: unknown }).source).toEqual({ type: "local", path: "./other" })
 })
 
+test("loads a git reference; repository required, branch optional", () => {
+  const withBranch = ref("g", `{ "type": "git", "repository": "https://x/y", "branch": "main" }`)
+  expect(loadReference(withBranch)).toEqual({
+    id: "g",
+    source: { type: "git", repository: "https://x/y", branch: "main" },
+  })
+  const noBranch = ref("g2", `{ "type": "git", "repository": "https://x/y" }`)
+  expect(loadReference(noBranch).source).toEqual({ type: "git", repository: "https://x/y" })
+  expect(() => loadReference(ref("bad", `{ "type": "git" }`))).toThrow()
+})
+
+test("settings cannot override the file's reference type", async () => {
+  const r = ref("r", `{ "type": "local", "path": "./docs" }`)
+  const { ctx, calls } = createFakeContext()
+  await registerReference(ctx, r, { type: "git" })
+  expect((calls.reference[0] as { source: unknown }).source).toEqual({
+    type: "local",
+    path: "./docs",
+  })
+})
+
 test("invalid or missing reference files throw; description never throws", () => {
   expect(() => loadReference(ref("bad", `{ "type": "local" }`))).toThrow()
   const missing = defineReference({ id: "gone", dir: new URL("file:///no-such-ref/") })

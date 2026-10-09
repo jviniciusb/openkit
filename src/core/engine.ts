@@ -12,7 +12,7 @@ export interface DegradedItem {
 }
 
 /** Reads an item's config id; `KitCategory` stays unconstrained for bivariance. */
-function itemId<T>(item: T): string {
+export function itemId<T>(item: T): string {
   return (item as { id: string }).id
 }
 

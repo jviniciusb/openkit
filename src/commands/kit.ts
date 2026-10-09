@@ -57,20 +57,20 @@ const USAGE = [
   "kit enable <id>",
   "kit disable <id>",
   "kit config <id> <key> <value>",
-  "<id> is a tool or skill id; config applies to tools only.",
+  "<id> is a tool, skill, or reference id; config applies to settings-bearing categories (tools and references).",
 ].join("\n")
 
 /**
  * Registers the `/kit` slash command.
  *
  * Supported forms:
- * - `list` — print every shipped tool with its resolved enabled state;
- * - `enable <id>` / `disable <id>` — write `tools[id].enabled` (or, for a
- *   shipped skill id, `skills[id].enabled`) to the global kit config, then
- *   reload;
- * - `config <id> <key> <value>` — write `tools[id].settings[key]` to the global
- *   kit config (scalar coercion, comment-preserving), then reload. Skill ids
- *   are rejected: skills have no settings.
+ * - `list` — print every shipped item with its resolved enabled state;
+ * - `enable <id>` / `disable <id>` — write `<category>[id].enabled` (tools,
+ *   skills, or references) to the global kit config, then reload;
+ * - `config <id> <key> <value>` — write `<category>[id].settings[key]` for a
+ *   settings-bearing item (tools and references) to the global kit config
+ *   (scalar coercion, comment-preserving), then reload. Skill ids are rejected:
+ *   skills have no settings.
  *
  * Each form delegates to the shared operations so `/kit` and the CLI never
  * diverge; this adapter only owns I/O routing and the `/kit`-specific usage and
@@ -85,7 +85,7 @@ export async function registerKitCommand(
   return ctx.command.transform((editor) => {
     editor.add({
       name: "kit",
-      description: "Manage opencode-kit tools and skills (list, enable, disable, config)",
+      description: "Manage opencode-kit tools, skills, and references (list, enable, disable, config)",
       execute: (input: KitCommandInput) => executeKitCommand(input, ctx, deps),
     })
   })

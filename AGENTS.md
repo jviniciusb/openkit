@@ -45,7 +45,7 @@ src/
   catalog.ts            # assembles categories from the descriptors
   categories/           # tool, skill, reference descriptors + scaffolder metadata
   operations/           # shared list/toggle/config ops used by the CLI and /kit
-  config/               # discover, load, merge, effective, validate, edit, types
+  config/               # discover, load, merge, effective, validate, edit, coerce, types
   core/                 # category contract + engine, item contracts, kit API, context, testing fakes
   cli/                  # CLI entry and commands; scaffold.ts
   tools/<id>/index.ts   # one folder per tool

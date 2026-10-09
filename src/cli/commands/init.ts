@@ -4,7 +4,7 @@ import { categories } from "../../catalog"
 import { globalConfigPath, globalOpencodePath, projectConfigPath } from "../../config/discover"
 import { ensurePluginEntry, seedEntries } from "../../config/edit"
 import type { CategoryEntry } from "../../config/types"
-import { itemId } from "../../operations/list"
+import { itemId } from "../../core/engine"
 import type { CliIo } from "./list"
 
 /** Options accepted by {@link initCommand}. */
