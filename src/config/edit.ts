@@ -9,7 +9,7 @@ import {
   type ModificationOptions,
   type ParseError,
 } from "jsonc-parser"
-import type { KitConfigFile, ToolConfigEntry } from "./types"
+import { categoryEntries, type CategoryEntry, type KitConfigFile } from "./types"
 
 /** Options used when `modify` has to create a JSON property. */
 const MODIFY_OPTIONS: ModificationOptions = {
@@ -17,7 +17,7 @@ const MODIFY_OPTIONS: ModificationOptions = {
 }
 
 /** Seed for a brand-new config file. */
-const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {} }
+const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {}, skills: {}, references: {} }
 
 /** Parses JSONC options shared by every read in this module. */
 const READ_OPTIONS = {
@@ -63,9 +63,11 @@ function readEditableText(path: string, fallback: string): string {
     throw new Error(`refusing to edit malformed config ${path}: ${details}`)
   }
 
-  // Empty / whitespace-only / comment-only documents parse to `undefined`; treat
-  // them like an absent file so the caller seeds a default config.
-  if (parsed === undefined) return fallback
+  // Empty / whitespace-only / comment-only documents parse to `undefined`, and a
+  // document that is exactly `null` parses to `null`; neither is a usable config
+  // object, so treat both like an absent file and seed the fallback. (Without
+  // this, editing a `null` document throws inside `modify`.)
+  if (parsed == null) return fallback
 
   return text
 }
@@ -83,60 +85,70 @@ function applyAndWrite(path: string, text: string, edits: Edit[]): void {
 }
 
 /**
- * Sets `tools[toolId].enabled` in the config at `path`.
+ * Sets `<category>[id].enabled` in the config at `path`.
  *
- * The file is read as raw text (creating a default config when absent) and
+ * `category` is the top-level config map key (`tools`, `skills`, `references`,
+ * …). The file is read as raw text (creating a default config when absent) and
  * edited with `jsonc-parser`'s `modify`/`applyEdits`, so existing comments,
  * key order, and indentation survive the round-trip. Missing intermediate
- * objects (`tools`, the tool entry) are created.
+ * objects (`category`, the entry) are created.
  */
-export async function setToolEnabled(path: string, toolId: string, enabled: boolean): Promise<void> {
+export async function setEntryEnabled(
+  path: string,
+  category: string,
+  id: string,
+  enabled: boolean,
+): Promise<void> {
   const text = readConfigText(path)
-  const edits = modify(text, ["tools", toolId, "enabled"], enabled, MODIFY_OPTIONS)
+  const edits = modify(text, [category, id, "enabled"], enabled, MODIFY_OPTIONS)
   applyAndWrite(path, text, edits)
 }
 
 /**
- * Sets `tools[toolId].settings[key]` in the config at `path`.
+ * Sets `<category>[id].settings[key]` in the config at `path`.
  *
- * Same comment-preserving read/modify/write as {@link setToolEnabled}; missing
- * `tools`, tool, or `settings` objects are created as needed.
+ * `category` is the top-level config map key (`tools`, `skills`, `references`,
+ * …). Same comment-preserving read/modify/write as {@link setEntryEnabled};
+ * missing `category`, entry, or `settings` objects are created as needed.
  */
-export async function setToolSetting(
+export async function setEntrySetting(
   path: string,
-  toolId: string,
+  category: string,
+  id: string,
   key: string,
   value: unknown,
 ): Promise<void> {
   const text = readConfigText(path)
-  const edits = modify(text, ["tools", toolId, "settings", key], value, MODIFY_OPTIONS)
+  const edits = modify(text, [category, id, "settings", key], value, MODIFY_OPTIONS)
   applyAndWrite(path, text, edits)
 }
 
-/** True when a config document already declares `tools[toolId]`. */
-function hasToolEntry(text: string, toolId: string): boolean {
+/** True when a config document already declares `<category>[id]`. */
+function hasEntry(text: string, category: string, id: string): boolean {
+  // `parse("null")` yields `null`, so guard both nullish cases before indexing.
   const parsed = parse(text, [], READ_OPTIONS) as KitConfigFile | undefined
-  return parsed?.tools?.[toolId] !== undefined
+  return parsed != null && categoryEntries(parsed, category)?.[id] !== undefined
 }
 
 /**
- * Seeds tool entries into the kit config at `path`.
+ * Seeds entries into the kit config at `path` under `category`.
  *
- * Each seed is written only when `tools[id]` is absent, so re-running `init`
- * (and any hand-edited entry) is left untouched. Edits still go through
+ * Each seed is written only when `category[id]` is absent, so re-running
+ * `init` (and any hand-edited entry) is left untouched. Edits still go through
  * `modify`/`applyEdits`, preserving comments and formatting; a missing file is
  * created from the default config seed.
  */
-export async function seedTools(
+export async function seedEntries(
   path: string,
-  seeds: Record<string, ToolConfigEntry>,
+  category: string,
+  seeds: Record<string, CategoryEntry>,
 ): Promise<void> {
   const text = readConfigText(path)
 
   let next = text
-  for (const [toolId, entry] of Object.entries(seeds)) {
-    if (hasToolEntry(next, toolId)) continue
-    next = applyEdits(next, modify(next, ["tools", toolId], entry, MODIFY_OPTIONS))
+  for (const [id, entry] of Object.entries(seeds)) {
+    if (hasEntry(next, category, id)) continue
+    next = applyEdits(next, modify(next, [category, id], entry, MODIFY_OPTIONS))
   }
 
   mkdirSync(dirname(path), { recursive: true })

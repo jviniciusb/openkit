@@ -1,9 +1,10 @@
 import { join } from "node:path"
 
+import { categories } from "../../catalog"
 import { globalConfigPath, globalOpencodePath, projectConfigPath } from "../../config/discover"
-import { ensurePluginEntry, seedTools } from "../../config/edit"
-import type { ToolConfigEntry } from "../../config/types"
-import { tools } from "../../tools/index"
+import { ensurePluginEntry, seedEntries } from "../../config/edit"
+import type { CategoryEntry } from "../../config/types"
+import { itemId } from "../../core/engine"
 import type { CliIo } from "./list"
 
 /** Options accepted by {@link initCommand}. */
@@ -19,10 +20,12 @@ const PLUGIN_ID = "opencode-kit"
  * Handles `opencode-kit init [--project]`.
  *
  * Creates the kit config (global by default, project with `--project`) and seeds
- * every shipped tool with its declared default `enabled`/`settings`. It also
- * ensures the matching `opencode.json` lists `"opencode-kit"` in `plugins`,
- * creating that file when absent. Both writes are idempotent: existing tool
- * entries and plugin entries are never overwritten or duplicated.
+ * every shipped item of every category with its declared defaults: `enabled`
+ * from the category's `defaultEnabled`, plus `settings` for settings-bearing
+ * categories. It also ensures the matching `opencode.json` lists
+ * `"opencode-kit"` in `plugins`, creating that file when absent. Both writes are
+ * idempotent: existing entries, and plugin entries, are never overwritten or
+ * duplicated.
  */
 export async function initCommand(io: CliIo, options: InitOptions = {}): Promise<number> {
   const project = options.project ?? false
@@ -30,15 +33,16 @@ export async function initCommand(io: CliIo, options: InitOptions = {}): Promise
   const configPath = project ? projectConfigPath(io.cwd) : globalConfigPath(io.home)
   const opencodePath = project ? join(io.cwd, "opencode.json") : globalOpencodePath(io.home)
 
-  const seeds: Record<string, ToolConfigEntry> = {}
-  for (const tool of tools) {
-    seeds[tool.id] = {
-      enabled: tool.defaultEnabled ?? false,
-      settings: tool.defaultSettings as Record<string, unknown>,
+  for (const category of categories) {
+    const seeds: Record<string, CategoryEntry> = {}
+    for (const item of category.items) {
+      const entry: CategoryEntry = { enabled: category.defaultEnabled(item) }
+      if (category.hasSettings) entry.settings = category.defaultSettings?.(item)
+      seeds[itemId(item)] = entry
     }
+    await seedEntries(configPath, category.key, seeds)
   }
 
-  await seedTools(configPath, seeds)
   await ensurePluginEntry(opencodePath, PLUGIN_ID)
 
   io.stdout(`${project ? "project" : "global"} config ready: ${configPath}`)

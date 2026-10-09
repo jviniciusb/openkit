@@ -4,6 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { defineTool } from "../../src/core/tool"
 import { createLifecycle } from "../../src/plugin"
+import { toolCategory } from "../../src/categories/tool"
 import { createFakeContext } from "../../src/core/testing"
 
 test("a failing reload leaves no generation to double-dispose", async () => {
@@ -31,7 +32,7 @@ test("a failing reload leaves no generation to double-dispose", async () => {
   const a = defineTool({ id: "a", name: "A", description: "d", defaultSettings: {},
     register(c) { return c.tool.transform(() => {}) } })
 
-  const life = await createLifecycle(failing, [a], {}, () => () => {})
+  const life = await createLifecycle(failing, [{ ...toolCategory, items: [a] }], {}, () => () => {})
   expect(disposed).toBe(0)
 
   explode = true
@@ -52,7 +53,7 @@ test("reload disposes previous registrations then re-registers", async () => {
     onRegistration: () => ({ dispose: async () => { disposed++ } }) })
   const a = defineTool({ id: "a", name: "A", description: "d", defaultSettings: {},
     register(c) { return c.tool.transform(() => {}) } })
-  const life = await createLifecycle(ctx, [a], {}, () => () => {})
+  const life = await createLifecycle(ctx, [{ ...toolCategory, items: [a] }], {}, () => () => {})
   expect(calls.tool.length).toBe(1)
   await life.reload()
   expect(disposed).toBe(1)          // first generation released
@@ -91,7 +92,7 @@ test("dispose during an in-flight reload releases the newest generation exactly 
     } })
 
   let onChange: () => void = () => {}
-  const life = await createLifecycle(ctx, [a], {}, (_paths, cb) => {
+  const life = await createLifecycle(ctx, [{ ...toolCategory, items: [a] }], {}, (_paths, cb) => {
     onChange = cb
     return () => {}
   })

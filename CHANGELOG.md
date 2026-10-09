@@ -6,6 +6,37 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Skills** as a first-class, independently toggleable artifact category beside
+  tools: a skill is a declarative `src/skills/<id>/SKILL.md` package with its own
+  `skills.<id>.enabled` config section, resolved state, and registration
+  lifecycle. Tools can still contribute skills at runtime through the kit
+  context.
+- Two bundled skills, both enabled by default: `english-writing-assistant`
+  (model-visible) and `sdd-flow` (registered `autoinvoke: false`, invoked with
+  `@sdd-flow`).
+- `new-skill` CLI command, plus skill support in `list`, `enable`/`disable`,
+  `init`, and `doctor`.
+- **References** as a third first-class, independently toggleable category: a
+  declarative `src/references/<id>/reference.json` content source (a local path
+  or a git repository) exposed to the session through `ctx.reference`, with its
+  own `references.<id>` config section (`enabled` + `settings`) and registration
+  lifecycle. The category ships empty today.
+- A generic `KitCategory` engine: tools, skills, and references are descriptors
+  over one shared config resolver and registration/isolation loop, and a shared
+  `src/operations/` layer backs both the CLI and `/kit`.
+- Unified `new <category> <id>` CLI command (`new-skill` is retained as an alias
+  for `new skill`), plus a top-level `references` section in the JSON Schema.
+
+### Changed
+
+- `enable`/`disable` resolve ids across tools, skills, and references; `config
+  get|set` address any settings-bearing category (`tools` and `references`),
+  while skills expose only `enabled`.
+- `init`, `list`, and `doctor` iterate every category rather than hard-coding
+  tools and skills.
+
 ## [0.5.2] - 2026-10-06
 
 ### Changed

@@ -47,6 +47,8 @@ export interface KitApi {
   command(def: CommandDefinition): Promise<Registration>
   skill(def: SkillDefinition): Promise<Registration>
   on(kind: string, handler: HookHandler, opts?: unknown): Promise<Registration>
+  /** Registers a tool-execution hook, e.g. `"execute.before"`. */
+  toolHook(name: string, handler: HookHandler): Promise<Registration>
 }
 
 /**

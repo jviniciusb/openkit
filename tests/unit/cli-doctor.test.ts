@@ -2,8 +2,11 @@ import { expect, test } from "bun:test"
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
+import { pathToFileURL } from "node:url"
 import pkg from "../../package.json"
+import { skillCategory } from "../../src/categories/skill"
 import { globalConfigPath } from "../../src/config/discover"
+import { defineSkill } from "../../src/core/skill"
 import { doctorCommand, versionCommand } from "../../src/cli/commands/doctor"
 import { runCli } from "../../src/cli/index"
 
@@ -69,6 +72,34 @@ test("version prints CLI and plugin versions", async () => {
   expect(h.out()).toContain("CLI")
   expect(h.out()).toContain("plugin")
   expect(h.out()).toContain(pkg.version)
+})
+
+test("doctor reports skills: ok for a loadable skill", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = mkdtempSync(join(tmpdir(), "skill-"))
+  writeFileSync(join(dir, "SKILL.md"), "---\nname: S\n---\nbody")
+  const h = io(home)
+  const skill = defineSkill({ id: "s", dir: pathToFileURL(`${dir}/`) })
+  const code = await doctorCommand(h.io, [{ ...skillCategory, items: [skill] }])
+  expect(code).toBe(0)
+  expect(h.out()).toContain("skills: ok")
+})
+
+test("doctor fails and names a skill whose SKILL.md is missing", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const h = io(home)
+  const skill = defineSkill({ id: "broken", dir: new URL("file:///no-such-dir/") })
+  const code = await doctorCommand(h.io, [{ ...skillCategory, items: [skill] }])
+  expect(code).not.toBe(0)
+  expect(h.out()).toContain("skill: error broken")
+})
+
+test("doctor reports a references section", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const h = io(home)
+  const code = await doctorCommand(h.io)
+  expect(code).toBe(0)
+  expect(h.out()).toContain("references: ok")
 })
 
 test("runCli dispatches init, doctor, and version", async () => {
