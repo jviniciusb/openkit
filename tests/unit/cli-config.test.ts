@@ -203,6 +203,39 @@ test("enable warns when opencode.json plugin options override the global write",
   expect(err()).toContain("plugin options")
 })
 
+function storedSkills(h: string): Record<string, { enabled?: boolean }> {
+  const data = parse(readFileSync(globalConfig(h), "utf8")) as { skills?: Record<string, { enabled?: boolean }> }
+  return data.skills ?? {}
+}
+
+test("enable and disable a skill id write the skills section", async () => {
+  const h = home()
+  expect(await runCli(["disable", "sdd-flow"], io(h).io)).toBe(0)
+  expect(storedSkills(h)["sdd-flow"]?.enabled).toBe(false)
+  expect(await runCli(["enable", "sdd-flow"], io(h).io)).toBe(0)
+  expect(storedSkills(h)["sdd-flow"]?.enabled).toBe(true)
+})
+
+test("enabling a previously disabled skill does not report an override", async () => {
+  const h = home()
+  await runCli(["disable", "sdd-flow"], io(h).io)
+  const { io: streams, err } = io(h)
+
+  const code = await runCli(["enable", "sdd-flow"], streams)
+
+  expect(code).toBe(0)
+  expect(storedSkills(h)["sdd-flow"]?.enabled).toBe(true)
+  expect(err()).not.toContain("overridden")
+})
+
+test("config on a skill id fails and does not write", async () => {
+  const h = home()
+  const { io: streams, err } = io(h)
+  const code = await runCli(["config", "set", "sdd-flow", "x", "1"], streams)
+  expect(code).not.toBe(0)
+  expect(err()).toContain("sdd-flow")
+})
+
 test("CLI honors an explicit XDG_CONFIG_HOME and restores the ambient value", async () => {
   const h = home()
   const xdg = mkdtempSync(join(tmpdir(), "xdg-"))

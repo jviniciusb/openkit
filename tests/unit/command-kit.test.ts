@@ -54,6 +54,7 @@ test("setup disposes the lifecycle when command registration fails", async () =>
     command: { async transform() { throw new Error("boom") } },
   }
   await expect(plugin.setup(broken)).rejects.toThrow("boom")
+  // The item(s) registered during bootstrap were all released.
   expect(registered).toBeGreaterThan(0)
   expect(disposed).toBe(registered)
 })
@@ -70,6 +71,46 @@ test("`kit config` warns through its output when the write degrades the tool", a
   expect(out).toContain("background-subagents.count = 42")
   expect(out).toContain("warning")
   expect(out).toContain("background-subagents")
+})
+
+test("`kit list` includes skills", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let out = ""
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+  await cmd.execute({ arguments: "list", sessionID: "s" })
+  expect(out).toContain("skills:")
+  expect(out).toContain("sdd-flow")
+})
+
+test("`kit disable sdd-flow` writes the skills section and reloads", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let reloaded = 0
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => { reloaded++ }, stdout: () => {} })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+
+  await cmd.execute({ arguments: "disable sdd-flow", sessionID: "s" })
+
+  expect(reloaded).toBe(1)
+  const stored = JSON.parse(readFileSync(globalConfigPath(home), "utf8")) as {
+    skills?: Record<string, { enabled?: boolean }>
+  }
+  expect(stored.skills?.["sdd-flow"]?.enabled).toBe(false)
+})
+
+test("`kit config` on a skill id reports that skills have no settings", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let out = ""
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+
+  await cmd.execute({ arguments: "config sdd-flow x 1", sessionID: "s" })
+
+  expect(out).toContain("skills have no settings")
+  expect(out).toContain("sdd-flow")
 })
 
 test("`kit enable` warns when plugin options override the global write", async () => {

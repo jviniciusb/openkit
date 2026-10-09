@@ -6,6 +6,8 @@ import type {
   KitStorage,
   Logger,
   Namespace,
+  ReferenceEditor,
+  ReferenceSource,
   Registration,
   SkillDefinition,
   SkillEditor,
@@ -19,6 +21,14 @@ export interface FakeContextOptions {
   directory?: string
   /** Value exposed as `ctx.options.home`. Omitted from `options` when not given. */
   home?: string
+  /** Arbitrary entries merged into `ctx.options` (applied before `home`). */
+  options?: Record<string, unknown>
+  /**
+   * Installs `ctx.session.prompt` so tests can observe command output. `true`
+   * records each call in `calls.prompt`; a function is installed directly (and
+   * still recorded). Omit to leave `session.prompt` undefined.
+   */
+  prompt?: boolean | ((input: { sessionID: string; text: string }) => void | Promise<void>)
   /**
    * Factory for the disposable registration returned by every transform/hook.
    * Defaults to a no-op disposer. Use this to observe disposals in tests.
@@ -39,13 +49,19 @@ export interface FakeContextCalls {
   tool: unknown[]
   command: unknown[]
   skill: unknown[]
+  /** Reference additions, as `{ name, source }` in call order. */
+  reference: unknown[]
   hook: string[]
   /** Session-hook handlers, in the same order as `hook`. */
   hookHandlers: HookHandler[]
+  /** The `opts` passed to each session hook, in the same order as `hook`. */
+  hookOpts: unknown[]
   /** Tool `execute.before`/`execute.after` hooks, by name in call order. */
   toolHook: string[]
   /** The tool-hook handlers, in the same order as `toolHook`. */
   toolHookHandlers: HookHandler[]
+  /** `session.prompt` calls recorded when the `prompt` option is enabled. */
+  prompt: { sessionID: string; text: string }[]
   [key: string]: unknown[]
 }
 
@@ -79,19 +95,41 @@ function recordingEditor<D>(bucket: unknown[]): RecordingEditor<D> & { finish():
 }
 
 /**
+ * Builds a reference editor that records `add(name, source)` into `bucket` as
+ * `{ name, source }`. Like {@link recordingEditor}, a transform whose callback
+ * adds nothing records an invocation marker so `.length` still counts calls.
+ */
+function recordingReferenceEditor(bucket: unknown[]): ReferenceEditor & { finish(): void } {
+  const before = bucket.length
+  return {
+    add(name: string, source: ReferenceSource) {
+      bucket.push({ name, source })
+    },
+    finish() {
+      if (bucket.length === before) bucket.push({})
+    },
+  }
+}
+
+/**
  * Builds an in-memory {@link KitContext} for unit tests.
  *
- * Every `tool`/`command`/`skill` transform invokes its editor callback
- * synchronously against a recorder, so definitions land in `calls.tool` /
- * `calls.command` / `calls.skill`. `session.hook` records the hook's name in
- * `calls.hook`. Each transform/hook returns a `Registration` produced by
+ * Every `tool`/`command`/`skill`/`reference` transform invokes its editor
+ * callback synchronously against a recorder, so definitions land in
+ * `calls.tool` / `calls.command` / `calls.skill` / `calls.reference`.
+ * `session.hook` records the hook's name in `calls.hook` and its `opts` in
+ * `calls.hookOpts`. Each transform/hook returns a `Registration` produced by
  * `onRegistration` (a no-op disposer by default).
  */
 export function createFakeContext(overrides: FakeContextOptions = {}): {
   ctx: KitContext
   calls: FakeContextCalls
 } {
-  const calls: FakeContextCalls = { tool: [], command: [], skill: [], hook: [], hookHandlers: [], toolHook: [], toolHookHandlers: [] }
+  const calls: FakeContextCalls = {
+    tool: [], command: [], skill: [], reference: [],
+    hook: [], hookHandlers: [], hookOpts: [],
+    toolHook: [], toolHookHandlers: [], prompt: [],
+  }
   const makeRegistration = overrides.onRegistration ?? (() => noopRegistration)
 
   const storage: KitStorage = {
@@ -100,12 +138,24 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
     },
     async set() {},
     async remove() {},
+    async scan() {
+      return { entries: [] }
+    },
   }
 
   const log: Logger = { debug() {}, info() {}, warn() {}, error() {} }
 
-  const options: Record<string, unknown> = {}
+  const options: Record<string, unknown> = { ...overrides.options }
   if (overrides.home !== undefined) options.home = overrides.home
+
+  const promptOption = overrides.prompt
+  const promptRecorder =
+    promptOption === undefined || promptOption === false
+      ? undefined
+      : async (input: { sessionID: string; text: string }): Promise<void> => {
+          calls.prompt.push(input)
+          if (typeof promptOption === "function") await promptOption(input)
+        }
 
   const ctx: KitContext = {
     app: { version: "0.0.0" },
@@ -141,12 +191,22 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
         return makeRegistration()
       },
     },
-    session: {
-      async hook(name: string, handler: HookHandler) {
-        calls.hook.push(name)
-        calls.hookHandlers.push(handler)
+    reference: {
+      async transform(callback: (editor: ReferenceEditor) => void) {
+        const editor = recordingReferenceEditor(calls.reference)
+        callback(editor)
+        editor.finish()
         return makeRegistration()
       },
+    },
+    session: {
+      async hook(name: string, handler: HookHandler, opts?: unknown) {
+        calls.hook.push(name)
+        calls.hookHandlers.push(handler)
+        calls.hookOpts.push(opts)
+        return makeRegistration()
+      },
+      ...(promptRecorder === undefined ? {} : { prompt: promptRecorder }),
     },
   }
 

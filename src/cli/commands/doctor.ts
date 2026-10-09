@@ -2,11 +2,11 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 
+import { categories as catalogCategories } from "../../catalog"
 import { discoverKitConfigFiles, globalOpencodePath } from "../../config/discover"
-import { resolveToolConfig } from "../../config/resolve"
 import type { KitConfigFile } from "../../config/types"
-import { resolveValidated } from "../../config/validate"
-import { tools } from "../../tools/index"
+import type { KitCategory } from "../../core/category"
+import { itemId, resolveCategoryEntry } from "../../core/engine"
 import pkg from "../../../package.json"
 import type { CliIo } from "./list"
 
@@ -17,6 +17,13 @@ const READ_OPTIONS = { allowTrailingComma: true, disallowComments: false } as co
 interface ConfigScan {
   configs: KitConfigFile[]
   errors: string[]
+}
+
+/** One item whose category `inspect` returned a reason. */
+interface CategoryIssue {
+  id: string
+  reason: string
+  fatal: boolean
 }
 
 /**
@@ -71,12 +78,21 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
 /**
  * Handles `opencode-kit doctor`.
  *
- * Reports whether every discovered kit config parses, which tools are degraded
- * (invalid settings), and — best effort — whether the `opencode-kit` plugin is
- * listed in the relevant `opencode.json`. Only genuine config errors make the
- * command return non-zero; a missing plugin entry is advisory.
+ * Reports whether every discovered kit config parses, runs each category's
+ * `inspect` over its shipped items (invalid tool settings degrade, a skill or
+ * reference whose file is missing errors), and — best effort — whether the
+ * `opencode-kit` plugin is listed in the relevant `opencode.json`. Config parse
+ * errors and fatal inspect reasons make the command return non-zero; a
+ * non-fatal reason (e.g. invalid tool settings) and a missing plugin entry are
+ * advisory.
+ *
+ * `categories` is injectable so tests can exercise a category without touching
+ * the shipped catalog; it defaults to the catalog.
  */
-export async function doctorCommand(io: CliIo): Promise<number> {
+export async function doctorCommand(
+  io: CliIo,
+  categories: readonly KitCategory<unknown>[] = catalogCategories,
+): Promise<number> {
   const { configs, errors } = scanConfigs(io)
 
   if (errors.length === 0) {
@@ -85,15 +101,27 @@ export async function doctorCommand(io: CliIo): Promise<number> {
     for (const error of errors) io.stdout(`config: error ${error}`)
   }
 
-  let degraded = 0
-  for (const tool of tools) {
-    const { degraded: reason } = resolveValidated(tool, resolveToolConfig(tool, configs))
-    if (reason !== undefined) {
-      degraded += 1
-      io.stdout(`tool: degraded ${reason}`)
+  let fatal = 0
+  for (const category of categories) {
+    const issues: CategoryIssue[] = []
+    for (const item of category.items) {
+      const resolved = resolveCategoryEntry(category, item, configs)
+      const reason = category.inspect?.(item, resolved)
+      if (reason === undefined) continue
+      issues.push({ id: itemId(item), reason, fatal: category.inspectFatal ?? true })
+    }
+
+    if (issues.length === 0) {
+      io.stdout(`${category.label}: ok`)
+      continue
+    }
+
+    for (const issue of issues) {
+      if (issue.fatal) fatal += 1
+      const state = issue.fatal ? "error" : "degraded"
+      io.stdout(`${category.singular}: ${state} ${issue.id}: ${issue.reason}`)
     }
   }
-  if (degraded === 0) io.stdout("tools: ok")
 
   const candidates = [
     join(io.cwd, "opencode.json"),
@@ -102,7 +130,7 @@ export async function doctorCommand(io: CliIo): Promise<number> {
   const active = candidates.some((path) => opencodeListsPlugin(path, "opencode-kit"))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)
 
-  return errors.length > 0 ? 1 : 0
+  return errors.length > 0 || fatal > 0 ? 1 : 0
 }
 
 /** Handles `opencode-kit version`: prints the CLI and plugin versions. */

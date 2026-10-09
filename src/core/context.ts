@@ -21,11 +21,35 @@ export interface Logger {
   error(message: string, meta?: unknown): void
 }
 
+/** One page of storage entries returned by {@link KitStorage.scan}. */
+export interface StorageScanResult {
+  entries: readonly { key: string; value: unknown }[]
+  /** Opaque cursor for the next page; absent when the scan is exhausted. */
+  next?: string
+}
+
 /** Durable JSON storage exposed to tools (structural subset of the V2 domain). */
 export interface KitStorage {
   get(key: string): Promise<unknown | undefined>
   set(key: string, value: unknown): Promise<void>
   remove(key: string): Promise<void>
+  /** Lists stored entries, optionally filtered by `prefix` and paged. */
+  scan(options: { prefix: string; after?: string; limit?: number }): Promise<StorageScanResult>
+}
+
+/** Where a reference's content comes from (V2 `Reference.Source`-shaped). */
+export type ReferenceSource =
+  | { type: "local"; path: string }
+  | { type: "git"; repository: string; branch?: string }
+
+/** Editor handed to a reference transform; `add` registers one named source. */
+export interface ReferenceEditor {
+  add(name: string, source: ReferenceSource): void
+}
+
+/** Reference domain: transforms add named content sources to the session. */
+export interface ReferenceDomain {
+  transform(callback: (editor: ReferenceEditor) => void): Promise<Registration>
 }
 
 /** Namespace metadata applied to a transform editor (V2 `Tool.Namespace`). */
@@ -92,6 +116,7 @@ export interface SkillDefinition {
   description?: string
   path?: string
   content?: string
+  autoinvoke?: boolean
   [key: string]: unknown
 }
 
@@ -107,7 +132,7 @@ export interface SkillEditor {
 export type HookHandler<Event = any> = (event: Event) => void | Promise<void>
 
 export interface SessionDomain {
-  hook(name: string, handler: HookHandler): Promise<Registration>
+  hook(name: string, handler: HookHandler, opts?: unknown): Promise<Registration>
   /**
    * Optional in-session output channel. When the harness exposes it, command
    * results (e.g. `/kit list`) are delivered through it; callers fall back to
@@ -133,5 +158,6 @@ export interface KitContext {
   readonly skill: {
     transform(callback: (editor: SkillEditor) => void): Promise<Registration>
   }
+  readonly reference: ReferenceDomain
   readonly session: SessionDomain
 }

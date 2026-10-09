@@ -14,6 +14,27 @@
         },
         "additionalProperties": false
       }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "settings": { "type": "object" }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false
