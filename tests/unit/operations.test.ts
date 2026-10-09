@@ -74,3 +74,13 @@ test("configSet writes a tool setting and configGet reads it back", async () => 
   expect(await configGetOperation(categories, get.d, "hello", "greeting")).toEqual({ exitCode: 0 })
   expect(get.out()).toBe(`"Hi"`)
 })
+
+test("configSet warns via the category inspect hook when the write degrades a tool", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const x = deps(home)
+  // `count` is not in hello's schema (additionalProperties: false), so the
+  // written settings are invalid; the warning comes from `category.inspect`.
+  expect(await configSetOperation(categories, x.d, "hello", "count", ["42"])).toEqual({ exitCode: 0 })
+  expect(x.err()).toContain("warning")
+  expect(x.err()).toContain("invalid")
+})

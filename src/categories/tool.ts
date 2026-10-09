@@ -25,6 +25,9 @@ export const toolCategory: KitCategory<KitTool> = {
   hasSettings: true,
   defaultSettings: (tool) => tool.defaultSettings as Record<string, unknown>,
   describe: (tool) => tool.description,
+  inspect: (tool, resolved) =>
+    resolveValidated(tool, { enabled: resolved.enabled, settings: resolved.settings ?? {} })
+      .degraded,
   async registerItem(tool, resolved, ctx) {
     const { ctx: tracked, created } = createTrackingContext(ctx)
     const { config, degraded } = resolveValidated(tool, {
