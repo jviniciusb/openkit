@@ -104,6 +104,28 @@ test("bootstrap registers enabled skills and disposes them", async () => {
   expect(disposed).toBe(1)
 })
 
+test("invalid settings fall back to defaults and the tool still registers", async () => {
+  const { proj } = projectWithConfig(
+    `{ "tools": { "a": { "enabled": true, "settings": { "n": "not-an-int" } } } }`,
+  )
+  const { ctx, calls } = createFakeContext({ directory: proj })
+  let seen: unknown
+  const a = defineTool({
+    id: "a", name: "A", description: "d", defaultSettings: { n: 5 },
+    settingsSchema: {
+      type: "object",
+      properties: { n: { type: "integer" } },
+      additionalProperties: false,
+    },
+    register(c, settings) { seen = settings; return c.tool.transform(() => {}) },
+  })
+  const res = await bootstrap(ctx, [{ ...toolCategory, items: [a] }])
+  expect(calls.tool.length).toBe(1) // still registered, with the defaults
+  expect(seen).toEqual({ n: 5 })
+  expect(res.degraded.map((entry) => entry.id)).toEqual(["a"])
+  await res.dispose()
+})
+
 test("bootstrap registers tools and skills from descriptors and disposes both", async () => {
   const { proj } = projectWithConfig(`{ "tools": { "a": { "enabled": true } }, "skills": { "s": { "enabled": true } } }`)
   const dir = mkdtempSync(join(tmpdir(), "skill-"))
