@@ -35,20 +35,20 @@ test("enable writes an enabled entry to the global config", async () => {
   const h = home()
   const { io: streams } = io(h)
 
-  const code = await runCli(["enable", "hello"], streams)
+  const code = await runCli(["enable", "background-subagents"], streams)
 
   expect(code).toBe(0)
-  expect(storedTools(h).hello?.enabled).toBe(true)
+  expect(storedTools(h)["background-subagents"]?.enabled).toBe(true)
 })
 
 test("disable flips the value back to false", async () => {
   const h = home()
-  await runCli(["enable", "hello"], io(h).io)
+  await runCli(["enable", "background-subagents"], io(h).io)
 
-  const code = await runCli(["disable", "hello"], io(h).io)
+  const code = await runCli(["disable", "background-subagents"], io(h).io)
 
   expect(code).toBe(0)
-  expect(storedTools(h).hello?.enabled).toBe(false)
+  expect(storedTools(h)["background-subagents"]?.enabled).toBe(false)
 })
 
 test("enable with an unknown tool fails and does not write", async () => {
@@ -64,34 +64,34 @@ test("enable with an unknown tool fails and does not write", async () => {
 
 test("config set coerces JSON scalars and config get reads them back", async () => {
   const h = home()
-  await runCli(["config", "set", "hello", "count", "42"], io(h).io)
-  await runCli(["config", "set", "hello", "active", "true"], io(h).io)
-  await runCli(["config", "set", "hello", "greeting", "Hi"], io(h).io)
+  await runCli(["config", "set", "background-subagents", "count", "42"], io(h).io)
+  await runCli(["config", "set", "background-subagents", "active", "true"], io(h).io)
+  await runCli(["config", "set", "background-subagents", "greeting", "Hi"], io(h).io)
 
   const count = io(h)
-  expect(await runCli(["config", "get", "hello", "count"], count.io)).toBe(0)
+  expect(await runCli(["config", "get", "background-subagents", "count"], count.io)).toBe(0)
   expect(count.out().trim()).toBe("42")
 
   const active = io(h)
-  await runCli(["config", "get", "hello", "active"], active.io)
+  await runCli(["config", "get", "background-subagents", "active"], active.io)
   expect(active.out().trim()).toBe("true")
 
   const greeting = io(h)
-  await runCli(["config", "get", "hello", "greeting"], greeting.io)
+  await runCli(["config", "get", "background-subagents", "greeting"], greeting.io)
   expect(greeting.out().trim()).toBe(`"Hi"`)
 
   const stored = storedTools(h)
-  expect(stored.hello?.settings).toEqual({ count: 42, active: true, greeting: "Hi" })
+  expect(stored["background-subagents"]?.settings).toEqual({ count: 42, active: true, greeting: "Hi" })
 })
 
 test("config set preserves an existing comment", async () => {
   const h = home()
-  await runCli(["config", "set", "hello", "greeting", "Hi"], io(h).io)
+  await runCli(["config", "set", "background-subagents", "greeting", "Hi"], io(h).io)
   // rewrite with a comment then set again
   const f = globalConfig(h)
   writeFileSync(f, readFileSync(f, "utf8").replace("{", "{\n  // keep me"))
 
-  await runCli(["config", "set", "hello", "greeting", "Yo"], io(h).io)
+  await runCli(["config", "set", "background-subagents", "greeting", "Yo"], io(h).io)
 
   const text = readFileSync(f, "utf8")
   expect(text).toContain("// keep me")
@@ -102,7 +102,7 @@ test("config get for an unset key fails", async () => {
   const h = home()
   const { io: streams, err } = io(h)
 
-  const code = await runCli(["config", "get", "hello", "missing"], streams)
+  const code = await runCli(["config", "get", "background-subagents", "missing"], streams)
 
   expect(code).not.toBe(0)
   expect(err()).toContain("missing")
@@ -116,7 +116,7 @@ test("config set on a malformed config fails gracefully without clobbering it", 
   const { io: streams, err } = io(h)
 
   // Must not reject out of runCli.
-  const code = await runCli(["config", "set", "hello", "greeting", "Hi"], streams)
+  const code = await runCli(["config", "set", "background-subagents", "greeting", "Hi"], streams)
 
   expect(code).not.toBe(0)
   expect(err()).toContain("malformed")
@@ -130,24 +130,24 @@ test("config set seeds an empty global config", async () => {
   writeFileSync(f, "")
   const { io: streams } = io(h)
 
-  const code = await runCli(["config", "set", "hello", "greeting", "Hi"], streams)
+  const code = await runCli(["config", "set", "background-subagents", "greeting", "Hi"], streams)
 
   expect(code).toBe(0)
-  expect(storedTools(h).hello?.settings?.greeting).toBe("Hi")
+  expect(storedTools(h)["background-subagents"]?.settings?.greeting).toBe("Hi")
 })
 
 test("config set warns (advisory) when the write degrades the tool", async () => {
   const h = home()
   const { io: streams, out, err } = io(h)
 
-  const code = await runCli(["config", "set", "hello", "count", "42"], streams)
+  const code = await runCli(["config", "set", "background-subagents", "count", "42"], streams)
 
   expect(code).toBe(0)
-  expect(out()).toContain("hello.count = 42")
-  expect(err()).toContain("hello")
+  expect(out()).toContain("background-subagents.count = 42")
+  expect(err()).toContain("background-subagents")
   expect(err()).toContain("invalid")
   // The value is still persisted; the warning tells the user it will not apply.
-  expect(storedTools(h).hello?.settings?.count).toBe(42)
+  expect(storedTools(h)["background-subagents"]?.settings?.count).toBe(42)
 })
 
 test("config set warns when a project config overrides the value", async () => {
@@ -155,12 +155,12 @@ test("config set warns when a project config overrides the value", async () => {
   const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
   mkdirSync(join(cwd, ".opencode"), { recursive: true })
   const project = join(cwd, ".opencode", "opencode-kit.jsonc")
-  writeFileSync(project, '{ "tools": { "hello": { "settings": { "greeting": "Project" } } } }')
+  writeFileSync(project, '{ "tools": { "background-subagents": { "settings": { "greeting": "Project" } } } }')
 
   const { io: streams, err } = io(h)
   streams.cwd = cwd
 
-  const code = await runCli(["config", "set", "hello", "greeting", "Global"], streams)
+  const code = await runCli(["config", "set", "background-subagents", "greeting", "Global"], streams)
 
   expect(code).toBe(0)
   expect(err()).toContain("overridden")
@@ -172,15 +172,15 @@ test("enable warns when a project config overrides the global write", async () =
   const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
   mkdirSync(join(cwd, ".opencode"), { recursive: true })
   const project = join(cwd, ".opencode", "opencode-kit.jsonc")
-  writeFileSync(project, '{ "tools": { "hello": { "enabled": false } } }')
+  writeFileSync(project, '{ "tools": { "background-subagents": { "enabled": false } } }')
 
   const { io: streams, err } = io(h)
   streams.cwd = cwd
 
-  const code = await runCli(["enable", "hello"], streams)
+  const code = await runCli(["enable", "background-subagents"], streams)
 
   expect(code).toBe(0)
-  expect(storedTools(h).hello?.enabled).toBe(true)
+  expect(storedTools(h)["background-subagents"]?.enabled).toBe(true)
   expect(err()).toContain("overridden")
   expect(err()).toContain(project)
 })
@@ -190,13 +190,13 @@ test("enable warns when opencode.json plugin options override the global write",
   const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
   writeFileSync(
     join(cwd, "opencode.json"),
-    '{ "plugins": [["opencode-kit", { "tools": { "hello": { "enabled": false } } }]] }',
+    '{ "plugins": [["opencode-kit", { "tools": { "background-subagents": { "enabled": false } } }]] }',
   )
 
   const { io: streams, err } = io(h)
   streams.cwd = cwd
 
-  const code = await runCli(["enable", "hello"], streams)
+  const code = await runCli(["enable", "background-subagents"], streams)
 
   expect(code).toBe(0)
   expect(err()).toContain("overridden")
@@ -241,7 +241,7 @@ test("CLI honors an explicit XDG_CONFIG_HOME and restores the ambient value", as
   const xdg = mkdtempSync(join(tmpdir(), "xdg-"))
   const dir = join(xdg, "opencode")
   mkdirSync(dir, { recursive: true })
-  writeFileSync(join(dir, "opencode-kit.jsonc"), '{ "tools": { "hello": { "enabled": false } } }')
+  writeFileSync(join(dir, "opencode-kit.jsonc"), '{ "tools": { "background-subagents": { "enabled": true } } }')
 
   const previous = process.env.XDG_CONFIG_HOME
   process.env.XDG_CONFIG_HOME = xdg
@@ -254,7 +254,7 @@ test("CLI honors an explicit XDG_CONFIG_HOME and restores the ambient value", as
       stderr: () => {},
     })
     expect(code).toBe(0)
-    expect(out).toMatch(/hello\s+disabled/)
+    expect(out).toMatch(/background-subagents\s+enabled/)
   } finally {
     if (previous === undefined) delete process.env.XDG_CONFIG_HOME
     else process.env.XDG_CONFIG_HOME = previous

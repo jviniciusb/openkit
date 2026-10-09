@@ -8,14 +8,14 @@ Guidance for AI agents working in the **opencode-kit** repository.
 grouped into **categories**: tools, skills, and references. The framework (config,
 category engine, CLI, contracts) is the product; items are added on top. Every
 category is one `KitCategory` descriptor consumed by the generic engine, so
-config resolution, registration/isolation, the CLI, and `/kit` are shared. Three
-tools ship today: `hello` (`src/tools/hello/index.ts`, the enabled-by-default
-example), `background-subagents`
+config resolution, registration/isolation, the CLI, and `/kit` are shared. Two
+tools ship today: `background-subagents`
 (`src/tools/background-subagents/index.ts`, opt-in; forces every subagent call to
 run in the background), and `context-injections`
 (`src/tools/context-injections/index.ts`, opt-in; injects built-in behavioral
-rules, each individually toggleable, plus your own instructions). Two skills ship
-today, both enabled by default: `english-writing-assistant`
+rules, each individually toggleable, plus your own instructions). The `hello`
+example at `src/tools/hello/index.ts` is not registered at runtime. Two skills
+ship today, both enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible) and `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
 `@sdd-flow`). The **references** category
