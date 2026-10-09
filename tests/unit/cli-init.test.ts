@@ -100,3 +100,10 @@ test("init seeds every skill with its declared default", async () => {
   expect(cfg.skills["english-writing-assistant"].enabled).toBe(true)
   expect(cfg.skills["sdd-flow"].enabled).toBe(true)
 })
+
+test("init seeds a references section", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  await initCommand({ cwd: home, home, stdout: () => {}, stderr: () => {} }, {})
+  const cfg = JSON.parse(readFileSync(globalConfigPath(home), "utf8"))
+  expect(cfg.references).toEqual({})
+})
