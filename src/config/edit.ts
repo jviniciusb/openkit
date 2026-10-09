@@ -69,9 +69,11 @@ function readEditableText(path: string, fallback: string): string {
     throw new Error(`refusing to edit malformed config ${path}: ${details}`)
   }
 
-  // Empty / whitespace-only / comment-only documents parse to `undefined`; treat
-  // them like an absent file so the caller seeds a default config.
-  if (parsed === undefined) return fallback
+  // Empty / whitespace-only / comment-only documents parse to `undefined`, and a
+  // document that is exactly `null` parses to `null`; neither is a usable config
+  // object, so treat both like an absent file and seed the fallback. (Without
+  // this, editing a `null` document throws inside `modify`.)
+  if (parsed == null) return fallback
 
   return text
 }
@@ -170,8 +172,9 @@ export async function setToolSetting(
 
 /** True when a config document already declares `<category>[id]`. */
 function hasEntry(text: string, category: string, id: string): boolean {
+  // `parse("null")` yields `null`, so guard both nullish cases before indexing.
   const parsed = parse(text, [], READ_OPTIONS) as KitConfigFile | undefined
-  return parsed !== undefined && categoryEntries(parsed, category)?.[id] !== undefined
+  return parsed != null && categoryEntries(parsed, category)?.[id] !== undefined
 }
 
 /**

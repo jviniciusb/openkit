@@ -232,6 +232,17 @@ test("seedEntries only adds missing entries under an arbitrary category", async 
   expect(data.references?.b?.enabled).toBe(true)
 })
 
+test("seedEntries tolerates a config whose text is exactly null", async () => {
+  const d = mkdtempSync(join(tmpdir(), "kit-"))
+  const f = join(d, "opencode-kit.jsonc")
+  writeFileSync(f, "null")
+
+  await seedEntries(f, "tools", { a: { enabled: true } })
+
+  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
+  expect(data.tools?.a?.enabled).toBe(true)
+})
+
 test("setEntryEnabled seeds a default config that includes a references map", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const f = join(d, "opencode-kit.jsonc")
