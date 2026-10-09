@@ -1,20 +1,15 @@
 import { watch, type FSWatcher } from "node:fs"
 import { homedir } from "node:os"
 
+import { categories } from "./catalog"
 import { registerKitCommand } from "./commands/kit"
-import { createKitApi } from "./core/kit-api"
-import { registerSkills, registerTools, type DegradedItem } from "./core/registry"
+import type { KitCategory } from "./core/category"
 import type { KitContext } from "./core/context"
-import type { KitSkill } from "./core/skill"
-import type { KitTool } from "./core/tool"
+import { registerCategories, type DegradedItem } from "./core/engine"
 import { discoverKitConfigFiles } from "./config/discover"
 import { loadKitConfig } from "./config/load"
 import { deepMerge } from "./config/merge"
-import { resolveSkillConfig, resolveToolConfig } from "./config/resolve"
-import { resolveValidated } from "./config/validate"
-import type { KitConfigFile, ResolvedSkillConfig, ResolvedToolConfig } from "./config/types"
-import { tools } from "./tools/index"
-import { skills } from "./skills/index"
+import type { KitConfigFile } from "./config/types"
 
 /** Home directory used for the global config: `ctx.home`, then `options.home`, then the OS home. */
 function resolveHome(ctx: KitContext): string {
@@ -28,7 +23,7 @@ function resolveHome(ctx: KitContext): string {
 export interface BootstrapResult {
   /** Disposes every registration created during bootstrap. */
   dispose(): Promise<void>
-  /** Tools or skills that could not be fully configured (invalid settings or failed registration). */
+  /** Items that could not be fully configured (invalid settings or failed registration). */
   degraded: DegradedItem[]
 }
 
@@ -36,17 +31,15 @@ export interface BootstrapResult {
  * Boots the kit against a plugin context.
  *
  * Discovers global + project config files, loads and merges them (low → high
- * precedence, then `ctx.options`, then any explicit `options`), resolves and
- * validates each tool's effective config, then registers every enabled tool,
- * followed by every enabled skill. Per-item failures are isolated and reported
- * in `degraded`; the returned `dispose` releases every registration made
- * concurrently via `Promise.allSettled`, so one failing disposer cannot block
- * the rest.
+ * precedence, then `ctx.options`, then any explicit `options`), then resolves
+ * and registers every enabled item across `categories` in catalog order. Per-item
+ * failures are isolated and reported in `degraded`; the returned `dispose`
+ * releases every registration made concurrently via `Promise.allSettled`, so one
+ * failing disposer cannot block the rest.
  */
 export async function bootstrap(
   ctx: KitContext,
-  tools: KitTool[],
-  skills: KitSkill[],
+  categories: readonly KitCategory<unknown>[],
   options?: Record<string, unknown>,
 ): Promise<BootstrapResult> {
   const home = resolveHome(ctx)
@@ -60,36 +53,14 @@ export async function bootstrap(
     deepMerge(ctx.options, options ?? {}) as KitConfigFile,
   ]
 
-  const resolved = new Map<string, ResolvedToolConfig<unknown>>()
-  const degraded: DegradedItem[] = []
-
-  for (const tool of tools) {
-    const { config, degraded: reason } = resolveValidated(tool, resolveToolConfig(tool, sources))
-    resolved.set(tool.id, config as ResolvedToolConfig<unknown>)
-    if (reason !== undefined) degraded.push({ kind: "tool", id: tool.id, error: reason })
-  }
-
-  const result = await registerTools(tools, resolved, ctx, (toolId, toolCtx) =>
-    createKitApi(toolId, toolCtx, toolCtx.app.version),
-  )
-  degraded.push(...result.degraded)
-
-  const resolvedSkills = new Map<string, ResolvedSkillConfig>()
-  for (const skill of skills) {
-    resolvedSkills.set(skill.id, resolveSkillConfig(skill, sources))
-  }
-
-  const skillResult = await registerSkills(skills, resolvedSkills, ctx)
-  degraded.push(...skillResult.degraded)
-
-  // Tools and skills share one registration list so `dispose` releases them
+  // Every category shares one registration list so `dispose` releases them
   // together; disposal is concurrent and order-independent.
-  const registrations = [...result.registrations, ...skillResult.registrations]
+  const { registrations, degraded } = await registerCategories(categories, sources, ctx)
 
   // Surface every degraded item so a silently broken registration or invalid
   // setting is visible in the session logs (spec §5.1/§6.3).
   for (const entry of degraded) {
-    console.warn(`opencode-kit: ${entry.kind} "${entry.id}" degraded: ${entry.error}`)
+    console.warn(`opencode-kit: ${entry.category} "${entry.id}" degraded: ${entry.error}`)
   }
 
   return {
@@ -177,12 +148,11 @@ export interface Lifecycle {
  */
 export async function createLifecycle(
   ctx: KitContext,
-  tools: KitTool[],
-  skills: KitSkill[],
+  categories: readonly KitCategory<unknown>[],
   options?: Record<string, unknown>,
   watch: WatchFactory = defaultWatch,
 ): Promise<Lifecycle> {
-  let current = await bootstrap(ctx, tools, skills, options)
+  let current = await bootstrap(ctx, categories, options)
   let stopped = false
 
   /** Tail of the serialized operation chain; always settles, never rejects. */
@@ -218,7 +188,7 @@ export async function createLifecycle(
       current = { async dispose() {}, degraded: [] }
       // If disposal began while the prior generation was being released, the
       // queued disposable will collect whatever this task installs below.
-      current = await bootstrap(ctx, tools, skills, options)
+      current = await bootstrap(ctx, categories, options)
     })
   }
 
@@ -245,7 +215,7 @@ export async function createLifecycle(
 export default {
   id: "opencode-kit",
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
-    const life = await createLifecycle(ctx, tools, skills, ctx.options as Record<string, unknown>)
+    const life = await createLifecycle(ctx, categories, ctx.options as Record<string, unknown>)
     // Register the `/kit` command alongside the tool lifecycle so it is
     // disposed with everything else. It lives for the whole session (not per
     // reload generation) and drives reloads after each config mutation.
