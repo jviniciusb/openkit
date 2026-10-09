@@ -19,6 +19,7 @@ const kit: KitApi = {
   async command() { return noop() },
   async skill() { return noop() },
   async on() { return noop() },
+  async toolHook() { return noop() },
 }
 
 const ok = defineTool({ id: "ok", name: "OK", description: "d", defaultSettings: {},

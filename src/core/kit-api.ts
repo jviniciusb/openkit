@@ -81,8 +81,11 @@ export function createKitApi(
         editor.add(def)
       })
     },
-    async on(kind: string, handler: HookHandler): Promise<Registration> {
-      return ctx.session.hook(kind, handler)
+    async on(kind: string, handler: HookHandler, opts?: unknown): Promise<Registration> {
+      return ctx.session.hook(kind, handler, opts)
+    },
+    async toolHook(name: string, handler: HookHandler): Promise<Registration> {
+      return ctx.tool.hook(name, handler)
     },
   }
 }
