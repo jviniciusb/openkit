@@ -6,7 +6,7 @@ import { categories as catalogCategories } from "../../catalog"
 import { discoverKitConfigFiles, globalOpencodePath } from "../../config/discover"
 import type { KitConfigFile } from "../../config/types"
 import type { KitCategory } from "../../core/category"
-import { resolveCategoryEntry } from "../../core/engine"
+import { itemId, resolveCategoryEntry } from "../../core/engine"
 import pkg from "../../../package.json"
 import type { CliIo } from "./list"
 
@@ -108,7 +108,7 @@ export async function doctorCommand(
       const resolved = resolveCategoryEntry(category, item, configs)
       const reason = category.inspect?.(item, resolved)
       if (reason === undefined) continue
-      issues.push({ id: (item as { id: string }).id, reason, fatal: category.inspectFatal ?? true })
+      issues.push({ id: itemId(item), reason, fatal: category.inspectFatal ?? true })
     }
 
     if (issues.length === 0) {

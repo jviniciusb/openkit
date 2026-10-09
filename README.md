@@ -271,11 +271,12 @@ References are toggled and tuned per id under `references.<id>` — a peer of th
 }
 ```
 
-`settings` deep-merge over the source read from `reference.json`, so a project
-can override `path`, `repository`, or `branch` without editing the packaged file;
-`type` is preserved from the file. A disabled reference is not registered, and a
-reference whose file is missing or invalid degrades only itself (and fails
-`doctor`).
+`settings` are shallow-merged over the source read from `reference.json`: a
+project can override the source's `path`, `repository`, or `branch` without
+editing the packaged file. This replaces those fields individually (it is not a
+general deep-merge), and `type` always comes from the file. A disabled reference
+is not registered, and a reference whose file is missing or invalid degrades only
+itself (and fails `doctor`).
 
 No references ship with the kit today; the category is the supported home for
 curated bundles. Add one with `new reference <id>` (see
@@ -295,7 +296,7 @@ and preserve comments and formatting.
 | `disable <id>` | Set `<category>.<id>.enabled` to `false` in the global config. |
 | `config get <id> <key>` | Print a settings-bearing item's effective setting (defaults merged with the global config) as JSON. |
 | `config set <id> <key> <value>` | Write a setting to the global config. Values are coerced to `true`/`false`/`null`/number when they look like JSON scalars. |
-| `new <category> <id>` | Scaffold a new item for `tool`, `skill`, or `reference` under `src/<category>/<id>` and register it in the barrel (run from a checkout; for authors). |
+| `new <category> <id>` | Scaffold a new item for `tool`, `skill`, or `reference` under the category's directory (`src/tools\|skills\|references/<id>`) and register it in the barrel (run from a checkout; for authors). |
 | `new <tool-id>` | Alias for `new tool <tool-id>`. |
 | `new-skill <skill-id>` | Alias for `new skill <skill-id>`. |
 | `doctor` | Check that config parses, that no item is degraded, that every skill and reference loads, and whether the plugin is listed in `opencode.json`. |

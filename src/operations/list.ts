@@ -1,5 +1,5 @@
 import type { KitCategory } from "../core/category"
-import { resolveCategoryEntry } from "../core/engine"
+import { itemId, resolveCategoryEntry } from "../core/engine"
 import { discoverKitConfigFiles } from "../config/discover"
 import { loadKitConfig } from "../config/load"
 import type { KitConfigFile } from "../config/types"
@@ -26,11 +26,6 @@ export interface OperationDeps {
 /** Outcome of an operation; `1` when the operation reported an error. */
 export interface OperationResult {
   exitCode: number
-}
-
-/** Reads an item's config id; `KitCategory` stays unconstrained for bivariance. */
-export function itemId(item: unknown): string {
-  return (item as { id: string }).id
 }
 
 /**

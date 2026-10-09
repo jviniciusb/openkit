@@ -48,6 +48,17 @@ test("resolveCategoryEffective records the layer that set enabled", () => {
   expect(eff.settings).toEqual({ n: 1 })
 })
 
+test("resolveCategoryEffective records the highest-precedence layer per settings key", () => {
+  const layers = [
+    { label: "global", config: { tools: { a: { settings: { n: 1, only: "global" } } } } },
+    { label: "project", config: { tools: { a: { settings: { n: 2 } } } } },
+  ]
+  const eff = resolveCategoryEffective(widgets, { id: "a" }, layers)
+  expect(eff.settings).toEqual({ n: 2, only: "global" })
+  expect(eff.settingLayers?.n?.label).toBe("project")
+  expect(eff.settingLayers?.only?.label).toBe("global")
+})
+
 function cat(
   key: string,
   items: Array<{ id: string }>,
@@ -96,4 +107,12 @@ test("createTrackingContext forwards session hook opts to the real context", asy
   const { ctx: tracked } = createTrackingContext(ctx)
   await tracked.session.hook("context", () => {}, { providerID: "openai" })
   expect(calls.hookOpts).toEqual([{ providerID: "openai" }])
+})
+
+test("createTrackingContext preserves optional session members like prompt", async () => {
+  const { ctx, calls } = createFakeContext({ prompt: true })
+  const { ctx: tracked } = createTrackingContext(ctx)
+  expect(typeof tracked.session.prompt).toBe("function")
+  await tracked.session.prompt?.({ sessionID: "s", text: "hi" })
+  expect(calls.prompt).toEqual([{ sessionID: "s", text: "hi" }])
 })

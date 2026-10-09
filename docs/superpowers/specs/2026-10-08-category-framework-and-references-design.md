@@ -357,7 +357,9 @@ export async function configSetOperation(categories, deps, id, key, valueParts):
   export function loadReference(ref: KitReference): LoadedReference      // throws if missing/invalid
   export function referenceDescription(ref: KitReference): string        // best effort, never throws
   export async function registerReference(ctx, ref, settings?): Promise<Registration>
-  // source = { ...loaded.source, ...settings }; ctx.reference.transform((e) => e.add(ref.id, source))
+  // source = { ...loaded.source, ...settings } but `type` is always taken from the
+  // loaded file, so settings override only path/repository/branch and cannot make
+  // the merged source invalid.
   ```
 
 - `loadReference` validates `type` and the required fields (`path`, or

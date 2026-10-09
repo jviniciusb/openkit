@@ -48,6 +48,14 @@ test("new skill dispatches to the skills category", async () => {
   expect(readFileSync(join(r, "src", "skills", "index.ts"), "utf8")).toContain('id: "my-skill"')
 })
 
+test("new <category> with no id is a user error and scaffolds nothing", async () => {
+  const r = root()
+  const io = { cwd: r, home: r, stdout: () => {}, stderr: () => {} }
+  expect(await runCli(["new", "reference"], io)).toBe(1)
+  expect(existsSync(join(r, "src", "references", "reference"))).toBe(false)
+  expect(existsSync(join(r, "src", "tools", "reference"))).toBe(false)
+})
+
 test("unknown category is a user error", async () => {
   const r = root()
   const io = { cwd: r, home: r, stdout: () => {}, stderr: () => {} }
