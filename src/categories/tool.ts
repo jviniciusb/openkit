@@ -10,10 +10,12 @@ import { tools } from "../tools/index"
  *
  * Settings-bearing and opt-in by default. `registerItem` wraps `ctx` so every
  * registration the tool creates is tracked, validates the resolved settings
- * against the tool's schema, and only then calls `register`. Invalid settings
- * degrade the tool without registering it; a throwing `register` disposes the
- * partial registrations it created and rethrows so the engine tags it degraded
- * while sibling tools are unaffected.
+ * against the tool's schema, and calls `register`. Invalid settings do not
+ * disable the tool: `resolveValidated` falls back to the tool's
+ * `defaultSettings`, the tool still registers with those, and the validation
+ * reason is returned as `degraded`. A throwing `register` disposes the partial
+ * registrations it created and rethrows so the engine tags it degraded while
+ * sibling tools are unaffected.
  */
 export const toolCategory: KitCategory<KitTool> = {
   key: "tools",
@@ -29,11 +31,9 @@ export const toolCategory: KitCategory<KitTool> = {
       enabled: resolved.enabled,
       settings: resolved.settings ?? tool.defaultSettings,
     })
-    if (degraded !== undefined) return { registrations: [], degraded }
-
     try {
       await tool.register(tracked, config.settings, createKitApi(tool.id, tracked, ctx.app.version))
-      return { registrations: created }
+      return degraded === undefined ? { registrations: created } : { registrations: created, degraded }
     } catch (error) {
       // Dispose what the tool managed to create before throwing; a failing
       // disposer must not mask the original registration error.
