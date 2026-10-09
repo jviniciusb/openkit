@@ -1,8 +1,9 @@
 import { expect, test } from "bun:test"
 import { createKitApi } from "../../src/core/kit-api"
 import { createFakeContext } from "../../src/core/testing"
-import { resolveToolConfig } from "../../src/config/resolve"
+import { toolCategory } from "../../src/categories/tool"
 import { resolveValidated } from "../../src/config/validate"
+import { resolveCategoryEntry } from "../../src/core/engine"
 import {
   BUILT_IN_RULES,
   contextInjections,
@@ -58,10 +59,10 @@ test("disabling careful-changes leaves other built-ins enabled", async () => {
 })
 
 test("partial existing rule settings inherit careful-changes default", () => {
-  const resolved = resolveToolConfig(contextInjections, [
+  const resolved = resolveCategoryEntry(toolCategory, contextInjections, [
     { tools: { "context-injections": { settings: { rules: { "subagent-driven": false } } } } },
   ])
-  expect((resolved.settings.rules as Record<string, boolean>)["careful-changes"]).toBe(true)
+  expect((resolved.settings?.rules as Record<string, boolean>)["careful-changes"]).toBe(true)
 })
 
 test("careful-changes is accepted by the settings schema", () => {

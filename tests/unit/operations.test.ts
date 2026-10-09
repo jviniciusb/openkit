@@ -68,20 +68,21 @@ test("list tolerates a throwing describe, printing an empty description", async 
 test("configSet writes a tool setting and configGet reads it back", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const set = deps(home)
-  expect(await configSetOperation(categories, set.d, "hello", "greeting", ["Hi"])).toEqual({ exitCode: 0 })
-  expect((parse(readFileSync(globalConfigPath(home), "utf8")) as any).tools.hello.settings.greeting).toBe("Hi")
+  expect(await configSetOperation(categories, set.d, "background-subagents", "greeting", ["Hi"])).toEqual({ exitCode: 0 })
+  expect((parse(readFileSync(globalConfigPath(home), "utf8")) as any).tools["background-subagents"].settings.greeting).toBe("Hi")
 
   const get = deps(home)
-  expect(await configGetOperation(categories, get.d, "hello", "greeting")).toEqual({ exitCode: 0 })
+  expect(await configGetOperation(categories, get.d, "background-subagents", "greeting")).toEqual({ exitCode: 0 })
   expect(get.out()).toBe(`"Hi"`)
 })
 
 test("configSet warns via the category inspect hook when the write degrades a tool", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const x = deps(home)
-  // `count` is not in hello's schema (additionalProperties: false), so the
-  // written settings are invalid; the warning comes from `category.inspect`.
-  expect(await configSetOperation(categories, x.d, "hello", "count", ["42"])).toEqual({ exitCode: 0 })
+  // `count` is not in background-subagents' schema (additionalProperties:
+  // false), so the written settings are invalid; the warning comes from
+  // `category.inspect`.
+  expect(await configSetOperation(categories, x.d, "background-subagents", "count", ["42"])).toEqual({ exitCode: 0 })
   expect(x.err()).toContain("warning")
   expect(x.err()).toContain("invalid")
 })
