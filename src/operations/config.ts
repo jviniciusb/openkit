@@ -4,9 +4,7 @@ import { globalConfigPath } from "../config/discover"
 import { setEntrySetting } from "../config/edit"
 import { buildConfigLayers, valuesEqual } from "../config/effective"
 import { loadKitConfig } from "../config/load"
-import { resolveValidated } from "../config/validate"
 import { resolveCategoryEffective, resolveCategoryEntry } from "../core/engine"
-import type { KitTool } from "../core/tool"
 import { findCategoryItem, type OperationDeps, type OperationResult } from "./list"
 
 /**
@@ -99,7 +97,7 @@ export async function configSetOperation(
   // defaults at load. Surface that here instead of reporting a clean success.
   const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, deps.options)
   const effective = resolveCategoryEffective(category, item, layers)
-  const { degraded } = resolveValidated(item as KitTool, {
+  const degraded = category.inspect?.(item, {
     enabled: effective.enabled,
     settings: effective.settings ?? {},
   })
