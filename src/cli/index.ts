@@ -41,7 +41,7 @@ async function dispatch(argv: string[], io: CliIo): Promise<number> {
     case "list":
       return listCommand(io)
     case "new":
-      return newCommand(io, rest[0])
+      return newCommand(io, rest)
     case "new-skill":
       return newSkillCommand(io, rest[0])
     case "enable":

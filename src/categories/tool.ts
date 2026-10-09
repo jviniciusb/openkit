@@ -4,6 +4,7 @@ import { createKitApi } from "../core/kit-api"
 import { createTrackingContext } from "../core/tracking"
 import type { KitTool } from "../core/tool"
 import { tools } from "../tools/index"
+import { toolScaffold } from "./scaffold"
 
 /**
  * The tools category.
@@ -24,6 +25,7 @@ export const toolCategory: KitCategory<KitTool> = {
   defaultEnabled: (tool) => tool.defaultEnabled ?? false,
   hasSettings: true,
   defaultSettings: (tool) => tool.defaultSettings as Record<string, unknown>,
+  scaffold: toolScaffold,
   describe: (tool) => tool.description,
   inspect: (tool, resolved) =>
     resolveValidated(tool, { enabled: resolved.enabled, settings: resolved.settings ?? {} })
