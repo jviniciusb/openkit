@@ -66,8 +66,10 @@ entries, or duplicates the plugin entry.
 
 **Fallback:** create the file by hand, seeded with the shipped tools —
 `background-subagents` (opt-in; forces every subagent call to run in the
-background) and `context-injections` (opt-in; injects built-in behavioral rules,
-each individually toggleable, plus your own):
+background), `context-injections` (opt-in; injects built-in behavioral rules,
+each individually toggleable, plus your own), and `auto-compact` (opt-in; queues
+compaction after related sessions, tool calls, and shells go idle, once the last
+prompt exceeds `thresholdTokens`):
 
 ```jsonc
 // ~/.config/opencode/opencode-kit.jsonc
@@ -76,7 +78,8 @@ each individually toggleable, plus your own):
   "configVersion": 1,
   "tools": {
     "background-subagents": { "enabled": false },
-    "context-injections": { "enabled": false }
+    "context-injections": { "enabled": false },
+    "auto-compact": { "enabled": false }
   },
   "skills": {
     "english-writing-assistant": { "enabled": true },
@@ -85,6 +88,10 @@ each individually toggleable, plus your own):
   "references": {}
 }
 ```
+
+When enabling `auto-compact`, also set `"compaction": { "auto": false }` in the
+project or global `opencode.json(c)` so native auto-compaction cannot run before
+related background work has finished.
 
 The kit also ships two **skills**, both enabled by default:
 `english-writing-assistant` (model-visible) and `sdd-flow` (invoked explicitly
