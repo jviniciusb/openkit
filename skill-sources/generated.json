@@ -134,5 +134,18 @@
     "output": "src/skills/verification/SKILL.md",
     "outputHash": "d99d5d8c2bae462132c8467879ee07428000ef47c4109e25afb934da9183cff3",
     "generatedAt": "2026-10-13T20:24:41.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/prototype.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/prototype/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/prototype/SKILL.md",
+    "outputHash": "55e1253b0c1198e99139ca6b670dce19c66224bdd68ebf1f11d1057f68eefc5c",
+    "generatedAt": "2026-10-13T21:10:00.000Z"
   }
 ]
