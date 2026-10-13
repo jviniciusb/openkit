@@ -243,5 +243,18 @@
     "output": "src/skills/improve-codebase-architecture/SKILL.md",
     "outputHash": "d52d0448e70634c962266050bca921df506d3ecad5eb6c1d834a2b9a197cd135",
     "generatedAt": "2026-10-13T21:43:15.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/to-spec.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/to-spec/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/to-spec/SKILL.md",
+    "outputHash": "ed7edf9cae88c4ac69a6d0259f31e2cd0b8081b7486b4b678dc3384ac5a448cb",
+    "generatedAt": "2026-10-13T21:46:39.000Z"
   }
 ]
