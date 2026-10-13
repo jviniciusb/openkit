@@ -140,9 +140,9 @@ A **batch** is one step, or a set of independent steps run in parallel (no share
 
 ### 3a. Propose the batch
 
-Refresh the execution state using the active project's workflow before proposing. If actual progress no longer matches the spec, go to Phase 3.5 first. Compute the frontier: steps whose logical blockers are complete and whose project-defined prerequisites for starting are satisfied. The dependency graph determines logical order; project instructions determine how that order maps to workspaces and Git operations. Choose a batch: one step, or independent steps with no shared files or interfaces. Your output has exactly three parts, in this order:
+Refresh the execution state using the active project's workflow before proposing. If actual progress no longer matches the spec, go to Phase 3.5 first. Compute the frontier: steps whose logical blockers are complete, whose project-defined prerequisites for starting are satisfied, and which are not already in flight (dispatched and not yet complete). The dependency graph determines logical order; project instructions determine how that order maps to workspaces and Git operations. Choose a batch: one step, or independent steps with no shared files or interfaces. Your output has exactly three parts, in this order:
 
-1. **The frontier.** Every startable step with its tags and project-informed size estimate, then what is blocked and on what.
+1. **The frontier.** Every startable step not already in flight, with its tags and project-informed size estimate, then what is blocked and on what.
 2. **Your recommendation.** Which batch to run and why. This is where your judgment goes.
 3. **The ask.** Reduced to one word wherever possible.
 
@@ -162,7 +162,7 @@ Then **stop**. Approving the batch starts the work; it does not waive the per-st
 
 **Advance delegation does not satisfy the gate.** "You choose", "I trust your judgment", "you decide the ordering" tell you what to *recommend*; they do not tell you to begin. Honor the delegation in part 2 by naming a pick instead of offering a menu; the go is still theirs, and it costs them one word. Ordering and permission-to-start are different questions, and only the first was delegated.
 
-The user decides: one here, a subset, or several in parallel workspaces. If parallel, also walk step-format.md's *When several run in parallel* notes, follow the `dispatching-parallel-agents` skill for the fan-out mechanics, and follow project workspace rules for each track.
+The user decides: one here, a subset, or several in parallel (per the project's workspace rules). If parallel, also walk step-format.md's *When several run in parallel* notes, follow the `dispatching-parallel-agents` skill for the fan-out mechanics, and follow project workspace rules for each track.
 
 ### 3b. Expand and route
 
@@ -180,7 +180,7 @@ Run per step in the batch. **Dispatched steps.** Dispatch one subagent per step,
 
 Treat the approved spec as the domain and behavior contract. Implement only the assigned slice, preserving those decisions and constraints; carry forward execution findings so later steps do not repeat discovered mistakes. Use project instructions for implementation conventions and required validation.
 
-**Spec stays current.** When a step turns up a discovery or a design change, write it to the spec now (see *Spec stays current*). Detail-level changes inside agreed behavior and scope are automatic; changes to agreed behavior, scope, or a user decision go to the user first through the agreed decision process, then to the spec before the affected work proceeds.
+**Spec stays current.** Write any discovery or design change to the spec per *Spec stays current*.
 
 **Direct steps.** Implement the assigned slice from the approved spec. Resolve gaps from the spec through the agreed decision process rather than inventing behavior. Validate according to project instructions.
 

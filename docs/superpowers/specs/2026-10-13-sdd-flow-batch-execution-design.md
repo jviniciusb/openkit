@@ -1,7 +1,7 @@
 # opencode-kit — sdd-flow Batch Execution Redesign
 
 - **Date:** 2026-10-13
-- **Status:** Draft for approval
+- **Status:** Approved and implemented (pending release)
 - **Author:** (agent-assisted)
 - **Topic:** Reshape `sdd-flow` so the orchestrator drives the spec: brainstorm,
   interview, plan, then execute in **batches** (one step or several parallel
@@ -167,19 +167,19 @@ absorb.
 > review.
 
 ### Task 1: Phase 1 brainstorm beat
-- [ ] Add 1.2, renumber 1.2–1.7 → 1.3–1.8, update all cross-references
+- [x] Add 1.2, renumber 1.2–1.7 → 1.3–1.8, update all cross-references
       (`SKILL.md`, `spec-template.md`).
 
 ### Task 2: Phase 3 batch execution
-- [ ] Rewrite Phase 3 around batch launch + per-step completion (3a propose +
+- [x] Rewrite Phase 3 around batch launch + per-step completion (3a propose +
       stop; per-step 3b–3e and 3f; 3h ask-what-next per step); update the intro
       and anti-patterns.
 
 ### Task 3: Continuous spec updates
-- [ ] Add the auto-vs-ask rule and wire it into 3c/3f/Phase 3.5.
+- [x] Add the auto-vs-ask rule and wire it into 3c/3f/Phase 3.5.
 
 ### Task 4: Docs, tests, provenance
-- [ ] Update `AGENTS.md`, `README.md`, `.opencode/INSTALL.md`, `CHANGELOG.md`;
+- [x] Update `AGENTS.md`, `README.md`, `.opencode/INSTALL.md`, `CHANGELOG.md`;
       extend the barrel test; re-record the `outputHash`; `check` clean.
 
 ### Task 5: Final gate + review + release
