@@ -5,7 +5,7 @@
     "ref": "v7.0.0",
     "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
     "license": "MIT",
-    "retrievedAt": "2026-10-13T21:02:30.480Z",
+    "retrievedAt": "2026-10-13T21:42:11.437Z",
     "include": [
       "skills/brainstorming/SKILL.md",
       "skills/requesting-code-review/SKILL.md",
@@ -17,6 +17,7 @@
       "skills/finishing-a-development-branch/SKILL.md",
       "skills/dispatching-parallel-agents/SKILL.md",
       "skills/using-git-worktrees/SKILL.md",
+      "skills/diagnosing-superpowers/SKILL.md",
       "LICENSE"
     ]
   },
@@ -26,7 +27,7 @@
     "ref": "v1.3.1",
     "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
     "license": "MIT",
-    "retrievedAt": "2026-10-13T21:02:32.245Z",
+    "retrievedAt": "2026-10-13T21:42:12.594Z",
     "include": [
       "skills/productivity/grilling/SKILL.md",
       "skills/productivity/grill-me/SKILL.md",
@@ -43,6 +44,9 @@
       "skills/engineering/pr/SKILL.md",
       "skills/productivity/writing-for-agents/SKILL.md",
       "skills/engineering/codebase-design/SKILL.md",
+      "skills/engineering/improve-codebase-architecture/SKILL.md",
+      "skills/engineering/wizard/SKILL.md",
+      "skills/engineering/ask-matt/SKILL.md",
       "LICENSE"
     ]
   }
