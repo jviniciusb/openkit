@@ -23,10 +23,14 @@ test("package entry points at the shipped TypeScript source", () => {
   expect(readFileSync(new URL("../../index.js", import.meta.url), "utf8")).toContain("./src/plugin.ts")
 })
 
-test("the kit ships the english-writing-assistant and sdd-flow skills", () => {
+test("the kit ships the english-writing-assistant, sdd-flow, and interview skills", () => {
   const sdd = skills.find((s) => s.id === "sdd-flow")!
   expect(loadSkill(sdd).autoinvoke).toBe(false)
   expect(skills.map((s) => s.id)).toContain("english-writing-assistant")
+  const interview = skills.find((s) => s.id === "interview")
+  expect(interview).toBeDefined()
+  expect(loadSkill(interview!).name).toBe("interview")
+  expect("autoinvoke" in loadSkill(interview!)).toBe(false)
 })
 
 test("the catalog loads tools, skills, and references categories", () => {
