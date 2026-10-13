@@ -17,7 +17,7 @@ rules, each individually toggleable, plus your own instructions), and
 `auto-compact` (`src/tools/auto-compact/index.ts`, opt-in; queues compaction once
 related sessions, tool calls, and shells are idle and the last prompt exceeds a
 token threshold). The `hello`
-example at `src/tools/hello/index.ts` is not registered at runtime. Seven skills
+example at `src/tools/hello/index.ts` is not registered at runtime. Eleven skills
 ship today, all enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
@@ -29,8 +29,16 @@ implementation), `skill-recipe` (`src/skills/skill-recipe/SKILL.md`, registered
 `research` (`src/skills/research/SKILL.md`, model-visible; cited findings from
 primary sources), `handoff` (`src/skills/handoff/SKILL.md`, registered
 `autoinvoke: false`, invoked with `@handoff`; compacts the conversation into a
-resumable document), and `code-review` (`src/skills/code-review/SKILL.md`,
-model-visible; reviews a change along Standards and Spec). The **references**
+resumable document), `code-review` (`src/skills/code-review/SKILL.md`,
+model-visible; reviews a change along Standards and Spec), `diagnosing-bugs`
+(`src/skills/diagnosing-bugs/SKILL.md`, model-visible; root-causes a bug from
+evidence before changing production code), `verification`
+(`src/skills/verification/SKILL.md`, model-visible; proves a completion claim
+against the current tree before reporting success), `prototype`
+(`src/skills/prototype/SKILL.md`, model-visible; builds throwaway code to resolve
+one design uncertainty), and `retro` (`src/skills/retro/SKILL.md`, registered
+`autoinvoke: false`, invoked with `@retro`; turns a finished session's friction
+into proposed environment changes). The **references**
 category
 (`src/references/<id>/reference.json`) ships empty today; references are
 declarative, opt-in, settings-bearing content sources registered through
