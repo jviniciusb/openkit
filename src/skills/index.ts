@@ -24,5 +24,10 @@ export const skills: KitSkill[] = [
   defineSkill({ id: "using-git-worktrees", dir: new URL("./using-git-worktrees/", import.meta.url) }),
   defineSkill({ id: "writing-for-agents", dir: new URL("./writing-for-agents/", import.meta.url) }),
   defineSkill({ id: "codebase-design", dir: new URL("./codebase-design/", import.meta.url) }),
+  defineSkill({ id: "improve-codebase-architecture", dir: new URL("./improve-codebase-architecture/", import.meta.url), autoinvoke: false }),
+  defineSkill({ id: "to-spec", dir: new URL("./to-spec/", import.meta.url), autoinvoke: false }),
+  defineSkill({ id: "wizard", dir: new URL("./wizard/", import.meta.url) }),
+  defineSkill({ id: "router", dir: new URL("./router/", import.meta.url), autoinvoke: false }),
+  defineSkill({ id: "diagnosing-sessions", dir: new URL("./diagnosing-sessions/", import.meta.url), autoinvoke: false }),
   // </kit:skills>
 ]

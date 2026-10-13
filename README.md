@@ -43,7 +43,7 @@ before related background work has finished. This also disables OpenCode's
 automatic overflow-recovery compaction. If the provider does not report prompt
 usage, the tool cannot trigger compaction.
 
-It also ships sixteen skills, all enabled by default:
+It also ships twenty-one skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
 (model-visible), [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
 explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
@@ -72,7 +72,18 @@ concurrently), [`using-git-worktrees`](src/skills/using-git-worktrees/SKILL.md)
 [`writing-for-agents`](src/skills/writing-for-agents/SKILL.md) (model-visible;
 writes agent-facing documents so the agent lands on the intended behavior), and
 [`codebase-design`](src/skills/codebase-design/SKILL.md) (model-visible; designs
-deep modules behind clean seams). See [Skills](#skills).
+deep modules behind clean seams),
+[`improve-codebase-architecture`](src/skills/improve-codebase-architecture/SKILL.md)
+(invoked with `@improve-codebase-architecture`; surveys a codebase read-only for
+deepening opportunities),
+[`to-spec`](src/skills/to-spec/SKILL.md) (invoked with `@to-spec`; distills the
+current conversation into a written spec without re-interviewing),
+[`wizard`](src/skills/wizard/SKILL.md) (model-visible; builds a guided interactive
+script for steps only a human can take), [`router`](src/skills/router/SKILL.md)
+(invoked with `@router`; points a request at the one kit skill or flow that fits),
+and [`diagnosing-sessions`](src/skills/diagnosing-sessions/SKILL.md) (invoked with
+`@diagnosing-sessions`; forensically explains why a past session went wrong). See
+[Skills](#skills).
 
 The **references** category ships empty today; it is the supported home for
 curated content sources. See [References](#references).
@@ -262,7 +273,7 @@ Skills are entirely declarative — there is no per-skill code. OpenCode either
 advertises a skill to the model so it can use it on its own, or hides it from
 the model's list while keeping it loadable by id.
 
-Sixteen skills ship with the kit, all **enabled by default**:
+Twenty-one skills ship with the kit, all **enabled by default**:
 
 | Skill | How it is used |
 | --- | --- |
@@ -282,6 +293,11 @@ Sixteen skills ship with the kit, all **enabled by default**:
 | [`using-git-worktrees`](src/skills/using-git-worktrees/SKILL.md) | Model-visible. Sets up or verifies an isolated workspace before feature work: detects existing isolation, prefers the harness's native worktree tool, and falls back to `git worktree` only when none exists. |
 | [`writing-for-agents`](src/skills/writing-for-agents/SKILL.md) | Model-visible. Writes or edits a document an agent consumes — instructions, a spec, an `AGENTS.md`, a skill — so the agent lands on the intended behavior on every run, with pointers that fire and steps that close on a checkable bound. |
 | [`codebase-design`](src/skills/codebase-design/SKILL.md) | Model-visible. Designs deep modules — a lot of behaviour behind a small interface at a clean seam — for leverage for callers, locality for maintainers, and testability through the interface. |
+| [`improve-codebase-architecture`](src/skills/improve-codebase-architecture/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@improve-codebase-architecture`**: surveys a codebase read-only for deepening opportunities — turning shallow modules into deep ones — and reports a prioritized list for the human to choose from. |
+| [`to-spec`](src/skills/to-spec/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@to-spec`**: distills the current conversation into a written spec, preserving decisions already made and leaving undecided items as open questions. |
+| [`wizard`](src/skills/wizard/SKILL.md) | Model-visible. Builds a guided interactive script for steps only a human can take — credentials, approvals, external consoles — so a manual procedure becomes repeatable instead of re-explained. |
+| [`router`](src/skills/router/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@router`**: names the one kit skill or flow that fits a request and why. It points; the user invokes. |
+| [`diagnosing-sessions`](src/skills/diagnosing-sessions/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@diagnosing-sessions`**: forensically reads a past session's transcript and reports, with evidence, why it stalled, repeated work, ignored a plan, or produced a poor result. |
 
 **Skill recipe:** `@skill-recipe` is the general authoring skill for deriving a
 new kit skill from a brief and arbitrary sources — it reads whatever paths the
@@ -310,7 +326,12 @@ section, with the same discovery and precedence:
     "dispatching-parallel-agents": { "enabled": true },
     "using-git-worktrees": { "enabled": true },
     "writing-for-agents": { "enabled": true },
-    "codebase-design": { "enabled": true }
+    "codebase-design": { "enabled": true },
+    "improve-codebase-architecture": { "enabled": true },
+    "to-spec": { "enabled": true },
+    "wizard": { "enabled": true },
+    "router": { "enabled": true },
+    "diagnosing-sessions": { "enabled": true }
   }
 }
 ```

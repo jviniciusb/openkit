@@ -230,5 +230,70 @@
     "output": "src/skills/codebase-design/SKILL.md",
     "outputHash": "8356ab0a34366d4314b2e429dbcf25f87c95781d9015074c523652a8b349c10a",
     "generatedAt": "2026-10-13T21:17:12.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/improve-codebase-architecture.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/improve-codebase-architecture/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/improve-codebase-architecture/SKILL.md",
+    "outputHash": "d52d0448e70634c962266050bca921df506d3ecad5eb6c1d834a2b9a197cd135",
+    "generatedAt": "2026-10-13T21:43:15.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/to-spec.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/to-spec/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/to-spec/SKILL.md",
+    "outputHash": "ed7edf9cae88c4ac69a6d0259f31e2cd0b8081b7486b4b678dc3384ac5a448cb",
+    "generatedAt": "2026-10-13T21:46:39.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/wizard.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/wizard/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/wizard/SKILL.md",
+    "outputHash": "806ca3757f6d8e2d4e2fd640b90c8cf8a4b63419c75945a77c725976d0f050e7",
+    "generatedAt": "2026-10-13T21:50:14.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/router.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/ask-matt/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/router/SKILL.md",
+    "outputHash": "357adde75d3b3309a0027abfaeaa850829ec7486fbaddd41beed8dd6f99ebcec",
+    "generatedAt": "2026-10-13T21:53:26.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/diagnosing-sessions.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/diagnosing-superpowers/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/diagnosing-sessions/SKILL.md",
+    "outputHash": "0c44dc2366ee94cb0ef6612e7a5da31ff4d1cc2ad2af2719c83fdc3452314f20",
+    "generatedAt": "2026-10-13T21:56:10.000Z"
   }
 ]
