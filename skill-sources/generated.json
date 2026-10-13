@@ -1,0 +1,20 @@
+[
+  {
+    "brief": "skill-sources/briefs/interview.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/brainstorming/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/productivity/grilling/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/interview/SKILL.md",
+    "outputHash": "7609456c18a7c8b52fffba76b8861e7426b5e9880095141bbb9597ff8924696c",
+    "generatedAt": "2026-10-13T17:54:17.080Z"
+  }
+]
