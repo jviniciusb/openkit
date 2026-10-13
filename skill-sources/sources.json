@@ -5,9 +5,14 @@
     "ref": "v7.0.0",
     "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
     "license": "MIT",
-    "retrievedAt": "2026-10-13T17:52:21.114Z",
+    "retrievedAt": "2026-10-13T18:41:49.171Z",
     "include": [
       "skills/brainstorming/SKILL.md",
+      "skills/requesting-code-review/SKILL.md",
+      "skills/receiving-code-review/SKILL.md",
+      "skills/subagent-driven-development/SKILL.md",
+      "skills/executing-plans/SKILL.md",
+      "skills/verification-before-completion/SKILL.md",
       "LICENSE"
     ]
   },
@@ -17,11 +22,17 @@
     "ref": "v1.3.1",
     "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
     "license": "MIT",
-    "retrievedAt": "2026-10-13T17:52:24.867Z",
+    "retrievedAt": "2026-10-13T18:41:50.841Z",
     "include": [
       "skills/productivity/grilling/SKILL.md",
       "skills/productivity/grill-me/SKILL.md",
       "skills/engineering/grill-with-docs/SKILL.md",
+      "skills/engineering/research/SKILL.md",
+      "skills/productivity/handoff/SKILL.md",
+      "skills/engineering/code-review/SKILL.md",
+      "skills/engineering/implement-spec/SKILL.md",
+      "skills/engineering/to-tickets/SKILL.md",
+      "skills/engineering/to-spec/SKILL.md",
       "LICENSE"
     ]
   }

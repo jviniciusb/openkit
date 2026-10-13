@@ -4,6 +4,28 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `research` skill (model-visible): settles a factual question with cited
+  findings from primary sources (official docs, source code, specs, first-party
+  APIs), dispatching the reading to a background subagent and keeping established
+  fact separate from inference.
+- `handoff` skill (`autoinvoke: false`, invoked with `@handoff`): compacts the
+  current conversation into one portable document a fresh session can resume
+  from, carrying state, decisions, open threads, and the next action.
+- `code-review` skill (model-visible): reviews a change along two independent
+  axes — Standards and Spec — so neither masks the other, and verifies review
+  feedback against the code before acting on it.
+
+### Changed
+
+- `sdd-flow` is now a self-contained spec-driven development orchestrator that
+  composes the kit's own `interview`, `research`, and `code-review` skills by id.
+  It no longer vendors content verbatim from a Claude Code setup and has no
+  external companion skills or `/sdd-flow` command; invoke it with `@sdd-flow`.
+
 ## [0.8.0] - 2026-10-13
 
 ### Added
