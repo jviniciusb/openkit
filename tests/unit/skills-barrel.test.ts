@@ -4,8 +4,14 @@ import { skills } from "../../src/skills/index"
 import { loadSkill } from "../../src/core/skill"
 import { tools } from "../../src/tools/index"
 
-test("ships the four expected skills with unique ids across tools and skills", () => {
-  expect(skills.map((s) => s.id)).toEqual(["skill-recipe", "english-writing-assistant", "sdd-flow", "interview"])
+test("ships the five expected skills with unique ids across tools and skills", () => {
+  expect(skills.map((s) => s.id)).toEqual([
+    "skill-recipe",
+    "english-writing-assistant",
+    "sdd-flow",
+    "interview",
+    "research",
+  ])
   const ids = [...tools.map((t) => t.id), ...skills.map((s) => s.id)]
   expect(new Set(ids).size).toBe(ids.length)
 })
