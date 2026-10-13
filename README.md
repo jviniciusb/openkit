@@ -43,13 +43,19 @@ before related background work has finished. This also disables OpenCode's
 automatic overflow-recovery compaction. If the provider does not report prompt
 usage, the tool cannot trigger compaction.
 
-It also ships four skills, all enabled by default:
+It also ships seven skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
 (model-visible), [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
 explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
-(model-visible; aligns on design before implementation), and
+(model-visible; aligns on design before implementation),
 [`skill-recipe`](src/skills/skill-recipe/SKILL.md) (the authoring recipe,
-invoked with `@skill-recipe`). See [Skills](#skills).
+invoked with `@skill-recipe`), [`research`](src/skills/research/SKILL.md)
+(model-visible; cited findings from primary sources),
+[`handoff`](src/skills/handoff/SKILL.md) (invoked with `@handoff`; compacts the
+conversation into a resumable handoff), and
+[`code-review`](src/skills/code-review/SKILL.md) (model-visible; reviews a change
+along Standards and Spec, and verifies feedback before acting). See
+[Skills](#skills).
 
 The **references** category ships empty today; it is the supported home for
 curated content sources. See [References](#references).
@@ -239,14 +245,17 @@ Skills are entirely declarative — there is no per-skill code. OpenCode either
 advertises a skill to the model so it can use it on its own, or hides it from
 the model's list while keeping it loadable by id.
 
-Four skills ship with the kit, all **enabled by default**:
+Seven skills ship with the kit, all **enabled by default**:
 
 | Skill | How it is used |
 | --- | --- |
 | [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md) | Model-visible. Turns a Portuguese speaker's draft, bullets, or Portuguese–English mix into clear, idiomatic English, with a short explanation of what changed. |
-| [`sdd-flow`](src/skills/sdd-flow/SKILL.md) | Registered with `autoinvoke: false`, so it stays off the model's advertised list. Invoke it explicitly with **`@sdd-flow`**. Spec-driven development: write an approved spec, then implement it in dependency-ordered slices. |
+| [`sdd-flow`](src/skills/sdd-flow/SKILL.md) | Registered with `autoinvoke: false`, so it stays off the model's advertised list. Invoke it explicitly with **`@sdd-flow`**. A self-contained spec-driven development orchestrator: write an approved spec, then implement it in dependency-ordered slices, composing the kit's own `interview`, `research`, and `code-review` skills along the way. |
 | [`interview`](src/skills/interview/SKILL.md) | Model-visible. Aligns on design or requirements before implementation: maps every open decision as a design tree, works it in rounds, and holds implementation behind an approval gate. |
 | [`skill-recipe`](src/skills/skill-recipe/SKILL.md) | Registered with `autoinvoke: false`. The authoring aid, invoked with **`@skill-recipe`**: turns a brief plus one or more source skills into a self-contained kit-style `SKILL.md`. |
+| [`research`](src/skills/research/SKILL.md) | Model-visible. Settles a factual question with cited findings from primary sources (official docs, source code, specs, first-party APIs), dispatching the reading to a background subagent and keeping established fact separate from inference. |
+| [`handoff`](src/skills/handoff/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@handoff`**: compacts the current conversation into one portable document a fresh session can resume from, carrying state, decisions, open threads, and the next action. |
+| [`code-review`](src/skills/code-review/SKILL.md) | Model-visible. Reviews a change along two independent axes — Standards and Spec — so neither masks the other, and, on the receiving side, verifies every finding against the code before acting on it. |
 
 **Skill recipe:** `@skill-recipe` is the general authoring skill for deriving a
 new kit skill from a brief and arbitrary sources — it reads whatever paths the
@@ -263,7 +272,10 @@ section, with the same discovery and precedence:
     "english-writing-assistant": { "enabled": true },
     "sdd-flow": { "enabled": false },
     "interview": { "enabled": true },
-    "skill-recipe": { "enabled": true }
+    "skill-recipe": { "enabled": true },
+    "research": { "enabled": true },
+    "handoff": { "enabled": true },
+    "code-review": { "enabled": true }
   }
 }
 ```
@@ -273,12 +285,10 @@ disabled skill is not registered at all. Toggle one with the CLI
 (`bun bin/opencode-kit.js disable sdd-flow`) or in-session with
 `/kit disable sdd-flow`.
 
-**sdd-flow caveat:** its content is vendored verbatim from a Claude Code setup.
-It references companion skills (`mattpocock-skills:*`, `superpowers:*`) and
-`Explore`-style agents, and its text mentions `/sdd-flow`. Those companions
-resolve only if installed separately, and in OpenCode the invocation is
-`@sdd-flow` (there is no `/sdd-flow` command). Without the companions, the flow's
-steps degrade.
+`sdd-flow` is a self-contained orchestrator: it sequences spec-driven
+development end to end and composes the kit's own `interview`, `research`, and
+`code-review` skills by id. It has no external companion skills and no
+`/sdd-flow` command — invoke it with `@sdd-flow`.
 
 ## References
 

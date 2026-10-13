@@ -58,6 +58,21 @@
       // Registered with `autoinvoke: false`; the authoring aid, invoked with
       // `@skill-recipe` to derive a new kit skill from a brief and sources.
       "enabled": true
+    },
+    "research": {
+      // Model-visible: settles a factual question with cited findings from
+      // primary sources, delegating the reading to a background subagent.
+      "enabled": true
+    },
+    "handoff": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with
+      // `@handoff` to compact the conversation into a resumable document.
+      "enabled": true
+    },
+    "code-review": {
+      // Model-visible: reviews a change along Standards and Spec, and verifies
+      // feedback against the code before acting on it.
+      "enabled": true
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.
     // `enable`/`disable` and the `/kit` command write here.

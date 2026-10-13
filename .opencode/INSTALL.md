@@ -85,7 +85,10 @@ prompt exceeds `thresholdTokens`):
     "english-writing-assistant": { "enabled": true },
     "sdd-flow": { "enabled": true },
     "interview": { "enabled": true },
-    "skill-recipe": { "enabled": true }
+    "skill-recipe": { "enabled": true },
+    "research": { "enabled": true },
+    "handoff": { "enabled": true },
+    "code-review": { "enabled": true }
   },
   "references": {}
 }
@@ -95,13 +98,16 @@ When enabling `auto-compact`, also set `"compaction": { "auto": false }` in the
 project or global `opencode.json(c)` so native auto-compaction cannot run before
 related background work has finished.
 
-The kit also ships four **skills**, all enabled by default:
-`english-writing-assistant` (model-visible), `sdd-flow` (invoked explicitly
-with `@sdd-flow`), `interview` (model-visible; aligns on design before
-implementation), and `skill-recipe` (the authoring recipe, invoked with
-`@skill-recipe`). Skills take no `settings` — only `enabled`. Disable one with
-`/kit disable <skill-id>` in a session, or
-`bun bin/opencode-kit.js disable <skill-id>` from a checkout.
+The kit also ships seven **skills**, all enabled by default:
+`english-writing-assistant` (model-visible), `sdd-flow` (a self-contained
+spec-driven development orchestrator, invoked explicitly with `@sdd-flow`),
+`interview` (model-visible; aligns on design before implementation),
+`skill-recipe` (the authoring recipe, invoked with `@skill-recipe`), `research`
+(model-visible; cited findings from primary sources), `handoff` (invoked with
+`@handoff`; compacts the conversation into a resumable document), and
+`code-review` (model-visible; reviews a change along Standards and Spec). Skills
+take no `settings` — only `enabled`. Disable one with `/kit disable <skill-id>`
+in a session, or `bun bin/opencode-kit.js disable <skill-id>` from a checkout.
 
 **References** are the third category (a `references` config section). A
 reference packages a content source (local path or git repository) for the
