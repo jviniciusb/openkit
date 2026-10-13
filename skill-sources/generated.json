@@ -42,5 +42,28 @@
     "output": "src/skills/handoff/SKILL.md",
     "outputHash": "bbdf91a723cc559a3e25d6b764d7cefe3f381ad9b1c7b86d81388ed812471dec",
     "generatedAt": "2026-10-13T18:46:52.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/code-review.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/code-review/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/requesting-code-review/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/receiving-code-review/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/code-review/SKILL.md",
+    "outputHash": "37fbfe78f8a080aa36a7afded74e2a629d4074d468ee184e254fadf1342e22e9",
+    "generatedAt": "2026-10-13T18:50:16.000Z"
   }
 ]

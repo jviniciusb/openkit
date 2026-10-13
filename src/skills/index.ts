@@ -14,5 +14,6 @@ export const skills: KitSkill[] = [
   defineSkill({ id: "interview", dir: new URL("./interview/", import.meta.url) }),
   defineSkill({ id: "research", dir: new URL("./research/", import.meta.url) }),
   defineSkill({ id: "handoff", dir: new URL("./handoff/", import.meta.url), autoinvoke: false }),
+  defineSkill({ id: "code-review", dir: new URL("./code-review/", import.meta.url) }),
   // </kit:skills>
 ]
