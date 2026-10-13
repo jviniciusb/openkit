@@ -1,6 +1,6 @@
 # Skill recipe rubric
 
-The house style and taste constraints for a derived kit skill. Read this before drafting.
+The house style and taste constraints for a derived kit skill. Read this before drafting. For general authoring depth beyond these skill-specific rules, see the `writing-for-agents` skill.
 
 ## Description discipline
 

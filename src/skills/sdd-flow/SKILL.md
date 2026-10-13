@@ -11,7 +11,7 @@ On activation, announce **"Using the sdd-flow skill."** then begin Phase 1.
 
 ## How this flow orchestrates skills
 
-This flow sequences the work from specification through delivery. It composes three kit skills: `interview` to align on the design, `research` to settle facts, and `code-review` to review each step. Invoke each by its skill id when its phase calls for it. A skill remains applicable when its own trigger applies, whether or not this flow names it; follow its guidance alongside project instructions.
+This flow sequences the work from specification through delivery. It composes kit skills by id, invoking each when its phase calls for it: `interview` to align on the design, `research` to settle facts, `code-review` to review each step, `codebase-design` for the seam vocabulary, `using-git-worktrees` for workspace isolation, and `dispatching-parallel-agents` for fan-out. A skill remains applicable when its own trigger applies, whether or not this flow names it; follow its guidance alongside project instructions.
 
 ## Project workflow authority
 
@@ -32,7 +32,7 @@ The survey feeds the interview in **both** directions:
 
 The second is the reason this phase exists. A survey that only pre-answers what you already knew to ask has not paid for itself.
 
-Dispatch read-only exploration subagents, one per question, all in one message. Each brief names its scope, the one question it answers, and that it must return findings with file paths, not proposals. A subagent that comes back with a suggested design has exceeded its brief: discard the design, keep the facts.
+Dispatch read-only exploration subagents, one per question, all in one message, following the `dispatching-parallel-agents` skill for the fan-out mechanics. Each brief names its scope, the one question it answers, and that it must return findings with file paths, not proposals. A subagent that comes back with a suggested design has exceeded its brief: discard the design, keep the facts.
 
 When an unknown is about a third-party library or API rather than this codebase, invoke `research` instead of an exploration subagent.
 
@@ -58,17 +58,7 @@ The interview ends at shared understanding; it writes nothing. This flow writes 
 
 ### 1.3 Seams
 
-Name the seams the feature will be tested at and confirm them with the user. Use this vocabulary exactly, in this phase and in every brief downstream:
-
-- **Module** is a unit of behavior behind an **interface**, the set of calls its callers make.
-- A **seam** is the boundary where behavior is observed and substituted.
-- An **adapter** is an implementation behind a seam.
-- **Depth** is how much behavior a small interface hides; a deep module hides more than it exposes.
-
-Two principles decide the phase:
-
-- **The interface is the test surface.** Callers and tests cross the same seam. Wanting to test *past* an interface means the module is the wrong shape; reshape it rather than test around it.
-- **One adapter is a hypothetical seam; two is a real one.** Do not introduce a seam unless something actually varies across it.
+Name the seams the feature will be tested at and confirm them with the user. Use the seam vocabulary and its principles from the `codebase-design` skill (module, interface, seam, adapter, depth; the interface is the test surface; one adapter is a hypothetical seam), in this phase and in every brief downstream; invoke it by id when you need the definitions.
 
 Use the project's architecture and existing test boundaries to choose the highest seam that still observes the behavior. Prefer existing seams; introduce fewer seams.
 
@@ -76,7 +66,7 @@ No test is written at an unconfirmed seam.
 
 ### 1.4 Write the spec
 
-Follow [spec-template.md](spec-template.md): one artifact carrying the design and the dependency-ordered steps. Add these sections when their trigger applies:
+Follow [spec-template.md](spec-template.md): one artifact carrying the design and the dependency-ordered steps. To draft it from the conversation so far, invoke the `to-spec` skill. Add these sections when their trigger applies:
 
 - **What already exists.** Reuse, do not rebuild. Whenever the work touches code that already exists. The APIs, flags, components, and files to mirror, with paths. Its absence is why a fresh agent rebuilds what is already there.
 - **Root cause.** Whenever the work is a defect, not a feature. The template is feature-shaped and has no place for it.
@@ -127,7 +117,7 @@ Exit 0 means ignored. Exit 1 means move it or add the path to `.gitignore` for t
 
 ## Phase 2: Workspace setup
 
-Follow the active project's workspace instructions for isolation, branch and worktree creation, local inputs, and baseline validation. Use one isolated workspace per independently executing track when the project workflow allows it. Keep the spec in the checkout where the flow was invoked and pass its absolute path to every worker; do not create a competing copy. Track every workspace created this session for Phase 4. If the user asks to preview or move work between workspaces, follow the applicable project and environment instructions.
+Follow the active project's workspace instructions for isolation, branch and worktree creation, local inputs, and baseline validation; invoke the `using-git-worktrees` skill for the isolation mechanics when the project workflow calls for a worktree. Use one isolated workspace per independently executing track when the project workflow allows it. Keep the spec in the checkout where the flow was invoked and pass its absolute path to every worker; do not create a competing copy. Track every workspace created this session for Phase 4. If the user asks to preview or move work between workspaces, follow the applicable project and environment instructions.
 
 ---
 
@@ -159,7 +149,7 @@ Then **stop**. Presenting the frontier and starting work in the same message is 
 
 **Advance delegation does not satisfy the gate.** "You choose", "I trust your judgment", "you decide the ordering" tell you what to *recommend*; they do not tell you to begin. Honor the delegation in part 2 by naming a pick instead of offering a menu; the go is still theirs, and it costs them one word. Ordering and permission-to-start are different questions, and only the first was delegated.
 
-The user decides: one here, a subset, or several in parallel workspaces. If parallel, also walk step-format.md's *When several run in parallel* notes and follow project workspace rules for each track.
+The user decides: one here, a subset, or several in parallel workspaces. If parallel, also walk step-format.md's *When several run in parallel* notes, follow the `dispatching-parallel-agents` skill for the fan-out mechanics, and follow project workspace rules for each track.
 
 ### 3b. Expand and route
 
@@ -278,4 +268,4 @@ Procedure:
 from: obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3 skills/subagent-driven-development/SKILL.md (+ executing-plans, verification-before-completion)
       mattpocock/skills@24fe0ef7737efae15c87225755e9f6f5965e4888 skills/engineering/implement-spec/SKILL.md (+ to-spec, to-tickets)
       src/skills/sdd-flow/SKILL.md (prior revision, evolved in place)
-license: MIT (dev-only snapshots: skill-sources/<name>/LICENSE in the repo) -->
+license: MIT (dev-only snapshots: skill-sources/superpowers/LICENSE, skill-sources/mattpocock-skills/LICENSE in the repo) -->

@@ -9,7 +9,7 @@ Survey the codebase for **deepening opportunities** and report them as a priorit
 
 ## Overview
 
-Architectural friction shows up as modules that are hard to understand, hard to test, or hard to change safely. This skill finds that friction and names the **deepening opportunity** behind it: a refactor that moves behavior behind a smaller interface, at a clean seam.
+Architectural friction shows up as modules that are hard to understand, hard to test, or hard to change safely. This skill finds that friction and names the **deepening opportunity** behind it: a refactor that moves behavior behind a smaller interface, at a clean seam. For the vocabulary (module, interface, seam, adapter, depth), see the `codebase-design` skill.
 
 The output is a prioritized list, not a refactor. Every candidate states the concrete change and its payoff in terms of locality, leverage, and testability. The survey is read-only: it reads the code, and it never edits it. The human picks what to tackle.
 
