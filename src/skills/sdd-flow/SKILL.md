@@ -66,7 +66,7 @@ No test is written at an unconfirmed seam.
 
 ### 1.4 Write the spec
 
-Follow [spec-template.md](spec-template.md): one artifact carrying the design and the dependency-ordered steps. To draft it from the conversation so far, invoke the `to-spec` skill. Add these sections when their trigger applies:
+Follow [spec-template.md](spec-template.md): one artifact carrying the design and the dependency-ordered steps. You may invoke the `to-spec` skill to distill the conversation first; the flow's spec still follows [spec-template.md](spec-template.md) and the canonical path. Add these sections when their trigger applies:
 
 - **What already exists.** Reuse, do not rebuild. Whenever the work touches code that already exists. The APIs, flags, components, and files to mirror, with paths. Its absence is why a fresh agent rebuilds what is already there.
 - **Root cause.** Whenever the work is a defect, not a feature. The template is feature-shaped and has no place for it.

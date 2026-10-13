@@ -1,7 +1,7 @@
 # opencode-kit — Skill Kit Gap Pass Design Spec
 
 - **Date:** 2026-10-13
-- **Status:** Draft for review
+- **Status:** Implemented (pending release)
 - **Author:** (agent-assisted)
 - **Topic:** The final gap pass across all four batches: dedupe overlaps, clear
   deferred minors repo-wide, resolve open decisions.
@@ -100,31 +100,31 @@ tracked across those batches, with no new skills:
 > C depends on A.
 
 ### Task 1 (Workstream A): skill content + hashes
-- [ ] `sdd-flow`: dedupe per §5.1 + provenance fix per §5.2.
-- [ ] `code-review`, `interview`: provenance fix per §5.2.
-- [ ] `skill-recipe/rubric.md` + `improve-codebase-architecture`: cross-refs.
-- [ ] `verification`: wording per §5.2.
-- [ ] Re-record the `outputHash` for every edited generated `SKILL.md` in
+- [x] `sdd-flow`: dedupe per §5.1 + provenance fix per §5.2.
+- [x] `code-review`, `interview`: provenance fix per §5.2.
+- [x] `skill-recipe/rubric.md` + `improve-codebase-architecture`: cross-refs.
+- [x] `verification`: wording per §5.2.
+- [x] Re-record the `outputHash` for every edited generated `SKILL.md` in
       `skill-sources/generated.json` (there is no record command — compute
       `sha256sum` of the raw bytes and write it); `bun scripts/skill-source.ts
       check` clean.
 
 ### Task 2 (Workstream B): test cleanup
-- [ ] Remove the vacuous `>-` guards from all skill tests.
-- [ ] Add the `router` `@id` cross-check test.
-- [ ] `bun test` green.
+- [x] Remove the vacuous `>-` guards from all skill tests.
+- [x] Add the `router` `@id` cross-check test.
+- [x] `bun test` green.
 
 ### Task 3 (Workstream C): docs + tracker
-- [ ] Update `docs/superpowers/skill-kit-gaps.md`: mark the dedupe + deferred
+- [x] Update `docs/superpowers/skill-kit-gaps.md`: mark the dedupe + deferred
       minors resolved, record the `interview` decision (Batch 4 is already marked
       released).
-- [ ] Update `AGENTS.md` / `README.md` if `sdd-flow`'s description changes.
-- [ ] `CHANGELOG.md` entry.
+- [x] Update `AGENTS.md` / `README.md` if `sdd-flow`'s description changes.
+- [x] `CHANGELOG.md` entry.
 
 ### Task 4: Final gate + whole-branch review
-- [ ] `bun run typecheck && bun test`; `bun scripts/skill-source.ts check` clean.
-- [ ] Whole-branch review; fix; re-review.
-- [ ] Commit, push, PR, merge, release (v0.13.0).
+- [x] `bun run typecheck && bun test`; `bun scripts/skill-source.ts check` clean.
+- [x] Whole-branch review; fix; re-review.
+- [x] Commit, push, PR, merge, release (v0.13.0).
 
 ## 7. Success criteria
 
