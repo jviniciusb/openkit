@@ -29,5 +29,18 @@
     "output": "src/skills/research/SKILL.md",
     "outputHash": "af4127bda99123f474a9b565a14a9d8a3748619d4a02534b4c928c0c20bed8d2",
     "generatedAt": "2026-10-13T18:43:25.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/handoff.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/productivity/handoff/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/handoff/SKILL.md",
+    "outputHash": "bbdf91a723cc559a3e25d6b764d7cefe3f381ad9b1c7b86d81388ed812471dec",
+    "generatedAt": "2026-10-13T18:46:52.000Z"
   }
 ]
