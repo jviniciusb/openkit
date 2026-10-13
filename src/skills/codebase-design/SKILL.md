@@ -5,13 +5,13 @@ description: Use when designing modules and interfaces, or reviewing a structure
 
 # Codebase Design
 
-Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. The aim is leverage for callers, locality for maintainers, and testability for everyone.
+Design **deep modules**: a lot of behavior behind a small interface, placed at a clean seam, testable through that interface. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 
 ## Overview
 
 A module is anything with an interface and an implementation, at any scale: a function, a class, a package, or a tier-spanning slice. Its **interface** is everything a caller must know to use it correctly: the type signature, plus invariants, ordering constraints, error modes, required configuration, and performance characteristics. Its **implementation** is the body of code inside.
 
-A module is **deep** when a large amount of behaviour sits behind a small interface, and **shallow** when the interface is nearly as complex as the implementation. Depth is leverage: more capability per unit of interface a caller or test has to learn. It is also locality: change, bugs, knowledge, and verification concentrate in one place instead of spreading across callers.
+A module is **deep** when a large amount of behavior sits behind a small interface, and **shallow** when the interface is nearly as complex as the implementation. Depth is leverage: more capability per unit of interface a caller or test has to learn. It is also locality: change, bugs, knowledge, and verification concentrate in one place instead of spreading across callers.
 
 Depth is a property of the interface, not the implementation. A deep module can be internally composed of small, swappable parts; those parts are simply not part of the interface.
 
@@ -35,11 +35,11 @@ Imagine deleting the module. If the complexity vanishes, it was a pass-through. 
 
 ### 3. Prefer depth
 
-Ask whether the interface can be smaller: fewer methods, simpler parameters, more complexity hidden inside. Move behaviour behind the interface rather than widening it. Internal parts stay private even when they are individually small and swappable.
+Ask whether the interface can be smaller: fewer methods, simpler parameters, more complexity hidden inside. Move behavior behind the interface rather than widening it. Internal parts stay private even when they are individually small and swappable.
 
 ### 4. Place the seam deliberately
 
-A **seam** is a place where behaviour can change without editing in that place: the location at which the interface lives. Where the seam goes is its own decision, separate from what goes behind it. Put it where variation is real, not where it is imagined.
+A **seam** is a place where behavior can change without editing in that place: the location at which the interface lives. Where the seam goes is its own decision, separate from what goes behind it. Put it where variation is real, not where it is imagined.
 
 ### 5. Introduce a seam only when something varies across it
 

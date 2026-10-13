@@ -9,7 +9,7 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 |---|---|---|---|
 | 1 | `interview` (derived), `skill-recipe`, `research`, `handoff`, `code-review`, `sdd-flow` (evolved) | v0.9.0 | done |
 | 2 | `diagnosing-bugs`, `verification`, `prototype`, `retro` | v0.10.0 | done |
-| 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | done |
+| 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | merged, pending release |
 
 ## Current skills (16)
 
@@ -56,7 +56,9 @@ Not yet derived; candidates for later batches or the final gap pass:
 ### Deferred minors (non-blocking)
 - Vacuous `expect(description).not.toContain(">-")` guards in several skill tests
   (`interview`, `research`, `handoff`, `code-review`, `diagnosing-bugs`,
-  `verification`, `prototype`, `retro`) — replace or drop repo-wide.
+  `verification`, `prototype`, `retro`, `finishing-a-branch`,
+  `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`,
+  `codebase-design`) — replace or drop repo-wide.
 - `verification` wording: "Run the whole command" vs Gate 3 "do not blanket-run
   everything" — tighten.
 - `generated.json` `generatedAt` values are hand-set, not machine-generated.

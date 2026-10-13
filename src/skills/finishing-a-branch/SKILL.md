@@ -32,7 +32,7 @@ Determine where the branch lives, because it selects the menu and the cleanup:
 
 - **Normal repo**: the git dir and common dir are the same. Standard menu, no worktree to clean up.
 - **Linked worktree on a named branch**: the git dir differs from the common dir. Standard menu, with worktree cleanup possible.
-- **Detached HEAD**: a linked worktree with no branch checked out. Reduced menu, with no local merge; the workspace is externally managed, so leave it in place.
+- **Detached HEAD**: `git rev-parse --abbrev-ref HEAD` returns `HEAD`, so no branch is checked out. This can happen in a normal checkout as well as a linked worktree. Reduced menu, with no local merge; the workspace is externally managed, so leave it in place.
 
 Capture the worktree path now, before any step changes directory.
 

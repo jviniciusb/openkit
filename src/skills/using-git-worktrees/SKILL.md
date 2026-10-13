@@ -41,7 +41,7 @@ Guard against the submodule false positive: the same difference is also true ins
 git rev-parse --show-superproject-working-tree
 ```
 
-A non-empty result means a submodule, not a worktree. Treat it as a normal repo, and never create a worktree inside it.
+A non-empty result means a submodule, not a worktree. Do not mistake it for an isolated workspace, and never create a worktree inside the submodule.
 
 ### 2. Prefer the native worktree tool
 

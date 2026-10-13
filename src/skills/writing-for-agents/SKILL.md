@@ -1,6 +1,6 @@
 ---
 name: writing-for-agents
-description: Use when writing or editing a document an agent will consume: instructions, a spec, an `AGENTS.md` or `CLAUDE.md`, a doc reached by a pointer, or a skill. Trigger on drafting, reviewing, or pruning agent-facing text. Do not use for human-only prose, or as a substitute for the skill-specific packaging rules in the skill-recipe rubric.
+description: Use when writing or editing a document an agent will consume: instructions, a spec, an `AGENTS.md` or `CLAUDE.md`, a doc reached by a pointer, or a skill. Trigger on drafting, reviewing, or pruning agent-facing text. Do not use for human-only prose.
 ---
 
 # Writing for Agents
