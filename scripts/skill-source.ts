@@ -152,6 +152,14 @@ function assertSafeInclude(include: string): void {
   }
 }
 
+function assertSafeName(name: string): void {
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(name)) {
+    throw new Error(
+      `invalid source name "${name}": use letters, digits, ".", "_", "-" (no separators or "..")`,
+    )
+  }
+}
+
 function assertIncludeExists(cloneDir: string, include: string): void {
   const source = join(cloneDir, include)
   if (!existsSync(source)) {
@@ -218,37 +226,45 @@ function cloneAt(repository: string, ref: string, destParent: string): string {
 
 /**
  * Copy the included paths (and LICENSE, when present) into a staging dir using
- * their upstream-relative paths, then swap the staging dir into place.
- * Returns the freshly materialized snapshot dir.
+ * their upstream-relative paths. Does NOT touch the live snapshot; the caller
+ * swaps staging into place once every target has validated. On failure the
+ * partial staging dir is removed and the error rethrown.
  */
-function materializeSnapshot(
+function stageSnapshot(
   cloneDir: string,
   name: string,
   include: string[],
   sourcesDir: string,
-): { snapshotDir: string; fileMap: FileMap } {
+): { stagingDir: string; fileMap: FileMap } {
   const stagingDir = join(sourcesDir, `.${name}.staging`)
   rmSync(stagingDir, { recursive: true, force: true })
   mkdirSync(stagingDir, { recursive: true })
 
-  const seenLicense = include.includes("LICENSE")
-  for (const entry of include) {
-    assertSafeInclude(entry)
-    assertIncludeExists(cloneDir, entry)
-    const source = join(cloneDir, entry)
-    const dest = join(stagingDir, entry)
-    mkdirSync(dirname(dest), { recursive: true })
-    cpSync(source, dest, { recursive: true })
+  try {
+    const seenLicense = include.includes("LICENSE")
+    for (const entry of include) {
+      assertSafeInclude(entry)
+      assertIncludeExists(cloneDir, entry)
+      const source = join(cloneDir, entry)
+      const dest = join(stagingDir, entry)
+      mkdirSync(dirname(dest), { recursive: true })
+      cpSync(source, dest, { recursive: true })
+    }
+
+    if (!seenLicense && existsSync(join(cloneDir, "LICENSE"))) {
+      cpSync(join(cloneDir, "LICENSE"), join(stagingDir, "LICENSE"))
+    }
+  } catch (error) {
+    rmSync(stagingDir, { recursive: true, force: true })
+    throw error
   }
 
-  if (!seenLicense && existsSync(join(cloneDir, "LICENSE"))) {
-    cpSync(join(cloneDir, "LICENSE"), join(stagingDir, "LICENSE"))
-  }
+  return { stagingDir, fileMap: snapshotFileMap(stagingDir) }
+}
 
-  const snapshotDir = join(sourcesDir, name)
+function swapSnapshot(stagingDir: string, snapshotDir: string): void {
   rmSync(snapshotDir, { recursive: true, force: true })
   renameSync(stagingDir, snapshotDir)
-  return { snapshotDir, fileMap: snapshotFileMap(snapshotDir) }
 }
 
 // ---------------------------------------------------------------------------
@@ -256,14 +272,18 @@ function materializeSnapshot(
 // ---------------------------------------------------------------------------
 
 export async function addSource(root: string, spec: SourceSpec): Promise<SourcePin> {
+  assertSafeName(spec.name)
   const sourcesDir = skillSourcesDir(root)
   mkdirSync(sourcesDir, { recursive: true })
   const tmp = mkdtempSync(join(tmpdir(), "skill-source-"))
+  let stagingDir: string | undefined
   try {
     const cloneDir = cloneAt(spec.repository, spec.ref, tmp)
     const commit = git(["rev-parse", "HEAD"], cloneDir)
     const license = deriveLicense(cloneDir)
-    materializeSnapshot(cloneDir, spec.name, spec.include, sourcesDir)
+    stagingDir = stageSnapshot(cloneDir, spec.name, spec.include, sourcesDir).stagingDir
+    swapSnapshot(stagingDir, join(sourcesDir, spec.name))
+    stagingDir = undefined
 
     const pin: SourcePin = {
       name: spec.name,
@@ -280,6 +300,7 @@ export async function addSource(root: string, spec: SourceSpec): Promise<SourceP
     return pin
   } finally {
     rmSync(tmp, { recursive: true, force: true })
+    if (stagingDir) rmSync(stagingDir, { recursive: true, force: true })
   }
 }
 
@@ -298,42 +319,70 @@ export async function updateSource(
     throw new Error(`unknown source: ${name}`)
   }
 
+  const sourcesDir = skillSourcesDir(root)
+  const tmps: string[] = []
+  const stagingDirs: string[] = []
   const aggregate: SourceDiff = { added: [], changed: [], removed: [] }
-  const updated: SourcePin[] = []
 
-  for (const pin of targets) {
-    const sourcesDir = skillSourcesDir(root)
-    const snapshotDir = join(sourcesDir, pin.name)
-    const before = snapshotFileMap(snapshotDir)
+  // Phase 1 — validate and stage every target. Nothing on disk (snapshots or
+  // manifest) is mutated here, so any failure leaves prior state untouched.
+  const staged: Array<{
+    pin: SourcePin
+    snapshotDir: string
+    stagingDir: string
+    diff: SourceDiff
+  }> = []
+  try {
+    for (const pin of targets) {
+      assertSafeName(pin.name)
+      const snapshotDir = join(sourcesDir, pin.name)
+      const before = snapshotFileMap(snapshotDir)
+      const nextRef = ref ?? pin.ref
+      const tmp = mkdtempSync(join(tmpdir(), "skill-source-"))
+      tmps.push(tmp)
 
-    const nextRef = ref ?? pin.ref
-    const tmp = mkdtempSync(join(tmpdir(), "skill-source-"))
-    try {
       const cloneDir = cloneAt(pin.repository, nextRef, tmp)
       const commit = git(["rev-parse", "HEAD"], cloneDir)
       const license = deriveLicense(cloneDir)
-      const { fileMap: after } = materializeSnapshot(cloneDir, pin.name, pin.include, sourcesDir)
-      const diff = diffFileMaps(before, after)
-      aggregate.added.push(...diff.added.map((p) => `${pin.name}/${p}`))
-      aggregate.changed.push(...diff.changed.map((p) => `${pin.name}/${p}`))
-      aggregate.removed.push(...diff.removed.map((p) => `${pin.name}/${p}`))
-      updated.push({
-        ...pin,
-        ref: nextRef,
-        commit,
-        license,
-        retrievedAt: new Date().toISOString(),
+      const { stagingDir, fileMap: after } = stageSnapshot(
+        cloneDir,
+        pin.name,
+        pin.include,
+        sourcesDir,
+      )
+      stagingDirs.push(stagingDir)
+      staged.push({
+        pin: {
+          ...pin,
+          ref: nextRef,
+          commit,
+          license,
+          retrievedAt: new Date().toISOString(),
+        },
+        snapshotDir,
+        stagingDir,
+        diff: diffFileMaps(before, after),
       })
-    } finally {
-      rmSync(tmp, { recursive: true, force: true })
     }
+
+    // Phase 2 — all targets validated; commit snapshots, then the manifest.
+    for (const entry of staged) {
+      swapSnapshot(entry.stagingDir, entry.snapshotDir)
+      aggregate.added.push(...entry.diff.added.map((p) => `${entry.pin.name}/${p}`))
+      aggregate.changed.push(...entry.diff.changed.map((p) => `${entry.pin.name}/${p}`))
+      aggregate.removed.push(...entry.diff.removed.map((p) => `${entry.pin.name}/${p}`))
+    }
+
+    const byName = new Map(staged.map((s) => [s.pin.name, s.pin]))
+    writeManifest(
+      root,
+      pins.map((p) => byName.get(p.name) ?? p),
+    )
+  } finally {
+    for (const tmp of tmps) rmSync(tmp, { recursive: true, force: true })
+    for (const stagingDir of stagingDirs) rmSync(stagingDir, { recursive: true, force: true })
   }
 
-  const byName = new Map(updated.map((p) => [p.name, p]))
-  writeManifest(
-    root,
-    pins.map((p) => byName.get(p.name) ?? p),
-  )
   return aggregate
 }
 
