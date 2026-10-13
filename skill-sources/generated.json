@@ -147,5 +147,18 @@
     "output": "src/skills/prototype/SKILL.md",
     "outputHash": "55e1253b0c1198e99139ca6b670dce19c66224bdd68ebf1f11d1057f68eefc5c",
     "generatedAt": "2026-10-13T21:10:00.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/retro.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/retro/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/retro/SKILL.md",
+    "outputHash": "724454776726a6577f1198435143b14b799bb04d2e4c8db45571fc6e4da0946e",
+    "generatedAt": "2026-10-13T20:30:39.000Z"
   }
 ]
