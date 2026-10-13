@@ -1,0 +1,82 @@
+---
+name: dispatching-parallel-agents
+description: Use when two or more independent tasks can be worked without shared state or sequential dependencies. Trigger on several unrelated failures, subsystems, or problem domains that can be investigated or implemented concurrently. Do not use when the tasks are related, share state, or need full-system context.
+---
+
+# Dispatching Parallel Agents
+
+Delegate one agent per independent problem domain and let them run concurrently. Independence is the precondition; the coordinator keeps its own context for integration.
+
+## Overview
+
+When several tasks are genuinely independent, investigating or implementing them one at a time wastes wall-clock time that parallel work recovers. Delegate each task to an agent with isolated context, and construct exactly what that agent needs: it never inherits the coordinator's session or history. Focused, self-contained prompts keep each agent on its task, and dispatching them together lets them run at the same time. The coordinator keeps its own context free for the review and integration that follows.
+
+The whole value depends on the tasks being independent. Work that is related, shares state, or needs the whole system stays with one agent or runs in sequence; parallelizing it multiplies confusion instead of saving time.
+
+## When to Use
+
+- Two or more tasks can be worked without shared state or sequential dependencies.
+- Several unrelated failures or subsystems each have their own cause.
+- Each problem can be understood without context from the others.
+- No shared state exists between the tasks: no common files, resources, or mutable state.
+- You already know what is broken and each domain is separable.
+
+Do not parallelize when:
+
+- The failures are related, so fixing one may fix the others; investigate them together first.
+- The tasks share state, so agents would interfere by editing the same files or using the same resources.
+- Understanding a task requires seeing the whole system rather than one domain.
+- You are still exploring and do not yet know what is broken.
+
+## Process
+
+### 1. Identify independent domains
+
+Group the work by what is broken, not by what is convenient. Name each domain and confirm it can be understood and changed on its own. If two domains touch the same code, resource, or decision, they are one domain, not two.
+
+### 2. Write one focused prompt per domain
+
+Give each agent a prompt that is:
+
+- **Focused:** one clear problem domain, scoped to a single file, subsystem, or question.
+- **Self-contained:** every piece of context the agent needs to understand the problem, pasted in. The agent does not see the coordinator's session, so the prompt carries the errors, test names, paths, and constraints.
+- **Specific about output:** state exactly what the agent should return, such as a summary of the root cause and the changes made.
+- **Constrained:** name what the agent must not touch, so it does not refactor beyond its scope.
+
+### 3. Dispatch in parallel
+
+Issue every subagent call in the same response so they run concurrently. One call per response is sequential, not parallel; the parallelism comes from batching the dispatches together.
+
+### 4. Review and integrate
+
+When the agents return:
+
+- Read each summary to understand what changed.
+- Check for conflicts, especially agents that edited the same code.
+- Run the full suite so the changes are verified together, not just in isolation.
+- Spot check the results: an agent can make a systematic error that its own summary will not reveal.
+- Integrate the changes only after they hold together.
+
+## Gates
+
+- **Independence before dispatch.** Every domain is understood without context from the others and shares no state. Related or shared-state work is not parallelized.
+- **One domain per agent.** A prompt covers a single problem domain, not several.
+- **Self-contained prompts.** Each agent gets all the context it needs, since it does not inherit the coordinator's session.
+- **Constraints are stated.** Each prompt names what the agent must not change.
+- **Parallel dispatch.** All calls go out in one response.
+- **Integrated and verified afterward.** The results are reviewed, checked for conflicts, and run against the full suite before they are accepted.
+
+## Anti-patterns
+
+- Parallelizing related failures that one fix might resolve together.
+- Fanning out tasks that share state, so agents interfere with each other.
+- Splitting a task that needs full-system context into domains that cannot stand alone.
+- Dispatching during exploratory debugging, before you know what is broken.
+- Sending a broad prompt such as "fix all the tests" instead of one focused domain.
+- Omitting the context, so an agent cannot understand the problem on its own.
+- Leaving constraints implicit, so an agent refactors beyond its scope.
+- Accepting summaries without checking for conflicts or running the full suite.
+
+<!-- generated by skill-recipe
+from: obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3 skills/dispatching-parallel-agents/SKILL.md
+license: MIT (dev-only snapshot: skill-sources/superpowers/LICENSE in the repo) -->

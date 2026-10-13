@@ -4,6 +4,29 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `finishing-a-branch` skill (`autoinvoke: false`, invoked with
+  `@finishing-a-branch`): lands completed work safely — verifies the tests,
+  detects the environment, presents the landing menu, executes the human's
+  choice — or leaves it deliberately in place, cleaning up only what the workflow
+  owns.
+- `dispatching-parallel-agents` skill (model-visible): delegates one agent per
+  independent problem domain and dispatches them in one response so they run
+  concurrently, keeping the coordinator's own context for review and integration.
+- `using-git-worktrees` skill (model-visible): sets up or verifies an isolated
+  workspace before feature work — detecting existing isolation, preferring the
+  harness's native worktree tool, and falling back to `git worktree` only when
+  none exists.
+- `writing-for-agents` skill (model-visible): writes or edits a document an agent
+  consumes — instructions, a spec, an `AGENTS.md`, a skill — so the agent lands on
+  the intended behavior on every run.
+- `codebase-design` skill (model-visible): designs deep modules — a lot of
+  behaviour behind a small interface at a clean seam — for leverage for callers,
+  locality for maintainers, and testability through the interface.
+
 ## [0.10.0] - 2026-10-13
 
 ### Added
