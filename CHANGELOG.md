@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `skill-recipe` authoring skill (`autoinvoke: false`, invoked with
+  `@skill-recipe`): turns a brief plus one or more source skills into a
+  self-contained kit-style `SKILL.md`.
+- `interview` skill (model-visible): aligns on design or requirements before
+  implementation by mapping the design as a tree and holding implementation
+  behind an approval gate.
+
 ## [0.6.0] - 2026-10-09
 
 ### Added
