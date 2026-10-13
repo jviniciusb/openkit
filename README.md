@@ -43,7 +43,7 @@ before related background work has finished. This also disables OpenCode's
 automatic overflow-recovery compaction. If the provider does not report prompt
 usage, the tool cannot trigger compaction.
 
-It also ships seven skills, all enabled by default:
+It also ships eleven skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
 (model-visible), [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
 explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
@@ -52,9 +52,17 @@ explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
 invoked with `@skill-recipe`), [`research`](src/skills/research/SKILL.md)
 (model-visible; cited findings from primary sources),
 [`handoff`](src/skills/handoff/SKILL.md) (invoked with `@handoff`; compacts the
-conversation into a resumable handoff), and
+conversation into a resumable handoff),
 [`code-review`](src/skills/code-review/SKILL.md) (model-visible; reviews a change
-along Standards and Spec, and verifies feedback before acting). See
+along Standards and Spec, and verifies feedback before acting),
+[`diagnosing-bugs`](src/skills/diagnosing-bugs/SKILL.md) (model-visible;
+root-causes a bug from evidence before changing production code),
+[`verification`](src/skills/verification/SKILL.md) (model-visible; proves a
+completion claim against the current tree before reporting success),
+[`prototype`](src/skills/prototype/SKILL.md) (model-visible; builds throwaway
+code to resolve one design uncertainty before committing to an approach), and
+[`retro`](src/skills/retro/SKILL.md) (invoked with `@retro`; turns a finished
+session's friction into proposed environment changes). See
 [Skills](#skills).
 
 The **references** category ships empty today; it is the supported home for
@@ -245,7 +253,7 @@ Skills are entirely declarative — there is no per-skill code. OpenCode either
 advertises a skill to the model so it can use it on its own, or hides it from
 the model's list while keeping it loadable by id.
 
-Seven skills ship with the kit, all **enabled by default**:
+Eleven skills ship with the kit, all **enabled by default**:
 
 | Skill | How it is used |
 | --- | --- |
@@ -256,6 +264,10 @@ Seven skills ship with the kit, all **enabled by default**:
 | [`research`](src/skills/research/SKILL.md) | Model-visible. Settles a factual question with cited findings from primary sources (official docs, source code, specs, first-party APIs), dispatching the reading to a background subagent and keeping established fact separate from inference. |
 | [`handoff`](src/skills/handoff/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@handoff`**: compacts the current conversation into one portable document a fresh session can resume from, carrying state, decisions, open threads, and the next action. |
 | [`code-review`](src/skills/code-review/SKILL.md) | Model-visible. Reviews a change along two independent axes — Standards and Spec — so neither masks the other, and, on the receiving side, verifies every finding against the code before acting on it. |
+| [`diagnosing-bugs`](src/skills/diagnosing-bugs/SKILL.md) | Model-visible. Root-causes a bug, failing test, or unexpected behavior before changing production code: builds a signal that goes red on the bug, shrinks it to the smallest failing case, and tests one falsifiable hypothesis at a time. |
+| [`verification`](src/skills/verification/SKILL.md) | Model-visible. Before any completion claim, runs the check that proves it against the current tree and reads the output, stating the command, its observed result, and anything it could not run. |
+| [`prototype`](src/skills/prototype/SKILL.md) | Model-visible. Builds the smallest throwaway artifact that answers one design question, keeps it out of the real code path, and lets the answer inform the implementation. |
+| [`retro`](src/skills/retro/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@retro`**: turns a finished session's friction into a short list of concrete proposed changes to the working environment; the user decides which to accept. |
 
 **Skill recipe:** `@skill-recipe` is the general authoring skill for deriving a
 new kit skill from a brief and arbitrary sources — it reads whatever paths the
@@ -275,7 +287,11 @@ section, with the same discovery and precedence:
     "skill-recipe": { "enabled": true },
     "research": { "enabled": true },
     "handoff": { "enabled": true },
-    "code-review": { "enabled": true }
+    "code-review": { "enabled": true },
+    "diagnosing-bugs": { "enabled": true },
+    "verification": { "enabled": true },
+    "prototype": { "enabled": true },
+    "retro": { "enabled": true }
   }
 }
 ```

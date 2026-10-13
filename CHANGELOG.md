@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `diagnosing-bugs` skill (model-visible): root-causes a bug, failing test, or
+  unexpected behavior before changing production code, building a signal that
+  goes red on the bug and testing one falsifiable hypothesis at a time.
+- `verification` skill (model-visible): before any completion claim, runs the
+  check that proves it against the current tree and reads the output, stating the
+  command, its observed result, and anything it could not run.
+- `prototype` skill (model-visible): builds the smallest throwaway artifact that
+  answers one design question, keeps it out of the real code path, and lets the
+  answer inform the real implementation.
+- `retro` skill (`autoinvoke: false`, invoked with `@retro`): turns a finished
+  session's friction into a short list of concrete proposed changes to the
+  working environment; the user decides which to accept.
+
 ## [0.9.0] - 2026-10-13
 
 ### Added
