@@ -176,7 +176,7 @@
       }
     ],
     "output": "src/skills/finishing-a-branch/SKILL.md",
-    "outputHash": "6e76daa5890b3fffcb3c93237c492990fc00a0f4e16500c72dc959f505e858eb",
+    "outputHash": "0255c107338ecf62fbaa2be3a1246b75318dc0ca3d4979feac4d324982aae073",
     "generatedAt": "2026-10-13T21:04:34.829Z"
   },
   {
@@ -202,7 +202,7 @@
       }
     ],
     "output": "src/skills/using-git-worktrees/SKILL.md",
-    "outputHash": "8996122d681b62f7bd8124ef279f133a7e48f0438cc4ec225f1dad2f3d8dee9f",
+    "outputHash": "cc05f1bdc0b38890199b3ee26addfce9b243c34ba988bc2a402da8cd04097555",
     "generatedAt": "2026-10-13T21:10:46.000Z"
   },
   {
@@ -215,7 +215,7 @@
       }
     ],
     "output": "src/skills/writing-for-agents/SKILL.md",
-    "outputHash": "458995a3547d5bea620867d473e2cabf667e6e12d56efd0423be963028ad72b0",
+    "outputHash": "b913b6a3c2c790b9b6b709cec1ef81eec31cd4464f325676a09d0575cb3cfc71",
     "generatedAt": "2026-10-13T21:13:55.010Z"
   },
   {
@@ -228,7 +228,7 @@
       }
     ],
     "output": "src/skills/codebase-design/SKILL.md",
-    "outputHash": "8706d5f1d343320cd008b1bbc5f5585a39da91c11c8065abe988558c8f2b0745",
+    "outputHash": "8356ab0a34366d4314b2e429dbcf25f87c95781d9015074c523652a8b349c10a",
     "generatedAt": "2026-10-13T21:17:12.000Z"
   }
 ]

@@ -44,3 +44,12 @@ test("finishing-a-branch requires a typed confirmation to discard", () => {
   expect(body).toContain("discard")
   expect(body).toMatch(/typed confirmation/i)
 })
+
+test("finishing-a-branch landing menu omits discard", () => {
+  const body = loadSkill(finishing!).content
+  const menu = body.match(/Implementation complete[\s\S]*?Which option\?/)?.[0] ?? ""
+  expect(menu).toContain("Merge back")
+  expect(menu).toContain("Keep the branch as-is")
+  expect(menu).not.toContain("Discard")
+  expect(menu).not.toContain("discard")
+})
