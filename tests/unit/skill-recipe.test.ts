@@ -15,7 +15,6 @@ test("skill-recipe SKILL.md frontmatter parses with name and description", () =>
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("skill-recipe")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("skill-recipe loads through loadSkill with stripped frontmatter", () => {

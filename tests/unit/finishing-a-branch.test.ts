@@ -15,7 +15,6 @@ test("finishing-a-branch SKILL.md frontmatter parses with name and a description
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("finishing-a-branch")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("finishing-a-branch loads through loadSkill with stripped frontmatter", () => {

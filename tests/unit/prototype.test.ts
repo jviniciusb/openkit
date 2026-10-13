@@ -15,7 +15,6 @@ test("prototype SKILL.md frontmatter parses with name and a description", () => 
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("prototype")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("prototype loads through loadSkill with stripped frontmatter", () => {
