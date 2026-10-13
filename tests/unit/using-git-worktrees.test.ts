@@ -15,7 +15,6 @@ test("using-git-worktrees SKILL.md frontmatter parses with name and a descriptio
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("using-git-worktrees")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("using-git-worktrees loads through loadSkill with stripped frontmatter", () => {

@@ -15,7 +15,6 @@ test("dispatching-parallel-agents SKILL.md frontmatter parses with name and a de
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("dispatching-parallel-agents")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("dispatching-parallel-agents loads through loadSkill with stripped frontmatter", () => {

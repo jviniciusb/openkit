@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Skill consistency pass (targeted for v0.13.0): `sdd-flow` now references the
+  shipped `codebase-design` (seam vocabulary), `using-git-worktrees` (workspace
+  isolation), and `dispatching-parallel-agents` (fan-out) skills instead of
+  duplicating their content, and names `to-spec` for drafting the initial spec;
+  `skill-recipe/rubric.md` and `improve-codebase-architecture` cross-reference
+  `writing-for-agents` and `codebase-design`; the batch-1 provenance comments
+  name real snapshots; `verification` wording is tightened; the vacuous
+  `>-` test guards are removed. No new skills and no behavior change.
+
 ## [0.12.0] - 2026-10-13
 
 ### Added
