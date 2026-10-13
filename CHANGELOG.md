@@ -4,6 +4,27 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `improve-codebase-architecture` skill (`autoinvoke: false`, invoked with
+  `@improve-codebase-architecture`): surveys a codebase read-only for deepening
+  opportunities — turning shallow modules into deep ones — and reports a
+  prioritized list for the human to choose from.
+- `to-spec` skill (`autoinvoke: false`, invoked with `@to-spec`): distills the
+  current conversation into a written spec, preserving decisions already made and
+  leaving undecided items as open questions instead of interviewing the user.
+- `wizard` skill (model-visible): builds a guided interactive script for steps
+  only a human can take — credentials, approvals, external consoles — so a manual
+  procedure becomes repeatable instead of re-explained.
+- `router` skill (`autoinvoke: false`, invoked with `@router`): names the one kit
+  skill or flow that fits a request and why. It points; the user invokes.
+- `diagnosing-sessions` skill (`autoinvoke: false`, invoked with
+  `@diagnosing-sessions`): forensically reads a past session's transcript and
+  reports, with evidence, why it stalled, repeated work, ignored a plan, or
+  produced a poor result.
+
 ## [0.11.0] - 2026-10-13
 
 ### Added
