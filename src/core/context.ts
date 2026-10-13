@@ -13,6 +13,30 @@ export interface Registration {
   dispose(): void | Promise<void>
 }
 
+/** Minimal public event-stream item used by lifecycle tools. */
+export interface KitEvent {
+  type: string
+  data: unknown
+  created?: number
+}
+
+/** Public server events exposed by the V2 plugin context. */
+export interface EventDomain {
+  subscribe(options?: { signal?: AbortSignal }): AsyncIterable<KitEvent>
+}
+
+/** Token fields needed to estimate the latest model request's prompt size. */
+export interface SessionMessageTokens {
+  input: number
+  cache: { read: number; write: number }
+}
+
+export interface SessionMessageInfo {
+  type: string
+  time?: { created?: number }
+  tokens?: SessionMessageTokens
+}
+
 /** Structured logging surface handed to tools. */
 export interface Logger {
   debug(message: string, meta?: unknown): void
@@ -133,6 +157,9 @@ export type HookHandler<Event = any> = (event: Event) => void | Promise<void>
 
 export interface SessionDomain {
   hook(name: string, handler: HookHandler, opts?: unknown): Promise<Registration>
+  wait(input: { sessionID: string }): Promise<void>
+  context(input: { sessionID: string }): Promise<readonly SessionMessageInfo[]>
+  compact(input: { sessionID: string; delivery: "queue" }): Promise<unknown>
   /**
    * Optional in-session output channel. When the harness exposes it, command
    * results (e.g. `/kit list`) are delivered through it; callers fall back to
@@ -159,5 +186,6 @@ export interface KitContext {
     transform(callback: (editor: SkillEditor) => void): Promise<Registration>
   }
   readonly reference: ReferenceDomain
+  readonly event: EventDomain
   readonly session: SessionDomain
 }

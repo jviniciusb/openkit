@@ -6,6 +6,7 @@
 //
 // `configVersion` is the current schema version. See the JSON Schema for the
 // full shape: https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json
+// When enabling auto-compact, also set `compaction.auto: false` in opencode.jsonc.
 {
   "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
   "configVersion": 1,
@@ -26,6 +27,11 @@
         "rules": { "subagent-driven": false },
         "extra": ["Any additional instruction you want injected."]
       }
+    },
+    "auto-compact": {
+      // Opt-in: wait for related child sessions, tool calls, and shells to finish.
+      "enabled": false,
+      "settings": { "thresholdTokens": 250000 }
     }
     // Add further tools as `"<tool-id>": { "enabled": true, "settings": { ... } }`.
     // A disabled tool's `register` never runs, so none of its tools, commands,

@@ -15,6 +15,27 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   implementation by mapping the design as a tree and holding implementation
   behind an approval gate.
 
+## [0.7.0] - 2026-10-13
+
+### Added
+
+- **`auto-compact`** tool (opt-in): queues compaction with `delivery: "queue"`
+  once the session, its child sessions, tool calls, and background shells are
+  idle and the last prompt exceeds `thresholdTokens` (250,000 by default). It
+  uses the V2 event stream and `session.wait`/`context`/`compact`, seeds on the
+  `session.status` idle transition, and aborts its event subscription when
+  disabled. Pair it with `"compaction": { "auto": false }` in `opencode.json(c)`
+  so OpenCode's native auto-compaction cannot run before related background work
+  has finished.
+- `ctx.event` and `session.wait`/`context`/`compact` on the plugin context
+  contract, with fakes in `createFakeContext`.
+
+### Fixed
+
+- `toolCategory.registerItem` now tracks and disposes a `Registration` returned
+  directly by a tool's `register`, so that cleanup path is isolated like every
+  other registration.
+
 ## [0.6.0] - 2026-10-09
 
 ### Added
@@ -98,7 +119,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/jviniciusb/opencode-kit/compare/v0.5.0...v0.5.1
