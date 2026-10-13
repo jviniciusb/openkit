@@ -191,5 +191,18 @@
     "output": "src/skills/dispatching-parallel-agents/SKILL.md",
     "outputHash": "7bcb6a584dfd29a4a6fdc513d1f16dd0c6b0b8fc16e9677d4aa09682363dcc5f",
     "generatedAt": "2026-10-13T21:08:06.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/using-git-worktrees.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/using-git-worktrees/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/using-git-worktrees/SKILL.md",
+    "outputHash": "8996122d681b62f7bd8124ef279f133a7e48f0438cc4ec225f1dad2f3d8dee9f",
+    "generatedAt": "2026-10-13T21:10:46.000Z"
   }
 ]
