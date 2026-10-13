@@ -204,5 +204,18 @@
     "output": "src/skills/using-git-worktrees/SKILL.md",
     "outputHash": "8996122d681b62f7bd8124ef279f133a7e48f0438cc4ec225f1dad2f3d8dee9f",
     "generatedAt": "2026-10-13T21:10:46.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/writing-for-agents.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/productivity/writing-for-agents/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/writing-for-agents/SKILL.md",
+    "outputHash": "458995a3547d5bea620867d473e2cabf667e6e12d56efd0423be963028ad72b0",
+    "generatedAt": "2026-10-13T21:13:55.010Z"
   }
 ]
