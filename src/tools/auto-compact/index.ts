@@ -151,8 +151,16 @@ export const autoCompact: KitTool<AutoCompactSettings> = defineTool<AutoCompactS
             case "session.status": {
               const status = stringField(record(data?.status), "type")
               if (!sessionID || !status) break
-              if (status === "idle") activeSessions.delete(sessionID)
-              else activeSessions.add(sessionID)
+              if (status === "idle") {
+                // `session.idle` is deprecated; seed from the status transition so
+                // compaction still triggers when only `session.status` is emitted.
+                activeSessions.delete(sessionID)
+                idleCandidates.add(sessionID)
+                void checkCandidate(sessionID)
+              } else {
+                activeSessions.add(sessionID)
+                idleCandidates.delete(sessionID)
+              }
               retryCandidates()
               break
             }
