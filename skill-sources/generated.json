@@ -103,5 +103,23 @@
     "output": "src/skills/sdd-flow/SKILL.md",
     "outputHash": "616320b507dc2ffce418656880c1a983aebb14601063130acb452a3d49c6d246",
     "generatedAt": "2026-10-13T18:58:11.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/diagnosing-bugs.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/diagnosing-bugs/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/systematic-debugging/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/diagnosing-bugs/SKILL.md",
+    "outputHash": "f9ea8549f3cd4398b32f19bf9ca6547edd59ea6ad218d73feecb108954a79a2f",
+    "generatedAt": "2026-10-13T21:05:00.000Z"
   }
 ]
