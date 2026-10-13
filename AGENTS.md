@@ -17,7 +17,7 @@ rules, each individually toggleable, plus your own instructions), and
 `auto-compact` (`src/tools/auto-compact/index.ts`, opt-in; queues compaction once
 related sessions, tool calls, and shells are idle and the last prompt exceeds a
 token threshold). The `hello`
-example at `src/tools/hello/index.ts` is not registered at runtime. Eleven skills
+example at `src/tools/hello/index.ts` is not registered at runtime. Sixteen skills
 ship today, all enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
@@ -36,9 +36,20 @@ evidence before changing production code), `verification`
 (`src/skills/verification/SKILL.md`, model-visible; proves a completion claim
 against the current tree before reporting success), `prototype`
 (`src/skills/prototype/SKILL.md`, model-visible; builds throwaway code to resolve
-one design uncertainty), and `retro` (`src/skills/retro/SKILL.md`, registered
+one design uncertainty), `retro` (`src/skills/retro/SKILL.md`, registered
 `autoinvoke: false`, invoked with `@retro`; turns a finished session's friction
-into proposed environment changes). The **references**
+into proposed environment changes), `finishing-a-branch`
+(`src/skills/finishing-a-branch/SKILL.md`, registered `autoinvoke: false`, invoked
+with `@finishing-a-branch`; lands completed work safely or leaves it deliberately
+in place), `dispatching-parallel-agents`
+(`src/skills/dispatching-parallel-agents/SKILL.md`, model-visible; delegates one
+agent per independent task and runs them concurrently), `using-git-worktrees`
+(`src/skills/using-git-worktrees/SKILL.md`, model-visible; sets up or verifies an
+isolated workspace before feature work), `writing-for-agents`
+(`src/skills/writing-for-agents/SKILL.md`, model-visible; writes agent-facing
+documents so the agent lands on the intended behavior), and `codebase-design`
+(`src/skills/codebase-design/SKILL.md`, model-visible; designs deep modules
+behind clean seams). The **references**
 category
 (`src/references/<id>/reference.json`) ships empty today; references are
 declarative, opt-in, settings-bearing content sources registered through

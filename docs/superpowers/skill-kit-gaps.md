@@ -9,12 +9,14 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 |---|---|---|---|
 | 1 | `interview` (derived), `skill-recipe`, `research`, `handoff`, `code-review`, `sdd-flow` (evolved) | v0.9.0 | done |
 | 2 | `diagnosing-bugs`, `verification`, `prototype`, `retro` | v0.10.0 | done |
-| 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | in progress |
+| 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | done |
 
-## Current skills (11)
+## Current skills (16)
 
 `english-writing-assistant`, `sdd-flow`, `interview`, `skill-recipe`, `research`,
-`handoff`, `code-review`, `diagnosing-bugs`, `verification`, `prototype`, `retro`.
+`handoff`, `code-review`, `diagnosing-bugs`, `verification`, `prototype`, `retro`,
+`finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`,
+`writing-for-agents`, `codebase-design`.
 
 ## Remaining candidates (compatible with the author's dislikes)
 
@@ -43,11 +45,11 @@ Not yet derived; candidates for later batches or the final gap pass:
 ## Trim / extend items (fix in the final gap pass)
 
 ### Overlaps to dedupe
+- `codebase-design` is standalone, but `sdd-flow` §1.3 still inlines the same
+  depth/seam guidance — replace the inline text with a reference to the skill.
 - `dispatching-parallel-agents` vs `sdd-flow` parallel tracks — decide the
   boundary (ad-hoc fan-out vs in-flow), or have `sdd-flow` reference it.
 - `using-git-worktrees` vs `sdd-flow` Phase 2 workspace setup — same boundary.
-- `codebase-design` is currently inlined in `sdd-flow` §1.3 — after shipping the
-  standalone skill, replace the inline text with a reference.
 - `writing-for-agents` vs `skill-recipe/rubric.md` — decide whether the rubric
   should reference the general authoring skill instead of duplicating rules.
 
@@ -64,5 +66,5 @@ Not yet derived; candidates for later batches or the final gap pass:
 
 ### Open decisions
 - `interview` is model-visible; confirm or flip to `@interview`-only.
-- Whether `codebase-design` ships standalone or is folded into
-  `improve-codebase-architecture`.
+- `codebase-design` shipped standalone in v0.11.0 (resolved); decide whether
+  `improve-codebase-architecture` stays a separate candidate or folds into it.

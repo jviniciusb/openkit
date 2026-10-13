@@ -43,7 +43,7 @@ before related background work has finished. This also disables OpenCode's
 automatic overflow-recovery compaction. If the provider does not report prompt
 usage, the tool cannot trigger compaction.
 
-It also ships eleven skills, all enabled by default:
+It also ships sixteen skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
 (model-visible), [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
 explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
@@ -60,10 +60,19 @@ root-causes a bug from evidence before changing production code),
 [`verification`](src/skills/verification/SKILL.md) (model-visible; proves a
 completion claim against the current tree before reporting success),
 [`prototype`](src/skills/prototype/SKILL.md) (model-visible; builds throwaway
-code to resolve one design uncertainty before committing to an approach), and
+code to resolve one design uncertainty before committing to an approach),
 [`retro`](src/skills/retro/SKILL.md) (invoked with `@retro`; turns a finished
-session's friction into proposed environment changes). See
-[Skills](#skills).
+session's friction into proposed environment changes),
+[`finishing-a-branch`](src/skills/finishing-a-branch/SKILL.md) (invoked with
+`@finishing-a-branch`; lands completed work safely or leaves it deliberately in
+place), [`dispatching-parallel-agents`](src/skills/dispatching-parallel-agents/SKILL.md)
+(model-visible; delegates one agent per independent task and runs them
+concurrently), [`using-git-worktrees`](src/skills/using-git-worktrees/SKILL.md)
+(model-visible; sets up or verifies an isolated workspace before feature work),
+[`writing-for-agents`](src/skills/writing-for-agents/SKILL.md) (model-visible;
+writes agent-facing documents so the agent lands on the intended behavior), and
+[`codebase-design`](src/skills/codebase-design/SKILL.md) (model-visible; designs
+deep modules behind clean seams). See [Skills](#skills).
 
 The **references** category ships empty today; it is the supported home for
 curated content sources. See [References](#references).
@@ -253,7 +262,7 @@ Skills are entirely declarative — there is no per-skill code. OpenCode either
 advertises a skill to the model so it can use it on its own, or hides it from
 the model's list while keeping it loadable by id.
 
-Eleven skills ship with the kit, all **enabled by default**:
+Sixteen skills ship with the kit, all **enabled by default**:
 
 | Skill | How it is used |
 | --- | --- |
@@ -268,6 +277,11 @@ Eleven skills ship with the kit, all **enabled by default**:
 | [`verification`](src/skills/verification/SKILL.md) | Model-visible. Before any completion claim, runs the check that proves it against the current tree and reads the output, stating the command, its observed result, and anything it could not run. |
 | [`prototype`](src/skills/prototype/SKILL.md) | Model-visible. Builds the smallest throwaway artifact that answers one design question, keeps it out of the real code path, and lets the answer inform the implementation. |
 | [`retro`](src/skills/retro/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@retro`**: turns a finished session's friction into a short list of concrete proposed changes to the working environment; the user decides which to accept. |
+| [`finishing-a-branch`](src/skills/finishing-a-branch/SKILL.md) | Registered with `autoinvoke: false`. Invoke it explicitly with **`@finishing-a-branch`**: lands completed work safely — verify the tests, detect the environment, present the landing menu — or leaves it deliberately in place, cleaning up only what the workflow owns. |
+| [`dispatching-parallel-agents`](src/skills/dispatching-parallel-agents/SKILL.md) | Model-visible. Delegates one agent per independent problem domain and dispatches them in one response so they run concurrently, keeping the coordinator's own context for review and integration. |
+| [`using-git-worktrees`](src/skills/using-git-worktrees/SKILL.md) | Model-visible. Sets up or verifies an isolated workspace before feature work: detects existing isolation, prefers the harness's native worktree tool, and falls back to `git worktree` only when none exists. |
+| [`writing-for-agents`](src/skills/writing-for-agents/SKILL.md) | Model-visible. Writes or edits a document an agent consumes — instructions, a spec, an `AGENTS.md`, a skill — so the agent lands on the intended behavior on every run, with pointers that fire and steps that close on a checkable bound. |
+| [`codebase-design`](src/skills/codebase-design/SKILL.md) | Model-visible. Designs deep modules — a lot of behaviour behind a small interface at a clean seam — for leverage for callers, locality for maintainers, and testability through the interface. |
 
 **Skill recipe:** `@skill-recipe` is the general authoring skill for deriving a
 new kit skill from a brief and arbitrary sources — it reads whatever paths the
@@ -291,7 +305,12 @@ section, with the same discovery and precedence:
     "diagnosing-bugs": { "enabled": true },
     "verification": { "enabled": true },
     "prototype": { "enabled": true },
-    "retro": { "enabled": true }
+    "retro": { "enabled": true },
+    "finishing-a-branch": { "enabled": true },
+    "dispatching-parallel-agents": { "enabled": true },
+    "using-git-worktrees": { "enabled": true },
+    "writing-for-agents": { "enabled": true },
+    "codebase-design": { "enabled": true }
   }
 }
 ```
