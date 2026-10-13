@@ -20,6 +20,7 @@ test("ships the eleven expected skills with unique ids across tools and skills",
     "finishing-a-branch",
     "dispatching-parallel-agents",
     "using-git-worktrees",
+    "writing-for-agents",
   ])
   const ids = [...tools.map((t) => t.id), ...skills.map((s) => s.id)]
   expect(new Set(ids).size).toBe(ids.length)
