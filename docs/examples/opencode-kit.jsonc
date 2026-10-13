@@ -93,6 +93,31 @@
       // Registered with `autoinvoke: false`; invoke it explicitly with `@retro`
       // to turn a finished session's friction into proposed environment changes.
       "enabled": true
+    },
+    "finishing-a-branch": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with
+      // `@finishing-a-branch` to land completed work safely or leave it in place.
+      "enabled": true
+    },
+    "dispatching-parallel-agents": {
+      // Model-visible: delegates one agent per independent task and runs them
+      // concurrently, keeping the coordinator's context for integration.
+      "enabled": true
+    },
+    "using-git-worktrees": {
+      // Model-visible: sets up or verifies an isolated workspace before feature
+      // work, preferring the harness's native worktree tool.
+      "enabled": true
+    },
+    "writing-for-agents": {
+      // Model-visible: writes agent-facing documents so the agent lands on the
+      // intended behavior on every run.
+      "enabled": true
+    },
+    "codebase-design": {
+      // Model-visible: designs deep modules behind a small interface at a clean
+      // seam, for leverage, locality, and testability.
+      "enabled": true
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.
     // `enable`/`disable` and the `/kit` command write here.
