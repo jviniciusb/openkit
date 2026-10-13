@@ -16,5 +16,92 @@
     "output": "src/skills/interview/SKILL.md",
     "outputHash": "40d61b51d9de967e142070ecb764e89a911c8cf62d19a6d8f2ed98287cc2c16d",
     "generatedAt": "2026-10-13T17:54:17.080Z"
+  },
+  {
+    "brief": "skill-sources/briefs/research.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/research/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/research/SKILL.md",
+    "outputHash": "af4127bda99123f474a9b565a14a9d8a3748619d4a02534b4c928c0c20bed8d2",
+    "generatedAt": "2026-10-13T18:43:25.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/handoff.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/productivity/handoff/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/handoff/SKILL.md",
+    "outputHash": "064dc4c5af19318082af4db797017d136d0c977b73d77c62ccd6a6b9dde5e6cb",
+    "generatedAt": "2026-10-13T18:46:52.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/code-review.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/code-review/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/requesting-code-review/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/receiving-code-review/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/code-review/SKILL.md",
+    "outputHash": "37fbfe78f8a080aa36a7afded74e2a629d4074d468ee184e254fadf1342e22e9",
+    "generatedAt": "2026-10-13T18:50:16.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/sdd-flow.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/subagent-driven-development/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/executing-plans/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "superpowers",
+        "path": "skills/verification-before-completion/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/implement-spec/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      },
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/to-spec/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      },
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/to-tickets/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/sdd-flow/SKILL.md",
+    "outputHash": "616320b507dc2ffce418656880c1a983aebb14601063130acb452a3d49c6d246",
+    "generatedAt": "2026-10-13T18:58:11.000Z"
   }
 ]
