@@ -44,7 +44,7 @@ A list of testing decisions that were made. Include:
 
 - A description of what makes a good test (only test external behavior, not implementation details)
 - Which modules will be tested
-- The seams the feature will be tested at, using the vocabulary from SKILL.md 1.3
+- The seams the feature will be tested at, using the vocabulary from SKILL.md 1.4
 - Prior art for the tests (that is, similar types of tests in the codebase)
 
 ## Implementation Steps
@@ -61,9 +61,9 @@ Any further notes about the feature.
 
 ## Conditional sections
 
-Add these only when their trigger applies (SKILL.md 1.4):
+Add these only when their trigger applies (SKILL.md 1.5):
 
-- **Before starting.** External prerequisites (flags, credentials, approvals, services) that must be ready; name each and block dependent steps until it is. (SKILL.md 1.6.)
+- **Before starting.** External prerequisites (flags, credentials, approvals, services) that must be ready; name each and block dependent steps until it is. (SKILL.md 1.7.)
 - **What already exists.** Reuse, do not rebuild.
 - **Root cause.** When the work is a defect.
 - **Verified non-issues.** Do NOT do these.
