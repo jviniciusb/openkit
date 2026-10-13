@@ -4,8 +4,8 @@
 - **Status:** Draft for approval
 - **Author:** (agent-assisted)
 - **Topic:** Reshape `sdd-flow` so the orchestrator drives the spec: brainstorm,
-  interview, plan, then execute in **batches** (one task or several parallel
-  tasks), keeping the spec continuously updated.
+  interview, plan, then execute in **batches** (one step or several parallel
+  steps), keeping the spec continuously updated.
 - **Base:** `main` @ v0.13.0 (`ce4522d`), branch `feat/sdd-flow-batch-execution`.
 - **Note:** This spec is the approval artifact (sdd-flow 1.8). Write no code and
   create no implementation worktree until it is approved.
@@ -14,14 +14,14 @@
 
 Three agreed changes to `src/skills/sdd-flow/`, decided in an `interview`:
 
-1. **Batch launch, per-task gate (Q1).** An *execution step* is one task, or a
-   set of independent tasks launched in parallel. The orchestrator drives the
-   spec: it *proposes* the next execution step and the user approves what to
-   start. The tasks then run (background subagents where available), so the
-   orchestrator stays free, and **each task as it finishes** is verified,
-   reviewed, written to the spec, and gets its own what-next prompt (keep moving
-   on / open a PR / refine or re-sync / stop). A task that surfaces a design
-   change or a question raises it immediately, not at batch end.
+1. **Batch launch, per-step gate (Q1).** A *batch* is one step, or a set of
+   independent steps launched in parallel. The orchestrator drives the spec: it
+   *proposes* the next batch and the user approves what to start. The steps then
+   run (background subagents where available), so the orchestrator stays free,
+   and **each step as it finishes** is verified, reviewed, written to the spec,
+   and gets its own what-next prompt (keep moving on / open a PR / refine or
+   re-sync / stop). A step that surfaces a design change or a question raises it
+   immediately, not at batch end.
 2. **Brainstorm before the interview (Q2).** For architectural-size work, the
    orchestrator drafts 2–3 candidate approaches with tradeoffs before the
    interview, so the user reacts to concrete options.
@@ -39,8 +39,8 @@ Three agreed changes to `src/skills/sdd-flow/`, decided in an `interview`:
   gaps.
 - **Posture:** behavior change to `sdd-flow` only. No new skills, no framework
   code.
-- **Trade-off:** per-task gates prompt the user more often than per-batch gates,
-  in exchange for faster decisions and earlier surfacing of design changes.
+- **Trade-off:** per-step gates prompt the user more often than one gate per
+  batch, in exchange for faster decisions and earlier surfacing of design changes.
 
 ## 3. Facts and constraints
 
@@ -60,26 +60,26 @@ Three agreed changes to `src/skills/sdd-flow/`, decided in an `interview`:
 
 ## 4. Decisions
 
-1. **Approve the batch, gate per task (Q1).** The orchestrator proposes a batch
-   (one task, or independent tasks with no shared files/interfaces), stating what
-   is blocked and its recommendation; the user approves what to start. Each task
+1. **Approve the batch, gate per step (Q1).** The orchestrator proposes a batch
+   (one step, or independent steps with no shared files/interfaces), stating what
+   is blocked and its recommendation; the user approves what to start. Each step
    then runs and, **as it finishes**, is verified, reviewed, and written to the
    spec, and gets its own prompt: keep moving on / open a PR / refine or re-sync
-   / stop. Design changes and questions a task raises are surfaced immediately.
+   / stop. Design changes and questions a step raises are surfaced immediately.
 2. **Brainstorm beat, architectural only (Q2).** A new Phase 1 step, skipped for
    the bounded-bypass path.
 3. **Continuous spec updates with a fork (Q3).** Auto for detail-level changes;
    ask first for behavior/scope/user-decision changes, then write.
 4. **No new gates removed.** The spec-approval gate (1.8), the batch-approval go
-   (3a), and the per-task go (3h) all remain.
+   (3a), and the per-step go (3h) all remain.
 5. **One PR**, one release (v0.14.0).
 
 ### Assumptions to confirm (from the interview)
 
-- "Open a PR" opens one for the completed task.
-- The post-task menu is exactly: keep moving on / open a PR / refine or re-sync
+- "Open a PR" opens one for the completed step.
+- The post-step menu is exactly: keep moving on / open a PR / refine or re-sync
   / stop.
-- The user accepts being prompted once per completed task (sooner questions,
+- The user accepts being prompted once per completed step (sooner questions,
   earlier design changes) rather than once per batch.
 
 ## 5. Changes
@@ -109,34 +109,34 @@ already exists"*; 1.0/1.2/1.3 refs; the conditional-section list) and
 
 ### 5.2 Phase 3 — batch execution
 
-Reframe Phase 3 around **execution steps (batches)**:
+Reframe Phase 3 around **batches of steps**:
 
-- **Definition:** an execution step is one task, or a set of independent tasks
+- **Definition:** a batch is one step, or a set of independent steps
   that can run in parallel (no shared files or interfaces) — dispatched as
   background subagents where the environment provides them, so the orchestrator
   stays free to handle each completion.
-- **3a Propose the execution step** (was "Present the frontier"): compute the
+- **3a Propose the batch** (was "Present the frontier"): compute the
   frontier, choose a batch with the recommendation, show what is blocked and on
   what. Then **stop** for the go. Keep the "recommendation is where delegation is
   honored; the go is still theirs" rule. Approving the batch starts the work; it
-  does not waive the per-task gate.
-- **3b–3e** run **per task in the batch**: expand/route → build (dispatch one
-  subagent per task; independent tasks in the batch run in parallel per
+  does not waive the per-step gate.
+- **3b–3e** run **per step in the batch**: expand/route → build (dispatch one
+  subagent per step; independent steps in the batch run in parallel per
   `dispatching-parallel-agents`, as background subagents where available) →
-  verify → `code-review`. Handle each task **as it completes**; do not wait for
+  verify → `code-review`. Handle each step **as it completes**; do not wait for
   its siblings.
-- **3f Complete the task** — update the spec (checkboxes, Execution findings,
+- **3f Complete the step** — update the spec (checkboxes, Execution findings,
   and §5.3 design updates), then Git per project instructions.
 - **3g Handle review feedback** (unchanged).
-- **3h Ask what next** (was "Gate"), **per completed task**: `keep moving on /
+- **3h Ask what next** (was "Gate"), **per completed step**: `keep moving on /
   open a PR / refine or re-sync / stop`. "Keep moving on" re-enters 3a with the
-  next batch; "open a PR" opens one for the completed task. A task's design change
+  next batch; "open a PR" opens one for the completed step. A step's design change
   or question is raised here, immediately — not held until the batch ends.
-- Phase 3 intro: loop until every step is checked; **every task** ends at 3h.
+- Phase 3 intro: loop until every step is checked; **every step** ends at 3h.
 
 Update the anti-patterns accordingly: keep "picking the next step yourself" and
-"auto-dispatching"; add "batching tasks that share files or interfaces" and
-"holding a finished task's question or design change until its siblings finish".
+"auto-dispatching"; add "batching steps that share files or interfaces" and
+"holding a finished step's question or design change until its siblings finish".
 
 ### 5.3 Continuous spec updates
 
@@ -171,8 +171,8 @@ absorb.
       (`SKILL.md`, `spec-template.md`).
 
 ### Task 2: Phase 3 batch execution
-- [ ] Rewrite Phase 3 around batch launch + per-task completion (3a propose +
-      stop; per-task 3b–3e and 3f; 3h ask-what-next per task); update the intro
+- [ ] Rewrite Phase 3 around batch launch + per-step completion (3a propose +
+      stop; per-step 3b–3e and 3f; 3h ask-what-next per step); update the intro
       and anti-patterns.
 
 ### Task 3: Continuous spec updates
@@ -188,9 +188,9 @@ absorb.
 
 ## 7. Success criteria
 
-- The orchestrator proposes a batch to start; each task, as it finishes, gets
+- The orchestrator proposes a batch to start; each step, as it finishes, gets
   its own completion step and a what-next prompt offering "open a PR".
-- A task's question or design change reaches the user without waiting for its
+- A step's question or design change reaches the user without waiting for its
   siblings.
 - Architectural work gets 2–3 candidate approaches before the interview.
 - The spec is updated continuously, with the auto-vs-ask fork.
@@ -199,10 +199,10 @@ absorb.
 
 ## 8. Review Focus
 
-1. **Both gates survive** — spec approval (1.8) and the per-task go (3h); the
-   batch approval (3a) starts work but never waives the per-task gate, and there
+1. **Both gates survive** — spec approval (1.8) and the per-step go (3h); the
+   batch approval (3a) starts work but never waives the per-step gate, and there
    is no auto-dispatch.
-2. **Batching respects independence** — never batch tasks that share files or
+2. **Batching respects independence** — never batch steps that share files or
    interfaces (the edge test, `step-format.md`).
 3. **The auto-vs-ask fork is explicit** — no silent fill of a user decision.
 4. **Self-containment and tests hold** — `# SDD Flow`, `\n---\n`, three files, no

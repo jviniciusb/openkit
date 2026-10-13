@@ -114,7 +114,8 @@ related background work has finished.
 
 The kit also ships twenty-one **skills**, all enabled by default:
 `english-writing-assistant` (model-visible), `sdd-flow` (a self-contained
-spec-driven development orchestrator, invoked explicitly with `@sdd-flow`),
+spec-driven development orchestrator — brainstorm, then gated batch execution,
+keeping the spec current — invoked explicitly with `@sdd-flow`),
 `interview` (model-visible; aligns on design before implementation),
 `skill-recipe` (the authoring recipe, invoked with `@skill-recipe`), `research`
 (model-visible; cited findings from primary sources), `handoff` (invoked with

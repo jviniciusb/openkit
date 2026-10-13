@@ -136,11 +136,11 @@ Follow the active project's workspace instructions for isolation, branch and wor
 
 ## Phase 3: Execution loop
 
-An **execution step** is one task, or a set of independent tasks run in parallel (no shared files or interfaces), dispatched as background subagents where the environment provides them so the orchestrator stays free. Loop until every step is checked; **every task** ends at 3h. Handle each task as it completes; do not wait for its siblings.
+A **batch** is one step, or a set of independent steps run in parallel (no shared files or interfaces), dispatched as background subagents where the environment provides them so the orchestrator stays free. Loop until every step is checked; **every step** ends at 3h. Handle each step as it completes; do not wait for its siblings.
 
-### 3a. Propose the execution step
+### 3a. Propose the batch
 
-Refresh the execution state using the active project's workflow before proposing. If actual progress no longer matches the spec, go to Phase 3.5 first. Compute the frontier: steps whose logical blockers are complete and whose project-defined prerequisites for starting are satisfied. The dependency graph determines logical order; project instructions determine how that order maps to workspaces and Git operations. Choose a batch: one task, or independent tasks with no shared files or interfaces. Your output has exactly three parts, in this order:
+Refresh the execution state using the active project's workflow before proposing. If actual progress no longer matches the spec, go to Phase 3.5 first. Compute the frontier: steps whose logical blockers are complete and whose project-defined prerequisites for starting are satisfied. The dependency graph determines logical order; project instructions determine how that order maps to workspaces and Git operations. Choose a batch: one step, or independent steps with no shared files or interfaces. Your output has exactly three parts, in this order:
 
 1. **The frontier.** Every startable step with its tags and project-informed size estimate, then what is blocked and on what.
 2. **Your recommendation.** Which batch to run and why. This is where your judgment goes.
@@ -158,7 +158,7 @@ Recommend X2 + Y2 in parallel: independent tracks, no shared files.
 Go? Or name a different pick.
 ```
 
-Then **stop**. Approving the batch starts the work; it does not waive the per-task gate.
+Then **stop**. Approving the batch starts the work; it does not waive the per-step gate.
 
 **Advance delegation does not satisfy the gate.** "You choose", "I trust your judgment", "you decide the ordering" tell you what to *recommend*; they do not tell you to begin. Honor the delegation in part 2 by naming a pick instead of offering a menu; the go is still theirs, and it costs them one word. Ordering and permission-to-start are different questions, and only the first was delegated.
 
@@ -166,35 +166,35 @@ The user decides: one here, a subset, or several in parallel workspaces. If para
 
 ### 3b. Expand and route
 
-Run per task in the batch. Create or select the task's workspace first, following the active project's workspace and Git instructions.
+Run per step in the batch. Create or select the step's workspace first, following the active project's workspace and Git instructions.
 
-Decompose the task into concrete changes (files, validating tests), tracked as a checkbox list under its step in the spec file.
+Decompose the step into concrete changes (files, validating tests), tracked as a checkbox list under the step in the spec file.
 
-Then route it using the active project's agent and platform-routing instructions. For a cross-layer task, follow the project's required sequence and keep dependent work on the same logical track.
+Then route it using the active project's agent and platform-routing instructions. For a cross-layer step, follow the project's required sequence and keep dependent work on the same logical track.
 
-Write directly only when project instructions allow direct work for that task; otherwise dispatch the project-designated orchestrator or skill.
+Write directly only when project instructions allow direct work for that step; otherwise dispatch the project-designated orchestrator or skill.
 
 ### 3c. Build
 
-Run per task in the batch. **Dispatched tasks.** Dispatch one subagent per task, with an independent reviewer per task at 3e. Independent tasks in the batch run in parallel per the `dispatching-parallel-agents` skill, as background subagents where available. The brief must carry: the task's ID, intent, and tags; the spec's absolute path and the slice it implements; the confirmed seams; the **execution findings** earlier tasks recorded; and the relevant implementation decisions and project guidance.
+Run per step in the batch. **Dispatched steps.** Dispatch one subagent per step, with an independent reviewer per step at 3e. Independent steps in the batch run in parallel per the `dispatching-parallel-agents` skill, as background subagents where available. The brief must carry: the step's ID, intent, and tags; the spec's absolute path and the slice it implements; the confirmed seams; the **execution findings** earlier steps recorded; and the relevant implementation decisions and project guidance.
 
-Treat the approved spec as the domain and behavior contract. Implement only the assigned slice, preserving those decisions and constraints; carry forward execution findings so later tasks do not repeat discovered mistakes. Use project instructions for implementation conventions and required validation.
+Treat the approved spec as the domain and behavior contract. Implement only the assigned slice, preserving those decisions and constraints; carry forward execution findings so later steps do not repeat discovered mistakes. Use project instructions for implementation conventions and required validation.
 
-**Spec stays current.** When a task turns up a discovery or a design change, write it to the spec now (see *Spec stays current*). Detail-level changes inside agreed behavior and scope are automatic; changes to agreed behavior, scope, or a user decision go to the user first through the agreed decision process, then to the spec before the affected work proceeds.
+**Spec stays current.** When a step turns up a discovery or a design change, write it to the spec now (see *Spec stays current*). Detail-level changes inside agreed behavior and scope are automatic; changes to agreed behavior, scope, or a user decision go to the user first through the agreed decision process, then to the spec before the affected work proceeds.
 
-**Direct tasks.** Implement the assigned slice from the approved spec. Resolve gaps from the spec through the agreed decision process rather than inventing behavior. Validate according to project instructions.
+**Direct steps.** Implement the assigned slice from the approved spec. Resolve gaps from the spec through the agreed decision process rather than inventing behavior. Validate according to project instructions.
 
 Refactoring is **not** part of this loop. It happens at 3e.
 
 ### 3d. Verify
 
-Verification is evidence, not assertion. Before claiming a task passes, run the verification command in this session and read its full output: the test command showing zero failures, the linter showing zero errors, the build exiting 0, or the original symptom now passing. "Should pass", "looks right", and a prior run are not evidence. If a check cannot be run, say so; never claim it passed.
+Verification is evidence, not assertion. Before claiming a step passes, run the verification command in this session and read its full output: the test command showing zero failures, the linter showing zero errors, the build exiting 0, or the original symptom now passing. "Should pass", "looks right", and a prior run are not evidence. If a check cannot be run, say so; never claim it passed.
 
 Follow the active project's instructions for validation scope, commands, and escalation. If they define no validation process, use the project's existing tooling to run tests relevant to the change and applicable lint, type-check, or build checks. Show fresh command output as evidence.
 
 ### 3e. Review and refactor
 
-Invoke `code-review` against the task's cumulative diff and the originating spec. The reviewer runs independently of the implementer. Evaluate every finding against the actual code and the applicable project rule; check that the described state is reachable, not merely that a code path exists. Keep Standards and Spec findings distinct when the review process does so. Applying nothing, or applying a different fix, are valid outcomes; say which and why. Surface unresolved findings to the user. Then take the refactor pass this task earned.
+Invoke `code-review` against the step's cumulative diff and the originating spec. The reviewer runs independently of the implementer. Evaluate every finding against the actual code and the applicable project rule; check that the described state is reachable, not merely that a code path exists. Keep Standards and Spec findings distinct when the review process does so. Applying nothing, or applying a different fix, are valid outcomes; say which and why. Surface unresolved findings to the user. Then take the refactor pass this step earned.
 
 Follow the project's requirements for tests, coverage, and other validation.
 
@@ -202,11 +202,11 @@ Skip 3e only when the project defines the change as trivial or a fresh review al
 
 Independent reviews can surface race conditions, scope errors, missing requirements, and dead code. Catching them here is cheaper than carrying them into later steps.
 
-### 3f. Complete the task
+### 3f. Complete the step
 
-1. Run the project's scope and size checks for the task. If it exceeds a project limit, go to Phase 3.5 before marking it complete.
-2. Flip the checkbox in the spec and add what the task learned to **Execution findings**, so later briefs can carry it forward. Write any design change to the spec now (see *Spec stays current*).
-3. Follow project instructions for staging, commits, branch synchronization, pushes, PRs, and dependency landing order. This skill does not prescribe Git commands, branch names or bases, or grant commit or push authorization. Record any project-required pending state beside the task.
+1. Run the project's scope and size checks for the step. If it exceeds a project limit, go to Phase 3.5 before marking it complete.
+2. Flip the checkbox in the spec and add what the step learned to **Execution findings**, so later briefs can carry it forward. Write any design change to the spec now (see *Spec stays current*).
+3. Follow project instructions for staging, commits, branch synchronization, pushes, PRs, and dependency landing order. This skill does not prescribe Git commands, branch names or bases, or grant commit or push authorization. Record any project-required pending state beside the step.
 4. After any project-required sync or review fix, repeat the affected validation and scope and size checks according to project instructions before advancing.
 
 ### 3g. Handle review feedback
@@ -223,11 +223,11 @@ When the project uses PRs or another review process, handle its feedback as part
 
 ### 3h. Ask what next
 
-Run per completed task. Ask:
+Run per completed step. Ask:
 
 > Keep moving on / open a PR / refine or re-sync / stop?
 
-"Keep moving on" re-enters 3a with the next batch. "Open a PR" opens one for the completed task. Refine means the user edits the spec; wait for an explicit go. Re-sync goes to Phase 3.5. Stop goes to Phase 4. A task's design change or question is raised here, immediately, not held until its siblings finish.
+"Keep moving on" re-enters 3a with the next batch. "Open a PR" opens one for the completed step. Refine means the user edits the spec; wait for an explicit go. Re-sync goes to Phase 3.5. Stop goes to Phase 4. A step's design change or question is raised here, immediately, not held until its siblings finish.
 
 ---
 
@@ -261,15 +261,15 @@ Procedure:
 ## Anti-patterns
 
 - **Auto-triggering on "let's build X".** Explicit invocation only.
-- **Picking the next step yourself.** 3a proposes the execution step; the user chooses. Auto-dispatching is the same violation, and so is proposing a batch and then starting it in the same message.
+- **Picking the next step yourself.** 3a proposes the batch; the user chooses. Auto-dispatching is the same violation, and so is proposing a batch and then starting it in the same message.
 - **"They already delegated ordering, so I don't need a second confirmation."** The recommendation is where delegation is honored. The go is still theirs.
-- **Batching tasks that share files or interfaces.** An execution step is one task, or independent tasks; shared files or interfaces run one at a time.
-- **Holding a finished task's question or design change until its siblings finish.** Raise it at 3h for that task, immediately.
+- **Batching steps that share files or interfaces.** A batch is one step, or independent steps; shared files or interfaces run one at a time.
+- **Holding a finished step's question or design change until its siblings finish.** Raise it at 3h for that step, immediately.
 - **Taking the first unchecked box** instead of the frontier. With a graph, the first unchecked step is frequently blocked.
-- **Writing feature code directly** when the task doesn't meet 3b's narrow exception.
+- **Writing feature code directly** when the step doesn't meet 3b's narrow exception.
 - **Estimating size after the code exists.** The project's size policy is a planning constraint.
-- **Starting the next task without passing 3h.**
-- **Treating a task as finished before project-required validation or review is complete.**
+- **Starting the next step without passing 3h.**
+- **Treating a step as finished before project-required validation or review is complete.**
 - **Claiming a step passes without fresh evidence.** Run the command and read its output first.
 - **Applying a review comment because a reviewer wrote it.** Evaluate it against the code and the rule it cites first, then apply, reject, or reach for the better pattern, with the reason in the reply.
 - **Inferring branch, commit, or PR policy from the dependency graph.** Use the active project's Git workflow.

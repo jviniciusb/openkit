@@ -55,7 +55,7 @@ X1 ──┬──► X2 ──► X4
 
 The graph does three jobs:
 
-- **Frontier.** A step is startable once its logical blockers are complete and project-defined start prerequisites are satisfied. This is what Phase 3a presents.
+- **Frontier.** A step is startable once its logical blockers are complete and project-defined start prerequisites are satisfied. This is the frontier Phase 3a proposes a batch from.
 - **Dependency order.** Edges state which completed work a step depends on. They do not prescribe branch bases, branch names, PR timing, or Git operations.
 - **Concurrency.** Independent frontier steps can run in parallel when the project's workspace rules allow it.
 
