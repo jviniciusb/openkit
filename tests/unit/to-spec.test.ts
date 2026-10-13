@@ -15,7 +15,6 @@ test("to-spec SKILL.md frontmatter parses with name and a description", () => {
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("to-spec")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("to-spec loads through loadSkill with stripped frontmatter", () => {

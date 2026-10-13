@@ -22,7 +22,9 @@ skills ship today, all enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
 `@sdd-flow`; a self-contained spec-driven development orchestrator that composes
-the kit's own `interview`, `research`, and `code-review` skills), `interview`
+the kit's own `interview`, `research`, `code-review`, `codebase-design`,
+`using-git-worktrees`, and `dispatching-parallel-agents` skills and names
+`to-spec` for drafting the initial spec), `interview`
 (`src/skills/interview/SKILL.md`, model-visible; aligns on design before
 implementation), `skill-recipe` (`src/skills/skill-recipe/SKILL.md`, registered
 `autoinvoke: false`, the authoring recipe invoked with `@skill-recipe`),

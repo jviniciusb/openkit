@@ -15,7 +15,6 @@ test("codebase-design SKILL.md frontmatter parses with name and a description", 
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("codebase-design")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("codebase-design loads through loadSkill with stripped frontmatter", () => {

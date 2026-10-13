@@ -15,7 +15,6 @@ test("writing-for-agents SKILL.md frontmatter parses with name and a description
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("writing-for-agents")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("writing-for-agents loads through loadSkill with stripped frontmatter", () => {

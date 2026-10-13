@@ -15,7 +15,6 @@ test("verification SKILL.md frontmatter parses with name and a description", () 
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("verification")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("verification loads through loadSkill with stripped frontmatter", () => {

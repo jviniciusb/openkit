@@ -27,7 +27,7 @@ State the exact claim you are about to make, then the check that would prove it 
 
 ### 2. Run it fresh on the current tree
 
-Run the full command now, in the working tree you are claiming about, after your change. A prior run, another branch, a cached result, or "it passed earlier" is not evidence about this tree. Run the whole command, not a partial or extrapolated subset.
+Run the full command now, in the working tree you are claiming about, after your change. A prior run, another branch, a cached result, or "it passed earlier" is not evidence about this tree. Run the whole command **that proves the claim**, not a partial subset of it.
 
 ### 3. Read the output, not just the vibe
 

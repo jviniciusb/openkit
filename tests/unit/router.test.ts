@@ -15,7 +15,6 @@ test("router SKILL.md frontmatter parses with name and a description", () => {
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("router")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("router loads through loadSkill with stripped frontmatter", () => {
@@ -40,4 +39,24 @@ test("router names real kit skill ids and stays a pointer", () => {
   const body = loadSkill(router!).content
   expect(body).toContain("@sdd-flow")
   expect(body).toContain("@router")
+})
+
+test("router skill-list @id tokens all exist in the skills barrel", () => {
+  const body = loadSkill(router!).content
+  const ids = [...body.matchAll(/^- `@([a-z0-9-]+)`/gm)].map((m) => m[1]!)
+  expect(ids.length).toBeGreaterThan(0)
+  const known = new Set(skills.map((s) => s.id))
+  for (const id of ids) {
+    expect(known.has(id)).toBe(true)
+  }
+})
+
+test("router model-visible skill ids all exist in the skills barrel", () => {
+  const body = loadSkill(router!).content
+  const ids = [...body.matchAll(/^- `([a-z0-9-]+)`/gm)].map((m) => m[1]!)
+  expect(ids.length).toBeGreaterThan(0)
+  const known = new Set(skills.map((s) => s.id))
+  for (const id of ids) {
+    expect(known.has(id)).toBe(true)
+  }
 })

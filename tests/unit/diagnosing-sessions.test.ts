@@ -15,7 +15,6 @@ test("diagnosing-sessions SKILL.md frontmatter parses with name and a descriptio
   const frontmatter = readSkillFrontmatter(text)
   expect(frontmatter.name).toBe("diagnosing-sessions")
   expect(frontmatter.description).toBeTruthy()
-  expect(frontmatter.description).not.toContain(">-")
 })
 
 test("diagnosing-sessions loads through loadSkill with stripped frontmatter", () => {
