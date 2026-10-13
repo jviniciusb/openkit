@@ -10,7 +10,7 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 | 1 | `interview` (derived), `skill-recipe`, `research`, `handoff`, `code-review`, `sdd-flow` (evolved) | v0.9.0 | done |
 | 2 | `diagnosing-bugs`, `verification`, `prototype`, `retro` | v0.10.0 | done |
 | 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | done |
-| 4 | `improve-codebase-architecture`, `to-spec`, `wizard`, `router`, `diagnosing-sessions` | v0.12.0 | done |
+| 4 | `improve-codebase-architecture`, `to-spec`, `wizard`, `router`, `diagnosing-sessions` | v0.12.0 | merged, pending release |
 
 ## Current skills (21)
 
