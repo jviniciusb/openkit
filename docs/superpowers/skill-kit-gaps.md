@@ -11,6 +11,7 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 | 2 | `diagnosing-bugs`, `verification`, `prototype`, `retro` | v0.10.0 | done |
 | 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | done |
 | 4 | `improve-codebase-architecture`, `to-spec`, `wizard`, `router`, `diagnosing-sessions` | v0.12.0 | done |
+| Gap pass | none (dedupe + consistency pass over the 21 shipped skills) | v0.13.0 | in review |
 
 ## Current skills (21)
 
@@ -22,8 +23,7 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 
 ## Remaining candidates (compatible with the author's dislikes)
 
-Not yet derived; niche productivity extras for a later batch or the final gap
-pass:
+Not yet derived; niche productivity extras for a later batch, if ever:
 
 | Candidate | Source | Fit | Notes |
 |---|---|---|---|
@@ -40,42 +40,51 @@ pass:
 - `using-superpowers` — enforced auto-trigger bootstrap.
 - `setup-*` / `setup-matt-pocock-skills` — tooling configuration.
 
-## Trim / extend items (fix in the final gap pass)
+## Gaps — final pass (v0.13.0)
 
-### Overlaps to dedupe
-- `codebase-design` is standalone, but `sdd-flow` §1.3 still inlines the same
-  depth/seam guidance — replace the inline text with a reference to the skill.
-- `improve-codebase-architecture` (read-only survey that proposes deepening) vs
-  `codebase-design` (designs a module's seam) — keep the boundary explicit: the
-  survey points, `codebase-design` builds.
-- `to-spec` vs `sdd-flow`'s spec phase — `to-spec` distills an existing
-  conversation, `sdd-flow` interviews then writes. Decide whether `sdd-flow`
-  references `to-spec` for the write-up.
-- `diagnosing-sessions` vs `diagnosing-bugs` — near-identical names; confirm the
-  router and README keep session forensics and code-bug root-causing distinct.
-- `router` vs `skill-recipe` — both are discovery/authoring aids; ensure the
-  router points at `@skill-recipe` rather than duplicating its rubric.
-- `dispatching-parallel-agents` vs `sdd-flow` parallel tracks — decide the
-  boundary (ad-hoc fan-out vs in-flow), or have `sdd-flow` reference it.
-- `using-git-worktrees` vs `sdd-flow` Phase 2 workspace setup — same boundary.
-- `writing-for-agents` vs `skill-recipe/rubric.md` — decide whether the rubric
-  should reference the general authoring skill instead of duplicating rules.
+All tracked gaps are now resolved or explicitly accepted. No new skills ship in
+this pass; the work is dedupe and consistency only.
 
-### Deferred minors (non-blocking)
-- Vacuous `expect(description).not.toContain(">-")` guards in several skill tests
-  (`interview`, `research`, `handoff`, `code-review`, `diagnosing-bugs`,
-  `verification`, `prototype`, `retro`, `finishing-a-branch`,
-  `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`,
-  `codebase-design`, `improve-codebase-architecture`, `to-spec`, `wizard`,
-  `router`, `diagnosing-sessions`) — replace or drop repo-wide.
-- `verification` wording: "Run the whole command" vs Gate 3 "do not blanket-run
-  everything" — tighten.
-- `generated.json` `generatedAt` values are hand-set, not machine-generated.
-- Unsubstituted `skill-sources/<name>/LICENSE` placeholder in the provenance
-  comments of `code-review`, `sdd-flow`, and `interview` (batch 1) — substitute
-  real snapshot names for consistency with the batch-2 skills.
+### Overlaps — deduped
+- `sdd-flow` §1.3 no longer inlines the depth/seam guidance: it references the
+  `codebase-design` skill for the seam vocabulary (keeping its own gates).
+  **Resolved.**
+- `improve-codebase-architecture` vs `codebase-design` — the boundary stays
+  explicit (the survey points, `codebase-design` builds) and the survey now
+  cross-references `codebase-design` for the vocabulary. **Resolved.**
+- `to-spec` vs `sdd-flow`'s spec phase — the two stay distinct (distill an
+  existing conversation vs interview then write); `sdd-flow` now names `to-spec`
+  as the option for drafting the initial spec. **Resolved.**
+- `diagnosing-sessions` vs `diagnosing-bugs` — kept distinct: session forensics
+  vs code-bug root-causing; the router and README keep them separate.
+  **Resolved (no change needed).**
+- `router` vs `skill-recipe` — the router points at `@skill-recipe` rather than
+  duplicating its rubric. **Resolved.**
+- `dispatching-parallel-agents` vs `sdd-flow` parallel tracks — `sdd-flow` now
+  references the skill for the fan-out mechanics. **Resolved.**
+- `using-git-worktrees` vs `sdd-flow` Phase 2 workspace setup — `sdd-flow` now
+  references the skill for the isolation mechanics. **Resolved.**
+- `writing-for-agents` vs `skill-recipe/rubric.md` — the rubric cross-references
+  `writing-for-agents` for general authoring depth, keeping only the
+  skill-specific rules. **Resolved.**
 
-### Open decisions
-- `interview` is model-visible; confirm or flip to `@interview`-only.
-- `improve-codebase-architecture` shipped as its own skill in v0.12.0 (resolved);
-  it stays separate from `codebase-design`.
+### Deferred minors — resolved
+- Vacuous `expect(description).not.toContain(">-")` guards — removed repo-wide
+  (all real assertions kept). **Resolved.**
+- `verification` wording — now "Run the whole command **that proves the
+  claim**", so it cannot read as a blanket mandate. **Resolved.**
+- Batch-1 provenance placeholders (`skill-sources/<name>/LICENSE`) — the
+  comments in `code-review`, `sdd-flow`, and `interview` now name real snapshot
+  paths. **Resolved.**
+- `router` `@id` cross-check test — added; it matches only the skill-list lines
+  (`` /^- `@([a-z0-9-]+)`/gm ``) and asserts each id exists in
+  `src/skills/index.ts`, so the provenance `...@24fe0ef...` hash and the `@id`
+  syntax placeholder are not captured. **Resolved.**
+- `generated.json` `generatedAt` hand-set values — **accepted as-is**:
+  `bun scripts/skill-source.ts check` validates only each record's `outputHash`,
+  never `generatedAt`, so the hand-set values are inert metadata.
+
+### Open decisions — resolved
+- `interview` stays **model-visible**. **Resolved.**
+- `improve-codebase-architecture` shipped as its own skill in v0.12.0, separate
+  from `codebase-design`. **Resolved.**
