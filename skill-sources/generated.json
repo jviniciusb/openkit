@@ -269,5 +269,18 @@
     "output": "src/skills/wizard/SKILL.md",
     "outputHash": "806ca3757f6d8e2d4e2fd640b90c8cf8a4b63419c75945a77c725976d0f050e7",
     "generatedAt": "2026-10-13T21:50:14.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/router.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/ask-matt/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/router/SKILL.md",
+    "outputHash": "357adde75d3b3309a0027abfaeaa850829ec7486fbaddd41beed8dd6f99ebcec",
+    "generatedAt": "2026-10-13T21:53:26.000Z"
   }
 ]

@@ -27,5 +27,6 @@ export const skills: KitSkill[] = [
   defineSkill({ id: "improve-codebase-architecture", dir: new URL("./improve-codebase-architecture/", import.meta.url), autoinvoke: false }),
   defineSkill({ id: "to-spec", dir: new URL("./to-spec/", import.meta.url), autoinvoke: false }),
   defineSkill({ id: "wizard", dir: new URL("./wizard/", import.meta.url) }),
+  defineSkill({ id: "router", dir: new URL("./router/", import.meta.url), autoinvoke: false }),
   // </kit:skills>
 ]
