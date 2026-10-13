@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test"
 import { execFileSync } from "node:child_process"
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import {
@@ -248,6 +248,61 @@ test("listSources reads what addSource wrote", async () => {
     include: ["skills/a/SKILL.md"],
   })
   expect(listSources(root)).toEqual([pin])
+})
+
+test("a failed multi-source update leaves every snapshot, pin, and staging dir untouched", async () => {
+  const a = initRepo((r) => {
+    write(r, "LICENSE", MIT_LICENSE)
+    write(r, "skills/a/SKILL.md", "a v1\n")
+  })
+  const b = initRepo((r) => {
+    write(r, "LICENSE", MIT_LICENSE)
+    write(r, "skills/b/SKILL.md", "b v1\n")
+  })
+  const root = tempRoot()
+
+  await addSource(root, {
+    name: "alpha",
+    repository: a.repo,
+    ref: "HEAD",
+    include: ["skills"],
+  })
+  await addSource(root, {
+    name: "beta",
+    repository: b.repo,
+    ref: "HEAD",
+    include: ["skills/b/SKILL.md"],
+  })
+  const before = readManifest(root)
+  const alphaSnapshot = join(root, "skill-sources", "alpha", "skills/a/SKILL.md")
+  const betaSnapshot = join(root, "skill-sources", "beta", "skills/b/SKILL.md")
+
+  // alpha advances legitimately; beta's include path vanishes -> update must fail.
+  write(a.repo, "skills/a/SKILL.md", "a v2\n")
+  commit(a.repo, "alpha change")
+  rmSync(join(b.repo, "skills/b/SKILL.md"))
+  commit(b.repo, "beta drop")
+
+  await expect(updateSource(root)).rejects.toThrow(/skills\/b\/SKILL\.md/)
+
+  // Neither snapshot advanced, including the earlier, successfully-staged alpha.
+  expect(readFileSync(alphaSnapshot, "utf8")).toBe("a v1\n")
+  expect(readFileSync(betaSnapshot, "utf8")).toBe("b v1\n")
+  // Manifest pins unchanged for both.
+  expect(readManifest(root)).toEqual(before)
+  // No staging dirs left behind.
+  expect(readdirSync(join(root, "skill-sources")).filter((n) => n.startsWith("."))).toEqual([])
+})
+
+test("addSource rejects an unsafe name without writing", async () => {
+  const { repo, head } = initRepo((r) => write(r, "skills/a/SKILL.md", "a\n"))
+  const root = tempRoot()
+  for (const bad of ["../evil", "foo/bar", ".hidden", "..", ""]) {
+    await expect(
+      addSource(root, { name: bad, repository: repo, ref: head, include: ["skills/a/SKILL.md"] }),
+    ).rejects.toThrow()
+  }
+  expect(existsSync(join(root, "skill-sources"))).toBe(false)
 })
 
 // ---------------------------------------------------------------------------
