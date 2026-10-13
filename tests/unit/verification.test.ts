@@ -35,3 +35,8 @@ test("verification body is self-contained and carries the provenance comment", (
   )
   expect(body).toContain("license: MIT")
 })
+
+test("verification requires evidence from the current tree", () => {
+  const body = loadSkill(verification!).content
+  expect(body).toContain("current tree")
+})

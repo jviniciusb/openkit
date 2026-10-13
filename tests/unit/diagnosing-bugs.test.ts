@@ -38,3 +38,8 @@ test("diagnosing-bugs body is self-contained and carries the provenance comment"
   )
   expect(body).toContain("license: MIT")
 })
+
+test("diagnosing-bugs requires a demonstrated root cause", () => {
+  const body = loadSkill(diagnosingBugs!).content
+  expect(body).toContain("root cause")
+})
