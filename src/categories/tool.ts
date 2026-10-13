@@ -39,7 +39,8 @@ export const toolCategory: KitCategory<KitTool> = {
       settings: resolved.settings,
     })
     try {
-      await tool.register(tracked, config.settings, createKitApi(tool.id, tracked, ctx.app.version))
+      const direct = await tool.register(tracked, config.settings, createKitApi(tool.id, tracked, ctx.app.version))
+      if (direct !== undefined && !created.includes(direct)) created.push(direct)
       return degraded === undefined ? { registrations: created } : { registrations: created, degraded }
     } catch (error) {
       // Dispose what the tool managed to create before throwing; a failing

@@ -2,6 +2,7 @@ import type {
   CommandDefinition,
   CommandEditor,
   HookHandler,
+  KitEvent,
   KitContext,
   KitStorage,
   Logger,
@@ -66,6 +67,8 @@ export interface FakeContextCalls {
 }
 
 const noopRegistration: Registration = { dispose() {} }
+
+async function* emptyEvents(): AsyncGenerator<KitEvent> {}
 
 /** A recording editor shared by the tool/command/skill transforms. */
 interface RecordingEditor<D> {
@@ -162,6 +165,11 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
     location: { directory: overrides.directory ?? process.cwd() },
     options,
     storage,
+    event: {
+      subscribe() {
+        return emptyEvents()
+      },
+    },
     tool: {
       async transform(callback: (editor: ToolEditor) => void) {
         const editor = recordingEditor<ToolDefinition>(calls.tool)
@@ -206,6 +214,11 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
         calls.hookOpts.push(opts)
         return makeRegistration()
       },
+      async wait() {},
+      async context() {
+        return []
+      },
+      async compact() {},
       ...(promptRecorder === undefined ? {} : { prompt: promptRecorder }),
     },
   }
