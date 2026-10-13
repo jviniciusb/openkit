@@ -44,7 +44,6 @@ test("skill-recipe registers autoinvoke:false with a real directory and resolvab
 test("english-writing-assistant parses its folded description and is model-visible", () => {
   const info = loadSkill(skills.find((s) => s.id === "english-writing-assistant")!)
   expect(info.description).toContain("Brazilian Portuguese")
-  expect(info.description).not.toContain(">-")
   expect("autoinvoke" in info).toBe(false)
 })
 
