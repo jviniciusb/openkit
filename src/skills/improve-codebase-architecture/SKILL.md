@@ -1,0 +1,80 @@
+---
+name: improve-codebase-architecture
+description: Use when explicitly invoked to survey a codebase for structural improvements. Trigger on requests to review a codebase's architecture, find deepening opportunities, or surface structural friction. Do not use for routine implementation, and do not refactor as part of the survey.
+---
+
+# Improve Codebase Architecture
+
+Survey the codebase for **deepening opportunities** and report them as a prioritized list. The aim is testability and navigability: turn shallow modules into deep ones. Propose the changes; let the human choose which to make.
+
+## Overview
+
+Architectural friction shows up as modules that are hard to understand, hard to test, or hard to change safely. This skill finds that friction and names the **deepening opportunity** behind it: a refactor that moves behavior behind a smaller interface, at a clean seam.
+
+The output is a prioritized list, not a refactor. Every candidate states the concrete change and its payoff in terms of locality, leverage, and testability. The survey is read-only: it reads the code, and it never edits it. The human picks what to tackle.
+
+## When to Use
+
+- You are explicitly asked to review a codebase's architecture.
+- You want deepening opportunities found and ranked.
+- You are looking for shallow modules, leaky seams, or duplicated responsibility.
+- You want a prioritized set of structural proposals before committing to any.
+
+## Process
+
+### 1. Scope before you scan
+
+Deepening pays off by making future change easier, so weight the parts of the codebase that change most. If the user named a direction (a module, a subsystem, a pain point), take it and skip the inference. Otherwise walk back a good stretch of `git log --oneline` to find the hot spots, the files and areas that keep coming up, and let those pull attention first. If changes are scattered with no clear hot spot, widen the net.
+
+### 2. Walk the codebase and note friction
+
+Explore organically; do not follow rigid heuristics. Note where you experience friction:
+
+- Where does understanding one concept require bouncing between many small modules?
+- Where are modules **shallow**, with an interface nearly as complex as the implementation?
+- Where have pure functions been extracted for testability while the real bugs hide in how they are called (no **locality**)?
+- Where do tightly coupled modules leak across their seams?
+- Which parts are untested, or hard to test through their current interface?
+
+Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? "Concentrates" is the signal.
+
+### 3. Shape each candidate
+
+For every candidate, write:
+
+- **Files**: the files and modules involved.
+- **Problem**: why the current architecture causes friction.
+- **Change**: the concrete structural change, in plain language.
+- **Payoff**: how locality, leverage, and testability improve.
+- **Recommendation strength**: `Strong`, `Worth exploring`, or `Speculative`.
+
+If a candidate contradicts a recorded decision (an ADR), surface it only when the friction is real enough to warrant revisiting that decision, and mark the conflict clearly. Do not list every theoretical refactor a decision forbids.
+
+### 4. Report a prioritized list
+
+Order the candidates by recommendation strength, strongest first, and end with a **Top recommendation**: which one to tackle first and why. A visual report (an HTML file written outside the repo, with a before/after diagram per candidate) is a good default, but a clear structured list is enough. State where the report was written and hand the choice back to the human: "Which of these would you like to explore?"
+
+### 5. Stop at the proposal
+
+Do not design interfaces or make changes in this skill. Once the human picks a candidate, hand off to a design or refactor pass. The survey ends when the list is delivered.
+
+## Gates
+
+- **Read-only.** The survey reads the codebase and writes nothing into it. Any report lands outside the repo.
+- **Propose, never auto-refactor.** The skill ends with a prioritized list and a question; the human chooses what to change.
+- **Every candidate names the concrete change and its payoff.** A finding with no change or no payoff is not a candidate.
+- **Candidates are prioritized.** Each carries a recommendation strength, and the list is ordered.
+- **The deletion test is applied.** A module suspected of being shallow is checked by asking whether deleting it concentrates complexity.
+
+## Anti-patterns
+
+- Refactoring or editing code as part of the survey.
+- Presenting an unranked dump of every possible change.
+- A candidate with no concrete change, or no payoff.
+- Naming structure with vocabulary the design pass owns instead of the terms this survey uses.
+- Listing theoretical refactors that recorded decisions already forbid.
+- Designing interfaces, or starting implementation, before the human chooses.
+
+<!-- generated by skill-recipe
+from: mattpocock/skills@24fe0ef7737efae15c87225755e9f6f5965e4888 skills/engineering/improve-codebase-architecture/SKILL.md
+license: MIT (dev-only snapshot: skill-sources/mattpocock-skills/LICENSE in the repo) -->
