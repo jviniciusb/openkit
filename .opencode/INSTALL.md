@@ -83,7 +83,9 @@ prompt exceeds `thresholdTokens`):
   },
   "skills": {
     "english-writing-assistant": { "enabled": true },
-    "sdd-flow": { "enabled": true }
+    "sdd-flow": { "enabled": true },
+    "interview": { "enabled": true },
+    "skill-recipe": { "enabled": true }
   },
   "references": {}
 }
@@ -93,9 +95,11 @@ When enabling `auto-compact`, also set `"compaction": { "auto": false }` in the
 project or global `opencode.json(c)` so native auto-compaction cannot run before
 related background work has finished.
 
-The kit also ships two **skills**, both enabled by default:
-`english-writing-assistant` (model-visible) and `sdd-flow` (invoked explicitly
-with `@sdd-flow`). Skills take no `settings` — only `enabled`. Disable one with
+The kit also ships four **skills**, all enabled by default:
+`english-writing-assistant` (model-visible), `sdd-flow` (invoked explicitly
+with `@sdd-flow`), `interview` (model-visible; aligns on design before
+implementation), and `skill-recipe` (the authoring recipe, invoked with
+`@skill-recipe`). Skills take no `settings` — only `enabled`. Disable one with
 `/kit disable <skill-id>` in a session, or
 `bun bin/opencode-kit.js disable <skill-id>` from a checkout.
 

@@ -39,7 +39,7 @@
   },
   "skills": {
     // Skills are declarative instruction packages (`src/skills/<id>/SKILL.md`).
-    // Unlike tools they take no `settings` — only `enabled`. Both bundled
+    // Unlike tools they take no `settings` — only `enabled`. All bundled
     // skills default to on.
     "english-writing-assistant": {
       // Model-visible: advertised to the model so it can use the skill on its own.
@@ -48,6 +48,15 @@
     "sdd-flow": {
       // Registered with `autoinvoke: false`, so it stays off the model's
       // advertised list; invoke it explicitly with `@sdd-flow`.
+      "enabled": true
+    },
+    "interview": {
+      // Model-visible: aligns on design or requirements before implementation.
+      "enabled": true
+    },
+    "skill-recipe": {
+      // Registered with `autoinvoke: false`; the authoring aid, invoked with
+      // `@skill-recipe` to derive a new kit skill from a brief and sources.
       "enabled": true
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.

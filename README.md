@@ -43,10 +43,13 @@ before related background work has finished. This also disables OpenCode's
 automatic overflow-recovery compaction. If the provider does not report prompt
 usage, the tool cannot trigger compaction.
 
-It also ships two skills, both enabled by default:
+It also ships four skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
-(model-visible) and [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
-explicitly with `@sdd-flow`). See [Skills](#skills).
+(model-visible), [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
+explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
+(model-visible; aligns on design before implementation), and
+[`skill-recipe`](src/skills/skill-recipe/SKILL.md) (the authoring recipe,
+invoked with `@skill-recipe`). See [Skills](#skills).
 
 The **references** category ships empty today; it is the supported home for
 curated content sources. See [References](#references).
@@ -236,12 +239,20 @@ Skills are entirely declarative — there is no per-skill code. OpenCode either
 advertises a skill to the model so it can use it on its own, or hides it from
 the model's list while keeping it loadable by id.
 
-Two skills ship with the kit, both **enabled by default**:
+Four skills ship with the kit, all **enabled by default**:
 
 | Skill | How it is used |
 | --- | --- |
 | [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md) | Model-visible. Turns a Portuguese speaker's draft, bullets, or Portuguese–English mix into clear, idiomatic English, with a short explanation of what changed. |
 | [`sdd-flow`](src/skills/sdd-flow/SKILL.md) | Registered with `autoinvoke: false`, so it stays off the model's advertised list. Invoke it explicitly with **`@sdd-flow`**. Spec-driven development: write an approved spec, then implement it in dependency-ordered slices. |
+| [`interview`](src/skills/interview/SKILL.md) | Model-visible. Aligns on design or requirements before implementation: maps every open decision as a design tree, works it in rounds, and holds implementation behind an approval gate. |
+| [`skill-recipe`](src/skills/skill-recipe/SKILL.md) | Registered with `autoinvoke: false`. The authoring aid, invoked with **`@skill-recipe`**: turns a brief plus one or more source skills into a self-contained kit-style `SKILL.md`. |
+
+**Skill recipe:** `@skill-recipe` is the general authoring skill for deriving a
+new kit skill from a brief and arbitrary sources — it reads whatever paths the
+brief names. The vendored snapshots under `skill-sources/` are maintainer
+tooling for the skills this repo ships; that directory is dev-only and is not
+part of the runtime package.
 
 Skills are toggled per id under `skills.<id>.enabled` — a peer of the `tools`
 section, with the same discovery and precedence:
@@ -250,7 +261,9 @@ section, with the same discovery and precedence:
 {
   "skills": {
     "english-writing-assistant": { "enabled": true },
-    "sdd-flow": { "enabled": false }
+    "sdd-flow": { "enabled": false },
+    "interview": { "enabled": true },
+    "skill-recipe": { "enabled": true }
   }
 }
 ```

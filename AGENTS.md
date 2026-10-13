@@ -17,11 +17,14 @@ rules, each individually toggleable, plus your own instructions), and
 `auto-compact` (`src/tools/auto-compact/index.ts`, opt-in; queues compaction once
 related sessions, tool calls, and shells are idle and the last prompt exceeds a
 token threshold). The `hello`
-example at `src/tools/hello/index.ts` is not registered at runtime. Two skills
-ship today, both enabled by default: `english-writing-assistant`
-(`src/skills/english-writing-assistant/SKILL.md`, model-visible) and `sdd-flow`
+example at `src/tools/hello/index.ts` is not registered at runtime. Four skills
+ship today, all enabled by default: `english-writing-assistant`
+(`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
-`@sdd-flow`). The **references** category
+`@sdd-flow`), `interview` (`src/skills/interview/SKILL.md`, model-visible;
+aligns on design before implementation), and `skill-recipe`
+(`src/skills/skill-recipe/SKILL.md`, registered `autoinvoke: false`, the
+authoring recipe invoked with `@skill-recipe`). The **references** category
 (`src/references/<id>/reference.json`) ships empty today; references are
 declarative, opt-in, settings-bearing content sources registered through
 `ctx.reference`.
@@ -125,6 +128,10 @@ category-keyed (`tools`, `skills`, `references`).
 5. `bun run typecheck && bun test`.
 
 ## Adding a skill
+
+Prefer `@skill-recipe` (`src/skills/skill-recipe/SKILL.md`) to derive a skill
+from a brief plus source skills: it drafts in the kit house style and adds the
+barrel entry. The steps below are the manual equivalent.
 
 1. `opencode-kit new skill my-skill` (run from the repo root; `new-skill` is an
    alias for `new skill`).

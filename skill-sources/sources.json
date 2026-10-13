@@ -1,0 +1,28 @@
+[
+  {
+    "name": "superpowers",
+    "repository": "https://github.com/obra/superpowers",
+    "ref": "v7.0.0",
+    "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+    "license": "MIT",
+    "retrievedAt": "2026-10-13T17:52:21.114Z",
+    "include": [
+      "skills/brainstorming/SKILL.md",
+      "LICENSE"
+    ]
+  },
+  {
+    "name": "mattpocock-skills",
+    "repository": "https://github.com/mattpocock/skills",
+    "ref": "v1.3.1",
+    "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888",
+    "license": "MIT",
+    "retrievedAt": "2026-10-13T17:52:24.867Z",
+    "include": [
+      "skills/productivity/grilling/SKILL.md",
+      "skills/productivity/grill-me/SKILL.md",
+      "skills/engineering/grill-with-docs/SKILL.md",
+      "LICENSE"
+    ]
+  }
+]
