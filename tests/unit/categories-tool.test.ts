@@ -23,6 +23,21 @@ test("toolCategory.registerItem disposes partial registrations when register thr
   expect(disposed).toBe(1)
 })
 
+test("toolCategory.registerItem tracks a cleanup returned directly by register", async () => {
+  let disposed = 0
+  const cleanup = { dispose() { disposed++ } }
+  const { ctx } = createFakeContext()
+  const tool = defineTool({
+    id: "cleanup", name: "Cleanup", description: "d", defaultSettings: {},
+    register() { return cleanup },
+  })
+
+  const result = await toolCategory.registerItem(tool, { enabled: true, settings: {} }, ctx)
+  expect(result.registrations).toContain(cleanup)
+  await result.registrations[0]!.dispose()
+  expect(disposed).toBe(1)
+})
+
 test("toolCategory.registerItem handles a getter-backed frozen context", async () => {
   let disposed = 0
   const { ctx } = createFakeContext({
