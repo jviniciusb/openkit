@@ -282,5 +282,18 @@
     "output": "src/skills/router/SKILL.md",
     "outputHash": "357adde75d3b3309a0027abfaeaa850829ec7486fbaddd41beed8dd6f99ebcec",
     "generatedAt": "2026-10-13T21:53:26.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/diagnosing-sessions.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/diagnosing-superpowers/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/diagnosing-sessions/SKILL.md",
+    "outputHash": "0c44dc2366ee94cb0ef6612e7a5da31ff4d1cc2ad2af2719c83fdc3452314f20",
+    "generatedAt": "2026-10-13T21:56:10.000Z"
   }
 ]
