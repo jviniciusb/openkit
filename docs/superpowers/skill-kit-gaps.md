@@ -11,7 +11,7 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 | 2 | `diagnosing-bugs`, `verification`, `prototype`, `retro` | v0.10.0 | done |
 | 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | done |
 | 4 | `improve-codebase-architecture`, `to-spec`, `wizard`, `router`, `diagnosing-sessions` | v0.12.0 | done |
-| Gap pass | none (dedupe + consistency pass over the 21 shipped skills) | v0.13.0 | in review |
+| Gap pass | none (dedupe + consistency pass over the 21 shipped skills) | v0.13.0 | done |
 
 ## Current skills (21)
 
