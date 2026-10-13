@@ -97,7 +97,12 @@ prompt exceeds `thresholdTokens`):
     "dispatching-parallel-agents": { "enabled": true },
     "using-git-worktrees": { "enabled": true },
     "writing-for-agents": { "enabled": true },
-    "codebase-design": { "enabled": true }
+    "codebase-design": { "enabled": true },
+    "improve-codebase-architecture": { "enabled": true },
+    "to-spec": { "enabled": true },
+    "wizard": { "enabled": true },
+    "router": { "enabled": true },
+    "diagnosing-sessions": { "enabled": true }
   },
   "references": {}
 }
@@ -107,7 +112,7 @@ When enabling `auto-compact`, also set `"compaction": { "auto": false }` in the
 project or global `opencode.json(c)` so native auto-compaction cannot run before
 related background work has finished.
 
-The kit also ships sixteen **skills**, all enabled by default:
+The kit also ships twenty-one **skills**, all enabled by default:
 `english-writing-assistant` (model-visible), `sdd-flow` (a self-contained
 spec-driven development orchestrator, invoked explicitly with `@sdd-flow`),
 `interview` (model-visible; aligns on design before implementation),
@@ -126,8 +131,16 @@ completed work safely or leaves it deliberately in place),
 task and runs them concurrently), `using-git-worktrees` (model-visible; sets up
 or verifies an isolated workspace before feature work), `writing-for-agents`
 (model-visible; writes agent-facing documents so the agent lands on the intended
-behavior), and `codebase-design` (model-visible; designs deep modules behind
-clean seams). Skills take no `settings` — only `enabled`. Disable one with
+behavior), `codebase-design` (model-visible; designs deep modules behind
+clean seams), `improve-codebase-architecture` (invoked with
+`@improve-codebase-architecture`; surveys a codebase read-only for deepening
+opportunities), `to-spec` (invoked with `@to-spec`; distills the current
+conversation into a written spec), `wizard` (model-visible; builds a guided
+interactive script for steps only a human can take), `router` (invoked with
+`@router`; points a request at the one kit skill or flow that fits), and
+`diagnosing-sessions` (invoked with `@diagnosing-sessions`; forensically explains
+why a past session went wrong). Skills take no `settings` — only `enabled`.
+Disable one with
 `/kit disable <skill-id>` in a session, or
 `bun bin/opencode-kit.js disable <skill-id>` from a checkout.
 

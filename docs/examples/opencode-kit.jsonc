@@ -118,6 +118,33 @@
       // Model-visible: designs deep modules behind a small interface at a clean
       // seam, for leverage, locality, and testability.
       "enabled": true
+    },
+    "improve-codebase-architecture": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with
+      // `@improve-codebase-architecture` to survey a codebase read-only for
+      // deepening opportunities.
+      "enabled": true
+    },
+    "to-spec": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with
+      // `@to-spec` to distill the current conversation into a written spec.
+      "enabled": true
+    },
+    "wizard": {
+      // Model-visible: builds a guided interactive script for steps only a human
+      // can take — credentials, approvals, external consoles.
+      "enabled": true
+    },
+    "router": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with `@router`
+      // to name the one kit skill or flow that fits a request.
+      "enabled": true
+    },
+    "diagnosing-sessions": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with
+      // `@diagnosing-sessions` to forensically explain why a past session went
+      // wrong.
+      "enabled": true
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.
     // `enable`/`disable` and the `/kit` command write here.
