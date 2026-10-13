@@ -23,6 +23,17 @@ test("package entry points at the shipped TypeScript source", () => {
   expect(readFileSync(new URL("../../index.js", import.meta.url), "utf8")).toContain("./src/plugin.ts")
 })
 
+test("package files exclude dev-only trees so upstream text is never published", () => {
+  // skill-sources/ holds vendored upstream text; scripts/, docs/, and tests/ are
+  // maintainer-only. None may ship in the published package.
+  for (const excluded of ["skill-sources", "scripts", "docs", "tests"]) {
+    const shipped = pkg.files.some(
+      (entry) => entry === excluded || entry.startsWith(`${excluded}/`),
+    )
+    expect(shipped).toBe(false)
+  }
+})
+
 test("the kit ships the english-writing-assistant, sdd-flow, and interview skills", () => {
   const sdd = skills.find((s) => s.id === "sdd-flow")!
   expect(loadSkill(sdd).autoinvoke).toBe(false)

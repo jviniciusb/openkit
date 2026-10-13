@@ -32,7 +32,7 @@ Resolve each source path the brief names. If a source id is unknown or absent on
 
 ### 3. Read the sources
 
-Read each named source in full. Extract only what the brief says to keep; drop what it says to drop. Keep the output self-contained: remove every reference to an external kit or skill, including `plugin:skill` prefixes that belong to another kit.
+Read each named source in full. Extract only what the brief says to keep; drop what it says to drop. Keep the output self-contained: remove every reference to an external kit or skill, including `plugin:skill` prefixes that belong to another kit. The provenance comment from Step 7 is the sole exception: it is the one allowed place to name a source repo.
 
 ### 4. Draft the SKILL.md
 
@@ -61,6 +61,16 @@ End the body with a provenance comment that names each source repo, commit, and 
      from: <repo>@<commit> <path>
      license: MIT (dev-only snapshot: skill-sources/<name>/LICENSE in the repo) -->
 ```
+
+The `skill-sources/<name>/LICENSE` pointer is the **vendored-snapshot** case: it applies when the source was vendored into `skill-sources/`. When the sources are arbitrary or local, point the license at wherever that source actually lives instead.
+
+### 8. Add a test
+
+Write `tests/unit/<id>.test.ts`, mirroring `tests/unit/interview.test.ts`: assert the barrel entry resolves (the skill is found in `skills` with the expected `autoinvoke`) and that the `SKILL.md` frontmatter parses with the right `name` and a `description`.
+
+### 9. Add the example entry
+
+Add the new skill to `docs/examples/opencode-kit.jsonc`, in the shape the existing entries use.
 
 Then run `bun run typecheck && bun test`.
 

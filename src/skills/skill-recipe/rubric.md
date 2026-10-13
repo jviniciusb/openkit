@@ -43,3 +43,5 @@ End the body with:
      from: <repo>@<commit> <path>
      license: MIT (dev-only snapshot: skill-sources/<name>/LICENSE in the repo) -->
 ```
+
+The `skill-sources/<name>/LICENSE` pointer is the vendored-snapshot case; when the sources are arbitrary or local, point the license at wherever that source actually lives.
