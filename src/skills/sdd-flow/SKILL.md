@@ -23,12 +23,12 @@ This skill coordinates specification, dependencies, skill invocations, gates, an
 
 ### 1.0 Orient
 
-Before deciding whether 1.1 applies, dispatch parallel read-only exploration subagents to survey the ground: what already exists for this behavior, which flows and screens it touches, which platforms surface it, how the closest analogous feature was built. Draft the raw material for 1.4's **What already exists** here; drafting it after the interview is too late to shape the interview.
+Before deciding whether 1.1 applies, dispatch parallel read-only exploration subagents to survey the ground: what already exists for this behavior, which flows and screens it touches, which platforms surface it, how the closest analogous feature was built. Draft the raw material for 1.5's **What already exists** here; drafting it after the interview is too late to shape the interview.
 
 The survey feeds the interview in **both** directions:
 
 - **It answers questions.** Anything it establishes is settled, and must not be put to the user. Bring findings as stated facts, not as questions with a recommended answer.
-- **It raises questions.** An existing pattern that conflicts with the ask, two callers where you assumed one, a flag or seam already in place, a constraint nobody mentioned. These are frontier questions the interview would never have reached; carry them into 1.2 as the first round.
+- **It raises questions.** An existing pattern that conflicts with the ask, two callers where you assumed one, a flag or seam already in place, a constraint nobody mentioned. These are frontier questions the interview would never have reached; carry them into 1.3 as the first round.
 
 The second is the reason this phase exists. A survey that only pre-answers what you already knew to ask has not paid for itself.
 
@@ -36,9 +36,9 @@ Dispatch read-only exploration subagents, one per question, all in one message, 
 
 When an unknown is about a third-party library or API rather than this codebase, invoke `research` instead of an exploration subagent.
 
-**One round, then move on.** Send the fan-out once, read what comes back, and go to 1.1, even with questions still open. Orient only widens the frontier; 1.2 is what closes it, and after the first round you finally know which facts are worth chasing.
+**One round, then move on.** Send the fan-out once, read what comes back, and go to 1.1, even with questions still open. Orient only widens the frontier; 1.3 is what closes it, and after the first round you finally know which facts are worth chasing.
 
-What is still open hands off **by kind**, never in a lump: a **fact** enters 1.2 as a lookup, for which you dispatch `research`, and a **decision** goes to the user. Nothing that could be looked up ever becomes a question, in this phase or any round after it.
+What is still open hands off **by kind**, never in a lump: a **fact** enters 1.3 as a lookup, for which you dispatch `research`, and a **decision** goes to the user. Nothing that could be looked up ever becomes a question, in this phase or any round after it.
 
 Stop early when the survey stops changing your picture of the work. Recurse only when a finding invalidates the premise of the fan-out itself, not merely because it raised something new, which is the success case.
 
@@ -46,17 +46,21 @@ Do not ask the user anything you have not tried to look up first.
 
 ### 1.1 Bounded bypass
 
-If the work has agreed acceptance criteria **and** touches one flow that already exists in this repo, skip the interview: present a short design in chat, get an explicit yes, and go to 1.3. Otherwise run 1.2 onward in full.
+If the work has agreed acceptance criteria **and** touches one flow that already exists in this repo, skip the interview: present a short design in chat, get an explicit yes, and go to 1.4. Otherwise run 1.2 onward in full.
 
-### 1.2 Interview
+### 1.2 Brainstorm the approach
+
+For architectural-size work, draft 2–3 candidate approaches with their tradeoffs and a recommendation, and carry them into 1.3's first round so the user reacts to concrete options. Mark them as **proposals**: this is your synthesis, not a subagent design, and 1.0's "facts, not designs" rule still holds. The bounded bypass skips this.
+
+### 1.3 Interview
 
 Invoke `interview`. It works the design tree in rounds, asking the whole frontier at once with a recommended answer per question. Facts are yours to find; dispatch `research` or an exploration subagent rather than asking the user anything you could look up. Decisions are the user's.
 
-Round 1 is 1.0's questions, the frontier the survey exposed. Everything the survey settled enters as a fact, never as a question.
+Round 1 opens with 1.2's candidate approaches, then works 1.0's questions, the frontier the survey exposed. Everything the survey settled enters as a fact, never as a question.
 
 The interview ends at shared understanding; it writes nothing. This flow writes the spec.
 
-### 1.3 Seams
+### 1.4 Seams
 
 Name the seams the feature will be tested at and confirm them with the user. Use the seam vocabulary and its principles from the `codebase-design` skill (module, interface, seam, adapter, depth; the interface is the test surface; one adapter is a hypothetical seam), in this phase and in every brief downstream; invoke it by id when you need the definitions.
 
@@ -64,7 +68,7 @@ Use the project's architecture and existing test boundaries to choose the highes
 
 No test is written at an unconfirmed seam.
 
-### 1.4 Write the spec
+### 1.5 Write the spec
 
 Follow [spec-template.md](spec-template.md): one artifact carrying the design and the dependency-ordered steps. You may invoke the `to-spec` skill to distill the conversation first; the flow's spec still follows [spec-template.md](spec-template.md) and the canonical path. Add these sections when their trigger applies:
 
@@ -77,17 +81,17 @@ Follow [spec-template.md](spec-template.md): one artifact carrying the design an
 
 Number the entries under Implementation Decisions so steps can cite them (`decision 7`).
 
-### 1.5 Plan the steps
+### 1.6 Plan the steps
 
 Read [step-format.md](step-format.md) and write `## Implementation Steps` to it: project-defined track IDs, project-informed size estimates and tier tags, `needs` edges, a `### Parallelism` DAG, and a ticket map when the work spans more than one ticket.
 
-### 1.6 External prerequisites
+### 1.7 External prerequisites
 
 Write a `## Before starting` section for prerequisites required by the project, such as feature flags, localization, credentials, service configuration, or approvals. Name each prerequisite, confirm its state, and make dependent steps explicitly blocked until it is ready. Update this section if execution reveals another prerequisite.
 
 Anything unconfirmed is a blocker on the steps that need it, not a footnote.
 
-### 1.7 Self-review, then the gate
+### 1.8 Self-review, then the gate
 
 Re-read the spec with fresh eyes and fix inline:
 
@@ -113,6 +117,15 @@ Exit 0 means ignored. Exit 1 means move it or add the path to `.gitignore` for t
 
 **One copy, in the checkout the flow was invoked in.** That path is canonical for the whole flow: worktrees never get their own copy, and every reader (you, an agent in a worktree, a later session) opens it there by absolute path. Record that absolute path in the spec's own header and pass it in every brief. Copying it into a worktree looks harmless and is exactly how the spec gets clobbered: the two copies diverge, and the sync that "fixes" it discards whichever side was ahead, taking the step splits and checkbox state that are the only record of where the flow had got to.
 
+### Spec stays current
+
+Execution keeps the spec true. When it turns up a discovery or a design change, write it to the spec now, not at the end.
+
+- **Automatic** when the change is detail-level and stays inside agreed behavior and scope: update the spec and continue.
+- **Ask first** when it changes agreed behavior, scope, or a decision the user made: put it to the user through the agreed decision process, then write the answer to the spec before the affected work proceeds.
+
+Phase 3.5 re-sync stays for structural drift these updates cannot absorb.
+
 ---
 
 ## Phase 2: Workspace setup
@@ -123,14 +136,14 @@ Follow the active project's workspace instructions for isolation, branch and wor
 
 ## Phase 3: Execution loop
 
-Loop until every step is checked. Every step ends at 3h's gate; never run the next one without passing through it.
+A **batch** is one step, or a set of independent steps run in parallel (no shared files or interfaces), dispatched as background subagents where the environment provides them so the orchestrator stays free. Loop until every step is checked; **every step** ends at 3h. Handle each step as it completes; do not wait for its siblings.
 
-### 3a. Present the frontier
+### 3a. Propose the batch
 
-Refresh the execution state using the active project's workflow before presenting the frontier. If actual progress no longer matches the spec, go to Phase 3.5 first. Compute the frontier: steps whose logical blockers are complete and whose project-defined prerequisites for starting are satisfied. The dependency graph determines logical order; project instructions determine how that order maps to workspaces and Git operations. Your output has exactly three parts, in this order:
+Refresh the execution state using the active project's workflow before proposing. If actual progress no longer matches the spec, go to Phase 3.5 first. Compute the frontier: steps whose logical blockers are complete, whose project-defined prerequisites for starting are satisfied, and which are not already in flight (dispatched and not yet complete). The dependency graph determines logical order; project instructions determine how that order maps to workspaces and Git operations. Choose a batch: one step, or independent steps with no shared files or interfaces. Your output has exactly three parts, in this order:
 
-1. **The frontier.** Every startable step with its tags and project-informed size estimate, then what is blocked and on what.
-2. **Your recommendation.** Which to run and why. This is where your judgment goes.
+1. **The frontier.** Every startable step not already in flight, with its tags and project-informed size estimate, then what is blocked and on what.
+2. **Your recommendation.** Which batch to run and why. This is where your judgment goes.
 3. **The ask.** Reduced to one word wherever possible.
 
 ```
@@ -140,22 +153,22 @@ Ready to start: 2 steps
 
 Blocked: X3 (needs X2) · X4 (needs X3) · Y3 (needs Y2)
 
-Recommend X2 + Y2 in parallel workspaces: independent tracks, no shared files.
+Recommend X2 + Y2 in parallel: independent tracks, no shared files.
 
 Go? Or name a different pick.
 ```
 
-Then **stop**. Presenting the frontier and starting work in the same message is skipping the gate.
+Then **stop**. Approving the batch starts the work; it does not waive the per-step gate.
 
 **Advance delegation does not satisfy the gate.** "You choose", "I trust your judgment", "you decide the ordering" tell you what to *recommend*; they do not tell you to begin. Honor the delegation in part 2 by naming a pick instead of offering a menu; the go is still theirs, and it costs them one word. Ordering and permission-to-start are different questions, and only the first was delegated.
 
-The user decides: one here, a subset, or several in parallel workspaces. If parallel, also walk step-format.md's *When several run in parallel* notes, follow the `dispatching-parallel-agents` skill for the fan-out mechanics, and follow project workspace rules for each track.
+The user decides: one here, a subset, or several in parallel (per the project's workspace rules). If parallel, also walk step-format.md's *When several run in parallel* notes, follow the `dispatching-parallel-agents` skill for the fan-out mechanics, and follow project workspace rules for each track.
 
 ### 3b. Expand and route
 
-Create or select the workspace first, following the active project's workspace and Git instructions.
+Run per step in the batch. Create or select the step's workspace first, following the active project's workspace and Git instructions.
 
-Decompose the step into concrete tasks (files, changes, validating tests), tracked as a checkbox list under the step in the spec file.
+Decompose the step into concrete changes (files, validating tests), tracked as a checkbox list under the step in the spec file.
 
 Then route it using the active project's agent and platform-routing instructions. For a cross-layer step, follow the project's required sequence and keep dependent work on the same logical track.
 
@@ -163,11 +176,11 @@ Write directly only when project instructions allow direct work for that step; o
 
 ### 3c. Build
 
-**Dispatched steps.** Dispatch one subagent per step, with an independent reviewer per step at 3e. The brief must carry: the step's ID, intent, and tags; the spec's absolute path and the slice it implements; the confirmed seams; the **execution findings** earlier steps recorded (1.4); and the relevant implementation decisions and project guidance.
+Run per step in the batch. **Dispatched steps.** Dispatch one subagent per step, with an independent reviewer per step at 3e. Independent steps in the batch run in parallel per the `dispatching-parallel-agents` skill, as background subagents where available. The brief must carry: the step's ID, intent, and tags; the spec's absolute path and the slice it implements; the confirmed seams; the **execution findings** earlier steps recorded; and the relevant implementation decisions and project guidance.
 
-Treat the approved spec as the domain and behavior contract. Implement only the assigned slice, preserving those decisions and constraints; carry forward execution findings so later steps do not repeat discovered mistakes. Use project instructions for implementation conventions and required validation. If implementation exposes a domain ambiguity or contradiction, resolve it through the agreed decision process and update the spec before proceeding.
+Treat the approved spec as the domain and behavior contract. Implement only the assigned slice, preserving those decisions and constraints; carry forward execution findings so later steps do not repeat discovered mistakes. Use project instructions for implementation conventions and required validation.
 
-Independent tracks may run in parallel workspaces; steps that share files or interfaces run one at a time.
+**Spec stays current.** Write any discovery or design change to the spec per *Spec stays current*.
 
 **Direct steps.** Implement the assigned slice from the approved spec. Resolve gaps from the spec through the agreed decision process rather than inventing behavior. Validate according to project instructions.
 
@@ -192,7 +205,7 @@ Independent reviews can surface race conditions, scope errors, missing requireme
 ### 3f. Complete the step
 
 1. Run the project's scope and size checks for the step. If it exceeds a project limit, go to Phase 3.5 before marking it complete.
-2. Flip the checkbox in the spec and add what the step learned to **Execution findings**, so later briefs can carry it forward.
+2. Flip the checkbox in the spec and add what the step learned to **Execution findings**, so later briefs can carry it forward. Write any design change to the spec now (see *Spec stays current*).
 3. Follow project instructions for staging, commits, branch synchronization, pushes, PRs, and dependency landing order. This skill does not prescribe Git commands, branch names or bases, or grant commit or push authorization. Record any project-required pending state beside the step.
 4. After any project-required sync or review fix, repeat the affected validation and scope and size checks according to project instructions before advancing.
 
@@ -208,19 +221,19 @@ When the project uses PRs or another review process, handle its feedback as part
 6. Respond to and resolve feedback using the project's review process.
 7. Return to 3h.
 
-### 3h. Gate
+### 3h. Ask what next
 
-Ask:
+Run per completed step. Ask:
 
-> Continue / refine remaining steps / pivot or re-sync / stop?
+> Keep moving on / open a PR / refine or re-sync / stop?
 
-Continue goes back to 3a's frontier. Refine means the user edits the spec; wait for an explicit go. Pivot or re-sync goes to Phase 3.5. Stop goes to Phase 4.
+"Keep moving on" re-enters 3a with the next batch. "Open a PR" opens one for the completed step. Refine means the user edits the spec; wait for an explicit go. Re-sync goes to Phase 3.5. Stop goes to Phase 4. A step's design change or question is raised here, immediately, not held until its siblings finish.
 
 ---
 
 ## Phase 3.5: Re-sync after drift
 
-Trigger whenever execution stops matching the step plan:
+The continuous spec updates in 3c handle detail-level and agreed-behavior changes; re-sync is for structural drift those cannot absorb. Trigger whenever execution stops matching the step plan:
 
 - Scope changed (descoped, expanded, bug found in QA)
 - Structure changed (steps split, merged, or reordered)
@@ -248,8 +261,10 @@ Procedure:
 ## Anti-patterns
 
 - **Auto-triggering on "let's build X".** Explicit invocation only.
-- **Picking the next step yourself.** 3a presents the frontier; the user chooses. Auto-dispatching is the same violation, and so is presenting the frontier and then starting in the same message.
+- **Picking the next step yourself.** 3a proposes the batch; the user chooses. Auto-dispatching is the same violation, and so is proposing a batch and then starting it in the same message.
 - **"They already delegated ordering, so I don't need a second confirmation."** The recommendation is where delegation is honored. The go is still theirs.
+- **Batching steps that share files or interfaces.** A batch is one step, or independent steps; shared files or interfaces run one at a time.
+- **Holding a finished step's question or design change until its siblings finish.** Raise it at 3h for that step, immediately.
 - **Taking the first unchecked box** instead of the frontier. With a graph, the first unchecked step is frequently blocked.
 - **Writing feature code directly** when the step doesn't meet 3b's narrow exception.
 - **Estimating size after the code exists.** The project's size policy is a planning constraint.

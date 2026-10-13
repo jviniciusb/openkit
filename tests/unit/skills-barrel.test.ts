@@ -79,4 +79,7 @@ test("sdd-flow body is self-contained and carries the provenance comment", () =>
     "mattpocock/skills@24fe0ef7737efae15c87225755e9f6f5965e4888 skills/engineering/implement-spec/SKILL.md",
   )
   expect(body).toContain("license: MIT")
+  expect(body).toContain("Propose the batch")
+  expect(body).toContain("open a PR")
+  expect(body).toContain("Brainstorm the approach")
 })
