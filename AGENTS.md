@@ -21,10 +21,13 @@ example at `src/tools/hello/index.ts` is not registered at runtime. Twenty-one
 skills ship today, all enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
-`@sdd-flow`; a self-contained spec-driven development orchestrator that composes
-the kit's own `interview`, `research`, `code-review`, `codebase-design`,
-`using-git-worktrees`, and `dispatching-parallel-agents` skills and names
-`to-spec` for drafting the initial spec), `interview`
+`@sdd-flow`; a self-contained spec-driven development orchestrator that
+brainstorms approaches before the interview for architectural work, then
+executes approved specs in batches (one step, or independent steps in parallel)
+with a per-step gate, composing the kit's own `interview`, `research`,
+`code-review`, `codebase-design`, `using-git-worktrees`, and
+`dispatching-parallel-agents` skills and naming `to-spec` for drafting the
+initial spec), `interview`
 (`src/skills/interview/SKILL.md`, model-visible; aligns on design before
 implementation), `skill-recipe` (`src/skills/skill-recipe/SKILL.md`, registered
 `autoinvoke: false`, the authoring recipe invoked with `@skill-recipe`),

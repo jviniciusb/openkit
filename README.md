@@ -46,7 +46,8 @@ usage, the tool cannot trigger compaction.
 It also ships twenty-one skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
 (model-visible), [`sdd-flow`](src/skills/sdd-flow/SKILL.md) (invoked
-explicitly with `@sdd-flow`), [`interview`](src/skills/interview/SKILL.md)
+explicitly with `@sdd-flow`; brainstorm, then gated batch execution),
+[`interview`](src/skills/interview/SKILL.md)
 (model-visible; aligns on design before implementation),
 [`skill-recipe`](src/skills/skill-recipe/SKILL.md) (the authoring recipe,
 invoked with `@skill-recipe`), [`research`](src/skills/research/SKILL.md)
@@ -278,7 +279,7 @@ Twenty-one skills ship with the kit, all **enabled by default**:
 | Skill | How it is used |
 | --- | --- |
 | [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md) | Model-visible. Turns a Portuguese speaker's draft, bullets, or Portuguese–English mix into clear, idiomatic English, with a short explanation of what changed. |
-| [`sdd-flow`](src/skills/sdd-flow/SKILL.md) | Registered with `autoinvoke: false`, so it stays off the model's advertised list. Invoke it explicitly with **`@sdd-flow`**. A self-contained spec-driven development orchestrator: write an approved spec, then implement it in dependency-ordered slices, composing the kit's own `interview`, `research`, `code-review`, `codebase-design`, `using-git-worktrees`, and `dispatching-parallel-agents` skills along the way, and naming `to-spec` for the initial draft. |
+| [`sdd-flow`](src/skills/sdd-flow/SKILL.md) | Registered with `autoinvoke: false`, so it stays off the model's advertised list. Invoke it explicitly with **`@sdd-flow`**. A self-contained spec-driven development orchestrator: brainstorm candidate approaches before the interview for architectural work, write an approved spec, then execute it in dependency-ordered batches — one step, or independent steps in parallel — with a gate on each completed step, keeping the spec continuously current and composing the kit's own `interview`, `research`, `code-review`, `codebase-design`, `using-git-worktrees`, and `dispatching-parallel-agents` skills along the way, and naming `to-spec` for the initial draft. |
 | [`interview`](src/skills/interview/SKILL.md) | Model-visible. Aligns on design or requirements before implementation: maps every open decision as a design tree, works it in rounds, and holds implementation behind an approval gate. |
 | [`skill-recipe`](src/skills/skill-recipe/SKILL.md) | Registered with `autoinvoke: false`. The authoring aid, invoked with **`@skill-recipe`**: turns a brief plus one or more source skills into a self-contained kit-style `SKILL.md`. |
 | [`research`](src/skills/research/SKILL.md) | Model-visible. Settles a factual question with cited findings from primary sources (official docs, source code, specs, first-party APIs), dispatching the reading to a background subagent and keeping established fact separate from inference. |
@@ -342,7 +343,10 @@ disabled skill is not registered at all. Toggle one with the CLI
 `/kit disable sdd-flow`.
 
 `sdd-flow` is a self-contained orchestrator: it sequences spec-driven
-development end to end and composes the kit's own `interview`, `research`,
+development end to end — brainstorming candidate approaches before the interview
+for architectural work, then executing the approved spec in batches (one step, or
+independent steps in parallel) with a gate on each completed step, keeping the
+spec continuously current — and composes the kit's own `interview`, `research`,
 `code-review`, `codebase-design`, `using-git-worktrees`, and
 `dispatching-parallel-agents` skills by id, naming `to-spec` for drafting the
 initial spec. It has no external companion skills and no `/sdd-flow` command —

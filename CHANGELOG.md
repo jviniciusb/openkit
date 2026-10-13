@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `sdd-flow` executes an approved spec in **batches** — one step, or a set of
+  independent steps run in parallel — launched as background subagents and gated
+  **per step**: each completed step is verified, reviewed, written to the spec,
+  and offered `keep moving on / open a PR / refine or re-sync / stop`. For
+  architectural-size work it brainstorms 2–3 candidate approaches before the
+  interview, and it keeps the spec continuously current (automatically for
+  detail-level changes, asking first for changes to agreed behavior, scope, or a
+  user decision). Terminology is normalized on **step** (the unit) and **batch**
+  (the group launched together); the docs and the skill test match.
+
 ## [0.13.0] - 2026-10-13
 
 ### Changed
