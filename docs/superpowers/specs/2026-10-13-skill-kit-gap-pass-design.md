@@ -124,7 +124,7 @@ tracked across those batches, with no new skills:
 ### Task 4: Final gate + whole-branch review
 - [x] `bun run typecheck && bun test`; `bun scripts/skill-source.ts check` clean.
 - [x] Whole-branch review; fix; re-review.
-- [x] Commit, push, PR, merge, release (v0.13.0).
+- [ ] Commit, push, PR, merge, release (v0.13.0).
 
 ## 7. Success criteria
 
