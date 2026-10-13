@@ -256,5 +256,18 @@
     "output": "src/skills/to-spec/SKILL.md",
     "outputHash": "ed7edf9cae88c4ac69a6d0259f31e2cd0b8081b7486b4b678dc3384ac5a448cb",
     "generatedAt": "2026-10-13T21:46:39.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/wizard.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/wizard/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/wizard/SKILL.md",
+    "outputHash": "806ca3757f6d8e2d4e2fd640b90c8cf8a4b63419c75945a77c725976d0f050e7",
+    "generatedAt": "2026-10-13T21:50:14.000Z"
   }
 ]
