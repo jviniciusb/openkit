@@ -178,5 +178,18 @@
     "output": "src/skills/finishing-a-branch/SKILL.md",
     "outputHash": "6e76daa5890b3fffcb3c93237c492990fc00a0f4e16500c72dc959f505e858eb",
     "generatedAt": "2026-10-13T21:04:34.829Z"
+  },
+  {
+    "brief": "skill-sources/briefs/dispatching-parallel-agents.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/dispatching-parallel-agents/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/dispatching-parallel-agents/SKILL.md",
+    "outputHash": "7bcb6a584dfd29a4a6fdc513d1f16dd0c6b0b8fc16e9677d4aa09682363dcc5f",
+    "generatedAt": "2026-10-13T21:08:06.000Z"
   }
 ]
