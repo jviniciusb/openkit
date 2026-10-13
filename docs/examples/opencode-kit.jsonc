@@ -73,6 +73,26 @@
       // Model-visible: reviews a change along Standards and Spec, and verifies
       // feedback against the code before acting on it.
       "enabled": true
+    },
+    "diagnosing-bugs": {
+      // Model-visible: root-causes a bug from evidence before changing
+      // production code.
+      "enabled": true
+    },
+    "verification": {
+      // Model-visible: proves a completion claim against the current tree
+      // before reporting success.
+      "enabled": true
+    },
+    "prototype": {
+      // Model-visible: builds throwaway code to resolve one design uncertainty
+      // before committing to an approach.
+      "enabled": true
+    },
+    "retro": {
+      // Registered with `autoinvoke: false`; invoke it explicitly with `@retro`
+      // to turn a finished session's friction into proposed environment changes.
+      "enabled": true
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.
     // `enable`/`disable` and the `/kit` command write here.

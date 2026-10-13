@@ -88,7 +88,11 @@ prompt exceeds `thresholdTokens`):
     "skill-recipe": { "enabled": true },
     "research": { "enabled": true },
     "handoff": { "enabled": true },
-    "code-review": { "enabled": true }
+    "code-review": { "enabled": true },
+    "diagnosing-bugs": { "enabled": true },
+    "verification": { "enabled": true },
+    "prototype": { "enabled": true },
+    "retro": { "enabled": true }
   },
   "references": {}
 }
@@ -98,16 +102,22 @@ When enabling `auto-compact`, also set `"compaction": { "auto": false }` in the
 project or global `opencode.json(c)` so native auto-compaction cannot run before
 related background work has finished.
 
-The kit also ships seven **skills**, all enabled by default:
+The kit also ships eleven **skills**, all enabled by default:
 `english-writing-assistant` (model-visible), `sdd-flow` (a self-contained
 spec-driven development orchestrator, invoked explicitly with `@sdd-flow`),
 `interview` (model-visible; aligns on design before implementation),
 `skill-recipe` (the authoring recipe, invoked with `@skill-recipe`), `research`
 (model-visible; cited findings from primary sources), `handoff` (invoked with
-`@handoff`; compacts the conversation into a resumable document), and
-`code-review` (model-visible; reviews a change along Standards and Spec). Skills
-take no `settings` — only `enabled`. Disable one with `/kit disable <skill-id>`
-in a session, or `bun bin/opencode-kit.js disable <skill-id>` from a checkout.
+`@handoff`; compacts the conversation into a resumable document),
+`code-review` (model-visible; reviews a change along Standards and Spec),
+`diagnosing-bugs` (model-visible; root-causes a bug from evidence before changing
+production code), `verification` (model-visible; proves a completion claim
+against the current tree before reporting success), `prototype` (model-visible;
+builds throwaway code to resolve one design uncertainty), and `retro` (invoked
+with `@retro`; turns a finished session's friction into proposed environment
+changes). Skills take no `settings` — only `enabled`. Disable one with
+`/kit disable <skill-id>` in a session, or
+`bun bin/opencode-kit.js disable <skill-id>` from a checkout.
 
 **References** are the third category (a `references` config section). A
 reference packages a content source (local path or git repository) for the
