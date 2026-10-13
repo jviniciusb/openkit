@@ -1,7 +1,7 @@
 # opencode-kit — sdd-flow Batch Execution Redesign
 
 - **Date:** 2026-10-13
-- **Status:** Approved and implemented (pending release)
+- **Status:** Approved and released (v0.14.0)
 - **Author:** (agent-assisted)
 - **Topic:** Reshape `sdd-flow` so the orchestrator drives the spec: brainstorm,
   interview, plan, then execute in **batches** (one step or several parallel
@@ -183,7 +183,7 @@ absorb.
       extend the barrel test; re-record the `outputHash`; `check` clean.
 
 ### Task 5: Final gate + review + release
-- [ ] `bun run typecheck && bun test`; whole-branch review; fix; re-review;
+- [x] `bun run typecheck && bun test`; whole-branch review; fix; re-review;
       commit, push, PR, merge, release (v0.14.0).
 
 ## 7. Success criteria
