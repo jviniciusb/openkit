@@ -101,6 +101,28 @@ test("compacts at the threshold after waiting for the idle session", async () =>
   expect(events.closed).toBe(true)
 })
 
+test("compacts from the non-deprecated session.status idle event", async () => {
+  const { ctx, events, calls } = configure([prompt(250_000)])
+  const registration = await autoCompact.register(ctx, autoCompact.defaultSettings, createKitApi(autoCompact.id, ctx, "0.0.0"))
+
+  events.send({ type: "session.status", data: { sessionID: "root", status: { type: "idle" } } })
+  await waitFor(() => calls.includes("compact:root:queue"))
+  expect(calls).toEqual(["wait:root", "context:root", "compact:root:queue"])
+
+  await registration?.dispose()
+})
+
+test("does not compact while session.status reports the session busy", async () => {
+  const { ctx, events, calls } = configure([prompt(300_000)])
+  const registration = await autoCompact.register(ctx, autoCompact.defaultSettings, createKitApi(autoCompact.id, ctx, "0.0.0"))
+
+  events.send({ type: "session.status", data: { sessionID: "root", status: { type: "busy" } } })
+  await tick()
+  expect(calls).toEqual([])
+
+  await registration?.dispose()
+})
+
 test("does not compact stale pre-compaction usage or usage below threshold", async () => {
   const { ctx, events, calls } = configure([
     prompt(300_000, 1),
