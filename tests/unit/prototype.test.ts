@@ -35,3 +35,8 @@ test("prototype body is self-contained and carries the provenance comment", () =
   )
   expect(body).toContain("license: MIT")
 })
+
+test("prototype keeps throwaway code out of the real code path", () => {
+  const body = loadSkill(prototype!).content
+  expect(body).toContain("real code path")
+})
