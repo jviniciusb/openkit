@@ -9,26 +9,24 @@ the end to fix all gaps in one pass. Dev-facing (not shipped).
 |---|---|---|---|
 | 1 | `interview` (derived), `skill-recipe`, `research`, `handoff`, `code-review`, `sdd-flow` (evolved) | v0.9.0 | done |
 | 2 | `diagnosing-bugs`, `verification`, `prototype`, `retro` | v0.10.0 | done |
-| 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | merged, pending release |
+| 3 | `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`, `codebase-design` | v0.11.0 | done |
+| 4 | `improve-codebase-architecture`, `to-spec`, `wizard`, `router`, `diagnosing-sessions` | v0.12.0 | merged, pending release |
 
-## Current skills (16)
+## Current skills (21)
 
 `english-writing-assistant`, `sdd-flow`, `interview`, `skill-recipe`, `research`,
 `handoff`, `code-review`, `diagnosing-bugs`, `verification`, `prototype`, `retro`,
 `finishing-a-branch`, `dispatching-parallel-agents`, `using-git-worktrees`,
-`writing-for-agents`, `codebase-design`.
+`writing-for-agents`, `codebase-design`, `improve-codebase-architecture`,
+`to-spec`, `wizard`, `router`, `diagnosing-sessions`.
 
 ## Remaining candidates (compatible with the author's dislikes)
 
-Not yet derived; candidates for later batches or the final gap pass:
+Not yet derived; niche productivity extras for a later batch or the final gap
+pass:
 
 | Candidate | Source | Fit | Notes |
 |---|---|---|---|
-| `improve-codebase-architecture` | pocock | high | deep-module survey; pairs with `codebase-design` |
-| `to-spec` | pocock | medium | mostly covered by `sdd-flow` spec phase |
-| `wizard` | pocock | low-med | interactive bash for human-only steps |
-| `diagnosing-superpowers` | superpowers | low-med | forensic session report (meta) |
-| `ask-matt` | pocock | low-med | router over skills; discovery aid as the kit grows |
 | `teach` | pocock | low | multi-session teaching workspace |
 | `to-questionnaire` | pocock | low | decision questionnaire |
 | `wait-what` | pocock | low | re-pitch a message that didn't land |
@@ -47,6 +45,16 @@ Not yet derived; candidates for later batches or the final gap pass:
 ### Overlaps to dedupe
 - `codebase-design` is standalone, but `sdd-flow` §1.3 still inlines the same
   depth/seam guidance — replace the inline text with a reference to the skill.
+- `improve-codebase-architecture` (read-only survey that proposes deepening) vs
+  `codebase-design` (designs a module's seam) — keep the boundary explicit: the
+  survey points, `codebase-design` builds.
+- `to-spec` vs `sdd-flow`'s spec phase — `to-spec` distills an existing
+  conversation, `sdd-flow` interviews then writes. Decide whether `sdd-flow`
+  references `to-spec` for the write-up.
+- `diagnosing-sessions` vs `diagnosing-bugs` — near-identical names; confirm the
+  router and README keep session forensics and code-bug root-causing distinct.
+- `router` vs `skill-recipe` — both are discovery/authoring aids; ensure the
+  router points at `@skill-recipe` rather than duplicating its rubric.
 - `dispatching-parallel-agents` vs `sdd-flow` parallel tracks — decide the
   boundary (ad-hoc fan-out vs in-flow), or have `sdd-flow` reference it.
 - `using-git-worktrees` vs `sdd-flow` Phase 2 workspace setup — same boundary.
@@ -58,7 +66,8 @@ Not yet derived; candidates for later batches or the final gap pass:
   (`interview`, `research`, `handoff`, `code-review`, `diagnosing-bugs`,
   `verification`, `prototype`, `retro`, `finishing-a-branch`,
   `dispatching-parallel-agents`, `using-git-worktrees`, `writing-for-agents`,
-  `codebase-design`) — replace or drop repo-wide.
+  `codebase-design`, `improve-codebase-architecture`, `to-spec`, `wizard`,
+  `router`, `diagnosing-sessions`) — replace or drop repo-wide.
 - `verification` wording: "Run the whole command" vs Gate 3 "do not blanket-run
   everything" — tighten.
 - `generated.json` `generatedAt` values are hand-set, not machine-generated.
@@ -68,5 +77,5 @@ Not yet derived; candidates for later batches or the final gap pass:
 
 ### Open decisions
 - `interview` is model-visible; confirm or flip to `@interview`-only.
-- `codebase-design` shipped standalone in v0.11.0 (resolved); decide whether
-  `improve-codebase-architecture` stays a separate candidate or folds into it.
+- `improve-codebase-architecture` shipped as its own skill in v0.12.0 (resolved);
+  it stays separate from `codebase-design`.

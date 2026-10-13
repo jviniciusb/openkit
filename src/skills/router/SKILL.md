@@ -1,0 +1,88 @@
+---
+name: router
+description: Use when explicitly invoked to be pointed at the right opencode-kit skill or flow for a request. Trigger on requests to route a situation to a skill, to ask which skill or flow fits, or what to do next. Do not use to run the work the skill names.
+---
+
+# Router
+
+Given a request, name the one kit skill or flow that fits it and say why. This skill points; the user invokes. It never runs the work and never chains skills together.
+
+## Overview
+
+The kit has more skills than anyone remembers. The router turns a request into a single recommendation: the skill or flow to reach for, and the reason it fits. It is a pointer, not an enforced chain. Naming a skill does not start it, does not require the next one, and does not stop the user from choosing differently. When two skills could genuinely apply, name the better fit first and the runner-up only when the choice is close.
+
+## When to Use
+
+- The user explicitly invokes this skill, by `@router` or by asking which skill or flow fits.
+- The user asks what to do next, or which skill applies to a request.
+- The user cannot tell whether a situation calls for a flow, a standalone skill, or a model-visible one.
+
+Do not use it to do the work: it names the skill and stops.
+
+## Process
+
+### 1. Read the request for its shape
+
+Identify what the user is trying to accomplish and where they are in it: an idea to sharpen, a decision to settle, a build to run, a finished branch to land, a session to review. The shape of the request picks the skill.
+
+### 2. Match to the kit
+
+Choose the one skill or flow whose trigger matches that shape. Use the lists below, and prefer a user-invoked skill when the work is a deliberate, whole-task action, and a model-visible one when the trigger already fits.
+
+### 3. Name the skill and the reason
+
+State the skill id and one line on why it fits this request. When the choice is genuinely close, name the better fit and the runner-up, with the difference that decides between them.
+
+### 4. Stop at the pointer
+
+End with the recommendation. Do not invoke the skill, do not lay out a sequence of them, and do not start the work. The user decides what to run and when.
+
+## User-invoked skills
+
+Hidden from the model's advertised list; they start only when the user types `@id`:
+
+- `@sdd-flow`: the full spec-driven flow, from spec through delivery, for a feature to build end to end.
+- `@to-spec`: turn the current conversation into a written spec, with no new interview.
+- `@improve-codebase-architecture`: survey the codebase for deepening opportunities and propose them; it never refactors.
+- `@finishing-a-branch`: land completed work safely, or leave it deliberately in place.
+- `@handoff`: compact the conversation into a resumable document for a new session, directory, or person.
+- `@retro`: turn a finished session's friction into proposed changes to the environment.
+- `@skill-recipe`: derive a new kit skill from a brief and its sources.
+- `@diagnosing-sessions`: produce a forensic report of a session that went wrong.
+- `@router`: this skill; point a request at the right skill or flow.
+
+## Model-visible skills
+
+These activate on their own triggers, so reach for one directly when the trigger fits:
+
+- `interview`: align on a design before implementation.
+- `research`: cited findings from primary sources to settle a factual question.
+- `code-review`: review a change along Standards and Spec.
+- `diagnosing-bugs`: root-cause a bug from evidence before changing production code.
+- `verification`: prove a completion claim against the current tree before reporting success.
+- `prototype`: throwaway code to resolve one design uncertainty.
+- `codebase-design`: design deep modules behind clean seams.
+- `dispatching-parallel-agents`: delegate one agent per independent task and run them concurrently.
+- `using-git-worktrees`: set up an isolated workspace before feature work.
+- `writing-for-agents`: write agent-facing documents so the agent lands on the intended behavior.
+- `english-writing-assistant`: turn a draft into clear, natural English.
+- `wizard`: generate an interactive script for the steps only a human can take.
+
+## Gates
+
+- **One recommendation, with a reason.** Name the skill and why it fits; a bare list is not a routing.
+- **A pointer, not a chain.** Never invoke the skill and never prescribe a sequence of them. The user chooses what to run and when.
+- **Real skill ids only.** Recommend only skills that exist in the kit; never invent one.
+- **Stop after naming.** The recommendation ends the turn; the work begins only when the user invokes the skill.
+
+## Anti-patterns
+
+- Chaining skills into a forced sequence, or starting the recommended skill.
+- Naming a skill that does not exist, or answering with a vague "you could use several".
+- Running the work instead of pointing at the skill that does.
+- Recommending a skill without saying why it fits.
+- Treating the recommendation as a gate the user must pass through.
+
+<!-- generated by skill-recipe
+from: mattpocock/skills@24fe0ef7737efae15c87225755e9f6f5965e4888 skills/engineering/ask-matt/SKILL.md
+license: MIT (dev-only snapshot: skill-sources/mattpocock-skills/LICENSE in the repo) -->

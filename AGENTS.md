@@ -17,8 +17,8 @@ rules, each individually toggleable, plus your own instructions), and
 `auto-compact` (`src/tools/auto-compact/index.ts`, opt-in; queues compaction once
 related sessions, tool calls, and shells are idle and the last prompt exceeds a
 token threshold). The `hello`
-example at `src/tools/hello/index.ts` is not registered at runtime. Sixteen skills
-ship today, all enabled by default: `english-writing-assistant`
+example at `src/tools/hello/index.ts` is not registered at runtime. Twenty-one
+skills ship today, all enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
 (`src/skills/sdd-flow/SKILL.md`, registered `autoinvoke: false`, invoked with
 `@sdd-flow`; a self-contained spec-driven development orchestrator that composes
@@ -49,7 +49,19 @@ isolated workspace before feature work), `writing-for-agents`
 (`src/skills/writing-for-agents/SKILL.md`, model-visible; writes agent-facing
 documents so the agent lands on the intended behavior), and `codebase-design`
 (`src/skills/codebase-design/SKILL.md`, model-visible; designs deep modules
-behind clean seams). The **references**
+behind clean seams), `improve-codebase-architecture`
+(`src/skills/improve-codebase-architecture/SKILL.md`, registered
+`autoinvoke: false`, invoked with `@improve-codebase-architecture`; surveys a
+codebase read-only for deepening opportunities),
+`to-spec` (`src/skills/to-spec/SKILL.md`, registered `autoinvoke: false`, invoked
+with `@to-spec`; distills the current conversation into a written spec),
+`wizard` (`src/skills/wizard/SKILL.md`, model-visible; builds a guided
+interactive script for steps only a human can take), `router`
+(`src/skills/router/SKILL.md`, registered `autoinvoke: false`, invoked with
+`@router`; points a request at the one kit skill or flow that fits), and
+`diagnosing-sessions` (`src/skills/diagnosing-sessions/SKILL.md`, registered
+`autoinvoke: false`, invoked with `@diagnosing-sessions`; forensically explains
+why a past session went wrong). The **references**
 category
 (`src/references/<id>/reference.json`) ships empty today; references are
 declarative, opt-in, settings-bearing content sources registered through
