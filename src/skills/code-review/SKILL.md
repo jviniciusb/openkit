@@ -96,4 +96,4 @@ Clarify anything unclear first. Then fix blocking issues (breaks, security), the
      from: mattpocock/skills@24fe0ef7737efae15c87225755e9f6f5965e4888 skills/engineering/code-review/SKILL.md
            obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3 skills/requesting-code-review/SKILL.md
            obra/superpowers@bb92a77741419a4ab5f06e711a283343f1ada0c3 skills/receiving-code-review/SKILL.md
-     license: MIT (dev-only snapshots: skill-sources/<name>/LICENSE in the repo) -->
+     license: MIT (dev-only snapshots: skill-sources/mattpocock-skills/LICENSE, skill-sources/superpowers/LICENSE in the repo) -->
