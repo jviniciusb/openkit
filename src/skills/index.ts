@@ -23,5 +23,6 @@ export const skills: KitSkill[] = [
   defineSkill({ id: "dispatching-parallel-agents", dir: new URL("./dispatching-parallel-agents/", import.meta.url) }),
   defineSkill({ id: "using-git-worktrees", dir: new URL("./using-git-worktrees/", import.meta.url) }),
   defineSkill({ id: "writing-for-agents", dir: new URL("./writing-for-agents/", import.meta.url) }),
+  defineSkill({ id: "codebase-design", dir: new URL("./codebase-design/", import.meta.url) }),
   // </kit:skills>
 ]
