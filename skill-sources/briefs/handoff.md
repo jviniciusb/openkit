@@ -44,7 +44,8 @@ pointers to the artifacts involved.
 
 Overview, When to Use, Process, Gates, Anti-patterns. Self-contained: no
 `superpowers:` or `mattpocock-skills:` references in the body. The document is
-written to a portable location chosen by the user (a path they name, or the
-repo/workspace root), never to the dev-only `skill-sources/` directory. End the
+written to a portable location: a path the user names, otherwise a gitignored or
+temporary location (never the repository root, `skill-sources/`, or any tracked
+path). End the
 body with the provenance HTML comment naming the source repo and path plus the
 license.
