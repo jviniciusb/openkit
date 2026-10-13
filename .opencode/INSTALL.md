@@ -92,7 +92,12 @@ prompt exceeds `thresholdTokens`):
     "diagnosing-bugs": { "enabled": true },
     "verification": { "enabled": true },
     "prototype": { "enabled": true },
-    "retro": { "enabled": true }
+    "retro": { "enabled": true },
+    "finishing-a-branch": { "enabled": true },
+    "dispatching-parallel-agents": { "enabled": true },
+    "using-git-worktrees": { "enabled": true },
+    "writing-for-agents": { "enabled": true },
+    "codebase-design": { "enabled": true }
   },
   "references": {}
 }
@@ -102,7 +107,7 @@ When enabling `auto-compact`, also set `"compaction": { "auto": false }` in the
 project or global `opencode.json(c)` so native auto-compaction cannot run before
 related background work has finished.
 
-The kit also ships eleven **skills**, all enabled by default:
+The kit also ships sixteen **skills**, all enabled by default:
 `english-writing-assistant` (model-visible), `sdd-flow` (a self-contained
 spec-driven development orchestrator, invoked explicitly with `@sdd-flow`),
 `interview` (model-visible; aligns on design before implementation),
@@ -113,9 +118,16 @@ spec-driven development orchestrator, invoked explicitly with `@sdd-flow`),
 `diagnosing-bugs` (model-visible; root-causes a bug from evidence before changing
 production code), `verification` (model-visible; proves a completion claim
 against the current tree before reporting success), `prototype` (model-visible;
-builds throwaway code to resolve one design uncertainty), and `retro` (invoked
-with `@retro`; turns a finished session's friction into proposed environment
-changes). Skills take no `settings` — only `enabled`. Disable one with
+builds throwaway code to resolve one design uncertainty), `retro` (invoked with
+`@retro`; turns a finished session's friction into proposed environment
+changes), `finishing-a-branch` (invoked with `@finishing-a-branch`; lands
+completed work safely or leaves it deliberately in place),
+`dispatching-parallel-agents` (model-visible; delegates one agent per independent
+task and runs them concurrently), `using-git-worktrees` (model-visible; sets up
+or verifies an isolated workspace before feature work), `writing-for-agents`
+(model-visible; writes agent-facing documents so the agent lands on the intended
+behavior), and `codebase-design` (model-visible; designs deep modules behind
+clean seams). Skills take no `settings` — only `enabled`. Disable one with
 `/kit disable <skill-id>` in a session, or
 `bun bin/opencode-kit.js disable <skill-id>` from a checkout.
 

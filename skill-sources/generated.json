@@ -160,5 +160,75 @@
     "output": "src/skills/retro/SKILL.md",
     "outputHash": "724454776726a6577f1198435143b14b799bb04d2e4c8db45571fc6e4da0946e",
     "generatedAt": "2026-10-13T20:30:39.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/finishing-a-branch.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/finishing-a-development-branch/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      },
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/pr/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/finishing-a-branch/SKILL.md",
+    "outputHash": "0255c107338ecf62fbaa2be3a1246b75318dc0ca3d4979feac4d324982aae073",
+    "generatedAt": "2026-10-13T21:04:34.829Z"
+  },
+  {
+    "brief": "skill-sources/briefs/dispatching-parallel-agents.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/dispatching-parallel-agents/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/dispatching-parallel-agents/SKILL.md",
+    "outputHash": "7bcb6a584dfd29a4a6fdc513d1f16dd0c6b0b8fc16e9677d4aa09682363dcc5f",
+    "generatedAt": "2026-10-13T21:08:06.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/using-git-worktrees.md",
+    "sources": [
+      {
+        "name": "superpowers",
+        "path": "skills/using-git-worktrees/SKILL.md",
+        "commit": "bb92a77741419a4ab5f06e711a283343f1ada0c3"
+      }
+    ],
+    "output": "src/skills/using-git-worktrees/SKILL.md",
+    "outputHash": "cc05f1bdc0b38890199b3ee26addfce9b243c34ba988bc2a402da8cd04097555",
+    "generatedAt": "2026-10-13T21:10:46.000Z"
+  },
+  {
+    "brief": "skill-sources/briefs/writing-for-agents.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/productivity/writing-for-agents/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/writing-for-agents/SKILL.md",
+    "outputHash": "b913b6a3c2c790b9b6b709cec1ef81eec31cd4464f325676a09d0575cb3cfc71",
+    "generatedAt": "2026-10-13T21:13:55.010Z"
+  },
+  {
+    "brief": "skill-sources/briefs/codebase-design.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/codebase-design/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/codebase-design/SKILL.md",
+    "outputHash": "8356ab0a34366d4314b2e429dbcf25f87c95781d9015074c523652a8b349c10a",
+    "generatedAt": "2026-10-13T21:17:12.000Z"
   }
 ]
