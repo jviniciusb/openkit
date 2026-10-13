@@ -4,16 +4,31 @@ import { skills } from "../../src/skills/index"
 import { loadSkill } from "../../src/core/skill"
 import { tools } from "../../src/tools/index"
 
-test("ships the two expected skills with unique ids across tools and skills", () => {
-  expect(skills.map((s) => s.id)).toEqual(["english-writing-assistant", "sdd-flow"])
+test("ships the four expected skills with unique ids across tools and skills", () => {
+  expect(skills.map((s) => s.id)).toEqual(["skill-recipe", "english-writing-assistant", "sdd-flow", "interview"])
   const ids = [...tools.map((t) => t.id), ...skills.map((s) => s.id)]
   expect(new Set(ids).size).toBe(ids.length)
+})
+
+test("skill-recipe registers autoinvoke:false with a real directory and resolvable files", () => {
+  const skill = skills.find((s) => s.id === "skill-recipe")!
+  const info = loadSkill(skill)
+  expect(info.autoinvoke).toBe(false)
+  for (const file of ["SKILL.md", "rubric.md", "brief-template.md"]) {
+    expect(existsSync(new URL(file, skill.dir))).toBe(true)
+  }
 })
 
 test("english-writing-assistant parses its folded description and is model-visible", () => {
   const info = loadSkill(skills.find((s) => s.id === "english-writing-assistant")!)
   expect(info.description).toContain("Brazilian Portuguese")
   expect(info.description).not.toContain(">-")
+  expect("autoinvoke" in info).toBe(false)
+})
+
+test("interview parses its description and is model-visible", () => {
+  const info = loadSkill(skills.find((s) => s.id === "interview")!)
+  expect(info.description).toBeTruthy()
   expect("autoinvoke" in info).toBe(false)
 })
 
