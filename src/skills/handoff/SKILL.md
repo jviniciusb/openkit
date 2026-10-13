@@ -21,7 +21,7 @@ A handoff is a snapshot of work in progress, written for a reader who was not he
 
 ### 1. Choose where it goes
 
-Write the document to a portable location the user can reach. Use the path the user names; otherwise use the repository or workspace root. Never write it into a dev-only internal directory such as `skill-sources/`.
+Write the document to a portable location the user can reach. A path the user names always wins. Otherwise use a gitignored or temporary location — the OS temp directory, or a path you have confirmed is gitignored (`git check-ignore <path>`). Never write it to the repository root, into a dev-only internal directory such as `skill-sources/`, or to any tracked path: the document can carry sensitive context and must not be committed by accident.
 
 ### 2. Capture the essentials
 
@@ -47,7 +47,7 @@ Save the document, then tell the user exactly where it was written so they can p
 
 ## Gates
 
-- **Portable location.** The document lands at a path the user can reach, never in a dev-only internal directory such as `skill-sources/`.
+- **Portable location.** The document lands at a path the user can reach — a user-named path, or failing that a gitignored or temporary location — never the repository root, `skill-sources/`, or any tracked path.
 - **Self-contained.** A fresh session with no memory of this conversation can resume from the document alone.
 - **Essentials present.** State, decisions and why, open threads, the immediate next action, and pointers are all captured.
 - **Secrets redacted.** No keys, passwords, tokens, or personally identifiable information.
@@ -55,7 +55,7 @@ Save the document, then tell the user exactly where it was written so they can p
 
 ## Anti-patterns
 
-- Writing the handoff into `skill-sources/` or another dev-only internal directory.
+- Writing the handoff to the repository root, into `skill-sources/` or another dev-only internal directory, or to any tracked path.
 - Dumping a transcript instead of distilling the essentials.
 - Restating artifacts that already exist instead of pointing to them by path.
 - Omitting the decisions and the reasons behind them.

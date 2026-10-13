@@ -63,6 +63,7 @@ Any further notes about the feature.
 
 Add these only when their trigger applies (SKILL.md 1.4):
 
+- **Before starting.** External prerequisites (flags, credentials, approvals, services) that must be ready; name each and block dependent steps until it is. (SKILL.md 1.6.)
 - **What already exists.** Reuse, do not rebuild.
 - **Root cause.** When the work is a defect.
 - **Verified non-issues.** Do NOT do these.

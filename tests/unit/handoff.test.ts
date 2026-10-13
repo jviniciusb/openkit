@@ -35,3 +35,13 @@ test("handoff body is self-contained and carries the provenance comment", () => 
   )
   expect(body).toContain("license: MIT")
 })
+
+test("handoff body carries the portable-output rule and forbids dev-only locations", () => {
+  const body = loadSkill(handoff!).content
+  // A user-named path wins; otherwise a gitignored or temporary location.
+  expect(body).toMatch(/user[- ]named path/i)
+  expect(body).toMatch(/gitignored or temporary/i)
+  // It must never instruct writing into skill-sources/ or any tracked path.
+  expect(body).toMatch(/never the repository root, `skill-sources\/`, or any tracked path/i)
+  expect(body).not.toMatch(/otherwise use the repository or workspace root/i)
+})
