@@ -217,5 +217,18 @@
     "output": "src/skills/writing-for-agents/SKILL.md",
     "outputHash": "458995a3547d5bea620867d473e2cabf667e6e12d56efd0423be963028ad72b0",
     "generatedAt": "2026-10-13T21:13:55.010Z"
+  },
+  {
+    "brief": "skill-sources/briefs/codebase-design.md",
+    "sources": [
+      {
+        "name": "mattpocock-skills",
+        "path": "skills/engineering/codebase-design/SKILL.md",
+        "commit": "24fe0ef7737efae15c87225755e9f6f5965e4888"
+      }
+    ],
+    "output": "src/skills/codebase-design/SKILL.md",
+    "outputHash": "8706d5f1d343320cd008b1bbc5f5585a39da91c11c8065abe988558c8f2b0745",
+    "generatedAt": "2026-10-13T21:17:12.000Z"
   }
 ]
