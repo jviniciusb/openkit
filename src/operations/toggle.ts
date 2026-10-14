@@ -25,13 +25,13 @@ export async function toggleOperation(
   const verb = enabled ? "enable" : "disable"
 
   if (id === undefined || id.length === 0) {
-    deps.err(`openkit: ${verb} requires a tool id`)
+    deps.err(`openkit: ${verb} requires an item id`)
     return { exitCode: 1 }
   }
 
   const found = findCategoryItem(categories, id)
   if (found === undefined) {
-    deps.err(`openkit: unknown tool "${id}"`)
+    deps.err(`openkit: unknown id "${id}"`)
     return { exitCode: 1 }
   }
 

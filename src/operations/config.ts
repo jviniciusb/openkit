@@ -49,7 +49,7 @@ export async function configGetOperation(
   const found = resolveSettingsItem(categories, deps, id)
   if (found === undefined) return { exitCode: 1 }
   if (key === undefined || key.length === 0) {
-    deps.err(`openkit: config get requires a tool id and key`)
+    deps.err(`openkit: config get requires an item id and key`)
     return { exitCode: 1 }
   }
 
@@ -84,7 +84,7 @@ export async function configSetOperation(
   const found = resolveSettingsItem(categories, deps, id)
   if (found === undefined) return { exitCode: 1 }
   if (key === undefined || key.length === 0 || valueParts.length === 0) {
-    deps.err(`openkit: config set requires a tool id, key, and value`)
+    deps.err(`openkit: config set requires an item id, key, and value`)
     return { exitCode: 1 }
   }
 
