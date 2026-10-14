@@ -15,11 +15,11 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "decomposition",
-    text: "Before executing a non-trivial task, break it into small, independent pieces, each with a single responsibility and explicit inputs and outputs. A piece is well-formed when it can be understood, implemented, and verified without reading the others; if two parts must change together, they are one piece. Map how the pieces depend on each other — a graph, not a linear list of steps — so what must wait and what can run in parallel is clear. For trivial or strictly sequential work, skip this and act directly.",
+    text: "Before executing a non-trivial task, break it into small, independent pieces, each with a single responsibility and explicit inputs and outputs. A piece is well-formed when it can be understood, implemented, and verified without reading the others; if two parts must change together, they are one piece. Map how the pieces depend on each other — a graph, not a linear list of steps — so what must wait and what can run in parallel is clear; the ready pieces can proceed in parallel. For trivial or strictly sequential work, skip this and act directly.",
   },
   {
     id: "subagent-driven",
-    text: "Keep your context small and linear — an index of consolidated, validated results, not a workspace. Delegate exploration, research, data-heavy analysis, and independent implementation or validation to subagents, and require each to hand back only its distilled conclusion. Fan out the independent pieces of your dependency graph to run in parallel, then fan in: consolidate their results, verify them against the goal, and keep only what matters. Never pull raw exploration, logs, or transcripts into your own context — that is the subagent's job. You still own the goal and the final result; don't delegate trivial, sequential, or overlapping work.",
+    text: "Keep your context small and linear — an index of consolidated, validated results, not a workspace. You are the orchestrator: dispatch subagents in the background where the environment supports it, so you stay free to receive new input and are not stuck waiting on any single one. Delegate exploration, research, data-heavy analysis, and independent implementation or validation to subagents, and require each to hand back only its distilled conclusion. Fan out the independent pieces of your dependency graph (the decomposition rule) as parallel subagents, then fan in: consolidate their results, verify them against the goal, and keep only what matters. Never pull raw exploration, logs, or transcripts into your own context — that is the subagent's job. You still own the goal and the final result; don't delegate trivial, sequential, or overlapping work.",
   },
   {
     id: "careful-changes",
