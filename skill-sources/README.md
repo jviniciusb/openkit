@@ -1,7 +1,7 @@
 # Vendored skill sources (dev-only)
 
 This directory holds pinned snapshots of upstream agent-skill kits that
-`opencode-kit` skills are derived from. It is **dev-only**: it is not listed in
+`openkit` skills are derived from. It is **dev-only**: it is not listed in
 `package.json` `files`, so nothing here is published.
 
 ## Layout

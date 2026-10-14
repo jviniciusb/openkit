@@ -92,8 +92,10 @@ Run a single test file with `bun test tests/unit/<file>.test.ts`.
 src/
   plugin.ts             # Plugin.define + bootstrap/lifecycle orchestration
   catalog.ts            # assembles categories from the descriptors
+  constants.ts          # shared PLUGIN_ID
   categories/           # tool, skill, reference descriptors + scaffolder metadata
   operations/           # shared list/toggle/config ops used by the CLI and /kit
+  commands/             # the /kit slash command (adapter over operations)
   config/               # discover, load, merge, effective, validate, edit, coerce, types
   core/                 # category contract + engine, item contracts, kit API, context, testing fakes
   cli/                  # CLI entry and commands; scaffold.ts
@@ -103,9 +105,12 @@ src/
   skills/index.ts       # explicit barrel with <kit:skills> markers
   references/<id>/reference.json  # one folder per reference
   references/index.ts   # explicit barrel with <kit:references> markers
-bin/openkit.js     # CLI entry (runs the TS CLI via Bun)
+bin/openkit.js          # CLI entry (runs the TS CLI via Bun)
 index.js                # package plugin entry -> src/plugin.ts
-openkit.schema.json
+openkit.schema.json     # JSON schema for openkit.jsonc
+docs/                   # examples + design notes (not published)
+scripts/                # repo tooling (not published)
+skill-sources/          # vendored skill sources (dev-only, not published)
 tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptance (real opencode)
 .opencode/INSTALL.md    # agent-driven install for consumers
 ```
