@@ -2,7 +2,14 @@ import { expect, test } from "bun:test"
 import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { discoverKitConfigFiles, globalConfigDir, globalConfigPath, globalOpencodePath } from "../../src/config/discover"
+import {
+  discoverKitConfigFiles,
+  globalConfigDir,
+  globalConfigPath,
+  globalOpencodePath,
+  globalOpencodePaths,
+  opencodeConfigPaths,
+} from "../../src/config/discover"
 
 test("includes global then project ancestors farthest->nearest", () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
@@ -50,6 +57,17 @@ test("globalConfigPath and globalOpencodePath follow XDG_CONFIG_HOME", () => {
   expect(globalOpencodePath("/home/u", {})).toBe(
     join("/home/u", ".config", "opencode", "opencode.json"),
   )
+})
+
+test("opencodeConfigPaths and globalOpencodePaths cover both .json and .jsonc", () => {
+  expect(opencodeConfigPaths("/proj")).toEqual([
+    join("/proj", "opencode.json"),
+    join("/proj", "opencode.jsonc"),
+  ])
+  expect(globalOpencodePaths("/home/u", { XDG_CONFIG_HOME: "/xdg" })).toEqual([
+    join("/xdg", "opencode", "opencode.json"),
+    join("/xdg", "opencode", "opencode.jsonc"),
+  ])
 })
 
 test("discoverKitConfigFiles honors XDG_CONFIG_HOME", () => {

@@ -1,11 +1,11 @@
 import { existsSync, readFileSync } from "node:fs"
-import { join } from "node:path"
 import { parse } from "jsonc-parser"
 
 import {
   discoverKitConfigFiles,
   globalConfigPath,
-  globalOpencodePath,
+  globalOpencodePaths,
+  opencodeConfigPaths,
   type Env,
 } from "./discover"
 import { loadKitConfig } from "./load"
@@ -81,7 +81,8 @@ function pluginOptionsFrom(plugins: unknown): KitConfigFile | undefined {
 
 /**
  * Best-effort read of the `openkit` plugin options from the global and
- * project (`cwd`) `opencode.json`, lower precedence first.
+ * project (`cwd`) OpenCode config (`opencode.json`/`opencode.jsonc`), lower
+ * precedence first.
  *
  * The CLI has no access to the live plugin context, so it re-reads the plugin's
  * `options` from disk to detect a layer that overrides a global write.
@@ -91,7 +92,7 @@ export function readPluginOptions(
   home: string,
   env: Env = process.env,
 ): KitConfigFile | undefined {
-  const candidates = [globalOpencodePath(home, env), join(cwd, "opencode.json")]
+  const candidates = [...globalOpencodePaths(home, env), ...opencodeConfigPaths(cwd)]
   let merged: KitConfigFile | undefined
 
   for (const path of candidates) {
