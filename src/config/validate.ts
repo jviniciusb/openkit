@@ -1,4 +1,4 @@
-import { Ajv } from "ajv"
+import { Ajv, type ValidateFunction } from "ajv"
 
 import type { JsonSchema, KitTool } from "../core/tool"
 import type { ResolvedToolConfig } from "./types"
@@ -6,7 +6,23 @@ import type { ResolvedToolConfig } from "./types"
 /** Result of validating a tool's settings against its JSON Schema. */
 export type ValidationResult = { valid: true } | { valid: false; errors: string[] }
 
-const ajv = new Ajv({ allErrors: true, strict: false })
+/**
+ * Compiled validators, keyed by schema identity.
+ *
+ * Each schema compiles against its own {@link Ajv} instance so two items whose
+ * schemas happen to share an `$id` cannot collide (a module-level singleton
+ * would throw on the second `compile`). The `WeakMap` keeps compilation to once
+ * per schema object, and lets schemas be garbage-collected with their category.
+ */
+const validators = new WeakMap<object, ValidateFunction>()
+
+function compileValidator(schema: object): ValidateFunction {
+  const cached = validators.get(schema)
+  if (cached !== undefined) return cached
+  const validator = new Ajv({ allErrors: true, strict: false }).compile(schema)
+  validators.set(schema, validator)
+  return validator
+}
 
 /** Renders an Ajv error as a stable, human-readable string. */
 function formatError(error: {
@@ -36,7 +52,7 @@ export function validateToolSettings(
   if (schema === undefined) return { valid: true }
 
   try {
-    const validate = ajv.compile(schema)
+    const validate = compileValidator(schema)
     if (validate(settings)) return { valid: true }
 
     const errors = (validate.errors ?? []).map(formatError)
@@ -66,5 +82,11 @@ export function resolveValidated<S>(
   }
 
   const reason = `Tool "${tool.id}" settings are invalid (or its schema failed to compile); using defaults: ${result.errors.join("; ")}`
-  return { config: { enabled: config.enabled, settings: tool.defaultSettings }, degraded: reason }
+  // Clone the defaults: the fallback must not hand a tool a live reference to
+  // its own `defaultSettings` (a mutating tool would corrupt the shared value
+  // for every later registration and reload).
+  return {
+    config: { enabled: config.enabled, settings: structuredClone(tool.defaultSettings) },
+    degraded: reason,
+  }
 }
