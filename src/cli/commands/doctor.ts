@@ -1,9 +1,8 @@
 import { readFileSync } from "node:fs"
-import { join } from "node:path"
 import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 
 import { categories as catalogCategories } from "../../catalog"
-import { discoverKitConfigFiles, globalOpencodePath } from "../../config/discover"
+import { discoverKitConfigFiles, globalOpencodePaths, opencodeConfigPaths } from "../../config/discover"
 import type { KitConfigFile } from "../../config/types"
 import type { KitCategory } from "../../core/category"
 import { itemId, resolveCategoryEntry } from "../../core/engine"
@@ -61,7 +60,26 @@ function scanConfigs(io: CliIo): ConfigScan {
   return { configs, errors }
 }
 
-/** True when an `opencode.json` at `path` lists `pluginId` in `plugins`. */
+/**
+ * Package name of a plugin entry, or `undefined` when it has none.
+ *
+ * Handles every spec OpenCode accepts: `"openkit"`,
+ * `"openkit@git+https://…"`, `"@acme/openkit@1.2.0"`, `{ package: "openkit" }`,
+ * and `["openkit", options]`.
+ */
+function pluginPackageName(entry: unknown): string | undefined {
+  if (typeof entry === "string") {
+    const separator = entry.indexOf("@", entry.startsWith("@") ? 1 : 0)
+    return separator === -1 ? entry : entry.slice(0, separator)
+  }
+  if (Array.isArray(entry)) return pluginPackageName(entry[0])
+  if (typeof entry === "object" && entry !== null && "package" in entry) {
+    return pluginPackageName((entry as { package?: unknown }).package)
+  }
+  return undefined
+}
+
+/** True when an OpenCode config at `path` lists `pluginId` in `plugins`. */
 function opencodeListsPlugin(path: string, pluginId: string): boolean {
   try {
     const parsed = parse(readFileSync(path, "utf8"), [], READ_OPTIONS) as
@@ -69,7 +87,7 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
       | undefined
     const plugins = parsed?.plugins
     if (!Array.isArray(plugins)) return false
-    return plugins.some((p) => p === pluginId || (Array.isArray(p) && p[0] === pluginId))
+    return plugins.some((entry) => pluginPackageName(entry) === pluginId)
   } catch {
     return false
   }
@@ -81,7 +99,8 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
  * Reports whether every discovered kit config parses, runs each category's
  * `inspect` over its shipped items (invalid tool settings degrade, a skill or
  * reference whose file is missing errors), and — best effort — whether the
- * `openkit` plugin is listed in the relevant `opencode.json`. Config parse
+ * `openkit` plugin is listed in the relevant OpenCode config (`opencode.json`
+ * or `opencode.jsonc`). Config parse
  * errors and fatal inspect reasons make the command return non-zero; a
  * non-fatal reason (e.g. invalid tool settings) and a missing plugin entry are
  * advisory.
@@ -123,10 +142,7 @@ export async function doctorCommand(
     }
   }
 
-  const candidates = [
-    join(io.cwd, "opencode.json"),
-    globalOpencodePath(io.home),
-  ]
+  const candidates = [...opencodeConfigPaths(io.cwd), ...globalOpencodePaths(io.home)]
   const active = candidates.some((path) => opencodeListsPlugin(path, "openkit"))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)
 
