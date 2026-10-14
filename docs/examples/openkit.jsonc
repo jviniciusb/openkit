@@ -1,14 +1,14 @@
-// Example opencode-kit configuration (JSONC — comments are allowed).
+// Example openkit configuration (JSONC — comments are allowed).
 //
 // Place this at:
-//   ~/.config/opencode/opencode-kit.jsonc            (global)
-//   <project>/.opencode/opencode-kit.jsonc           (project)
+//   ~/.config/opencode/openkit.jsonc            (global)
+//   <project>/.opencode/openkit.jsonc           (project)
 //
 // `configVersion` is the current schema version. See the JSON Schema for the
-// full shape: https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json
+// full shape: https://raw.githubusercontent.com/jviniciusb/openkit/main/openkit.schema.json
 // When enabling auto-compact, also set `compaction.auto: false` in opencode.jsonc.
 {
-  "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
+  "$schema": "https://raw.githubusercontent.com/jviniciusb/openkit/main/openkit.schema.json",
   "configVersion": 1,
   "tools": {
     "background-subagents": {
@@ -153,7 +153,7 @@
     // References are declarative content sources (`src/references/<id>/reference.json`)
     // exposed to the session through `ctx.reference`. They are opt-in and
     // settings-bearing; `settings` override the source's `path`/`repository`/`branch`.
-    // The category ships empty today — add one with `opencode-kit new reference <id>`.
+    // The category ships empty today — add one with `openkit new reference <id>`.
     //
     // "project-docs": {
     //   "enabled": true,

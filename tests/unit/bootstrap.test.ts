@@ -14,7 +14,7 @@ function projectWithConfig(json: string) {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const proj = join(home, "proj")
   mkdirSync(join(proj, ".opencode"), { recursive: true })
-  writeFileSync(join(proj, ".opencode", "opencode-kit.jsonc"), json)
+  writeFileSync(join(proj, ".opencode", "openkit.jsonc"), json)
   return { home, proj }
 }
 

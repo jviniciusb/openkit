@@ -15,7 +15,7 @@ import type { KitApi } from "./tool"
 
 /** Builds the scoped logger surfaced to a single tool. */
 function scopedLogger(toolId: string): Logger {
-  const prefix = `[opencode-kit:${toolId}]`
+  const prefix = `[openkit:${toolId}]`
   return {
     debug(message, meta) {
       console.debug(prefix, message, meta ?? "")

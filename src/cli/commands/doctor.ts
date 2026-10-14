@@ -76,12 +76,12 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
 }
 
 /**
- * Handles `opencode-kit doctor`.
+ * Handles `openkit doctor`.
  *
  * Reports whether every discovered kit config parses, runs each category's
  * `inspect` over its shipped items (invalid tool settings degrade, a skill or
  * reference whose file is missing errors), and — best effort — whether the
- * `opencode-kit` plugin is listed in the relevant `opencode.json`. Config parse
+ * `openkit` plugin is listed in the relevant `opencode.json`. Config parse
  * errors and fatal inspect reasons make the command return non-zero; a
  * non-fatal reason (e.g. invalid tool settings) and a missing plugin entry are
  * advisory.
@@ -127,15 +127,15 @@ export async function doctorCommand(
     join(io.cwd, "opencode.json"),
     globalOpencodePath(io.home),
   ]
-  const active = candidates.some((path) => opencodeListsPlugin(path, "opencode-kit"))
+  const active = candidates.some((path) => opencodeListsPlugin(path, "openkit"))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)
 
   return errors.length > 0 || fatal > 0 ? 1 : 0
 }
 
-/** Handles `opencode-kit version`: prints the CLI and plugin versions. */
+/** Handles `openkit version`: prints the CLI and plugin versions. */
 export async function versionCommand(io: CliIo): Promise<number> {
-  io.stdout(`opencode-kit CLI ${pkg.version}`)
-  io.stdout(`opencode-kit plugin ${pkg.version}`)
+  io.stdout(`openkit CLI ${pkg.version}`)
+  io.stdout(`openkit plugin ${pkg.version}`)
   return 0
 }
