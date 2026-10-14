@@ -37,6 +37,31 @@ test("settings-less category ignores settings and defaults", () => {
     .toEqual({ enabled: true })
 })
 
+test("coerces a quoted enabled and ignores a non-boolean value", () => {
+  const on = resolveCategoryEntry(widgets, { id: "a" }, [
+    { tools: { a: { enabled: "true" as unknown as boolean } } },
+  ])
+  expect(on.enabled).toBe(true)
+
+  const off = resolveCategoryEntry(widgets, { id: "a", defaultEnabled: true }, [
+    { tools: { a: { enabled: "false" as unknown as boolean } } },
+  ])
+  expect(off.enabled).toBe(false)
+
+  // A junk value is ignored, so an opt-out cannot silently flip an item.
+  const junk = resolveCategoryEntry(widgets, { id: "a", defaultEnabled: true }, [
+    { tools: { a: { enabled: 1 as unknown as boolean } } },
+  ])
+  expect(junk.enabled).toBe(true)
+})
+
+test("a non-object settings value does not wipe accumulated settings", () => {
+  const resolved = resolveCategoryEntry(widgets, { id: "a", defaults: { n: 1 } }, [
+    { tools: { a: { settings: null as unknown as Record<string, unknown> } } },
+  ])
+  expect(resolved.settings).toEqual({ n: 1 })
+})
+
 test("resolveCategoryEffective records the layer that set enabled", () => {
   const layers = [
     { label: "global", config: { tools: { a: { enabled: false } } } },
