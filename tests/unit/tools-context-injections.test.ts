@@ -7,6 +7,8 @@ import { resolveCategoryEntry } from "../../src/core/engine"
 import {
   BUILT_IN_RULES,
   contextInjections,
+  RULES_HEADING,
+  RULES_PREAMBLE,
   type ContextInjectionsSettings,
 } from "../../src/tools/context-injections"
 
@@ -22,6 +24,13 @@ const defaults = (): ContextInjectionsSettings => ({
   extra: [],
 })
 
+/** The single headed block the tool injects for the given rules. */
+const blockFor = (rules: readonly string[]) =>
+  [RULES_HEADING, "", RULES_PREAMBLE, "", ...rules.map((rule) => `- ${rule}`)].join("\n")
+
+const injectedText = (event: { system: Array<{ text: string }> }) =>
+  event.system.map((part) => part.text).join("\n")
+
 test("careful-changes is enabled by default and injected", async () => {
   const rules = contextInjections.defaultSettings.rules as Record<string, boolean>
   expect(rules["careful-changes"]).toBe(true)
@@ -33,7 +42,7 @@ test("careful-changes is enabled by default and injected", async () => {
   const { handler } = await register(defaults())
   const event = { system: [] as Array<{ type: string; text: string }> }
   await handler!(event)
-  expect(event.system.map((part) => part.text)).toContain(rule.text)
+  expect(injectedText(event)).toContain(rule.text)
 
   const text = rule.text.toLowerCase()
   expect(text).toContain("re-read")
@@ -53,7 +62,7 @@ test("disabling careful-changes leaves other built-ins enabled", async () => {
   const { handler } = await register(settings)
   const event = { system: [] as Array<{ type: string; text: string }> }
   await handler!(event)
-  const injected = event.system.map((part) => part.text)
+  const injected = injectedText(event)
   expect(injected).not.toContain(rule.text)
   expect(injected).toContain(BUILT_IN_RULES.find(({ id }) => id === "think-in-code")!.text)
 })
@@ -84,7 +93,7 @@ test("proactive is enabled by default, injected, and defers to gates", async () 
   const { handler } = await register(defaults())
   const event = { system: [] as Array<{ type: string; text: string }> }
   await handler!(event)
-  expect(event.system.map((part) => part.text)).toContain(rule.text)
+  expect(injectedText(event)).toContain(rule.text)
 
   const text = rule.text.toLowerCase()
   expect(text).toContain("proactively")
@@ -153,12 +162,14 @@ test("think-in-code writes one program for multi-call composition, not bulk only
   expect(text).toContain("exact tool path and signature")
 })
 
-test("injects all built-in rules in order by default", async () => {
+test("injects all built-in rules as one headed block by default", async () => {
   const { calls, handler } = await register(defaults())
   expect(calls.hook).toEqual(["context"])
   const event = { system: [] as Array<{ type: string; text: string }> }
   await handler!(event)
-  expect(event.system.map((part) => part.text)).toEqual(BUILT_IN_RULES.map((rule) => rule.text))
+  expect(event.system).toEqual([
+    { type: "text", text: blockFor(BUILT_IN_RULES.map((rule) => rule.text)) },
+  ])
 })
 
 test("omits a rule disabled through settings.rules", async () => {
@@ -167,8 +178,9 @@ test("omits a rule disabled through settings.rules", async () => {
   const { handler } = await register(settings)
   const event = { system: [] as Array<{ type: string; text: string }> }
   await handler!(event)
-  expect(event.system.length).toBe(BUILT_IN_RULES.length - 1)
-  expect(event.system.some((part) => part.text === BUILT_IN_RULES.find((r) => r.id === "subagent-driven")!.text)).toBe(false)
+  expect(event.system).toEqual([
+    { type: "text", text: blockFor(BUILT_IN_RULES.filter((r) => r.id !== "subagent-driven").map((rule) => rule.text)) },
+  ])
 })
 
 test("appends extra instructions after the built-ins, trimming blanks", async () => {
@@ -177,10 +189,11 @@ test("appends extra instructions after the built-ins, trimming blanks", async ()
   const { handler } = await register(settings)
   const event = { system: [] as Array<{ type: string; text: string }> }
   await handler!(event)
-  expect(event.system.map((part) => part.text)).toEqual([
-    ...BUILT_IN_RULES.map((rule) => rule.text),
-    "local rule",
-    "second local rule",
+  expect(event.system).toEqual([
+    {
+      type: "text",
+      text: blockFor([...BUILT_IN_RULES.map((rule) => rule.text), "local rule", "second local rule"]),
+    },
   ])
 })
 
