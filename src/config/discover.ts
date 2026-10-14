@@ -3,6 +3,9 @@ import { dirname, join, resolve } from "node:path"
 
 const CONFIG_FILE_NAME = "openkit.jsonc"
 
+/** OpenCode's own config file names; both are accepted, JSONC last. */
+const OPENCODE_FILE_NAMES = ["opencode.json", "opencode.jsonc"] as const
+
 /** Environment lookup used to honor `XDG_CONFIG_HOME`. */
 export interface Env {
   [key: string]: string | undefined
@@ -28,6 +31,16 @@ export function globalConfigPath(home: string, env: Env = process.env): string {
 /** Absolute path of the machine-global OpenCode config (`opencode.json`). */
 export function globalOpencodePath(home: string, env: Env = process.env): string {
   return join(globalConfigDir(env, home), "opencode.json")
+}
+
+/** Candidate OpenCode config paths in `directory` (`.json` and `.jsonc`). */
+export function opencodeConfigPaths(directory: string): string[] {
+  return OPENCODE_FILE_NAMES.map((name) => join(directory, name))
+}
+
+/** Candidate machine-global OpenCode config paths (`.json` and `.jsonc`). */
+export function globalOpencodePaths(home: string, env: Env = process.env): string[] {
+  return opencodeConfigPaths(globalConfigDir(env, home))
 }
 
 /** Absolute path of the project-level kit config for `directory`. */
