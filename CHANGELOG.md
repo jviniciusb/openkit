@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.19.0] - 2026-10-14
+
+### Changed
+
+- `context-injections`: the enabled rules are now injected as one headed,
+  imperative block (`# Operating rules (mandatory)` with a preamble and each
+  rule as a bullet) instead of one bare, unlabeled text part per rule. The
+  rules already reached the system prompt; the framing makes them read as
+  standing instructions rather than ambient context, so they compete better
+  against a project's `AGENTS.md`. No rule text, id, default, or schema
+  change; `extra` instructions still append after the built-ins.
+
 ## [0.18.1] - 2026-10-14
 
 ### Fixed
