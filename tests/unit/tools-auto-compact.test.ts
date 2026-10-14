@@ -112,6 +112,17 @@ test("compacts from the non-deprecated session.status idle event", async () => {
   await registration?.dispose()
 })
 
+test("compacts when an existing idle session is viewed", async () => {
+  const { ctx, events, calls } = configure([prompt(250_000)])
+  const registration = await autoCompact.register(ctx, autoCompact.defaultSettings, createKitApi(autoCompact.id, ctx, "0.0.0"))
+
+  events.send({ type: "session.viewed", data: { sessionID: "root", idle: 1 } })
+  await waitFor(() => calls.includes("compact:root:queue"))
+  expect(calls).toEqual(["wait:root", "context:root", "compact:root:queue"])
+
+  await registration?.dispose()
+})
+
 test("does not compact while session.status reports the session busy", async () => {
   const { ctx, events, calls } = configure([prompt(300_000)])
   const registration = await autoCompact.register(ctx, autoCompact.defaultSettings, createKitApi(autoCompact.id, ctx, "0.0.0"))
