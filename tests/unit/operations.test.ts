@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test"
-import { mkdtempSync, readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { dirname, join } from "node:path"
 import { pathToFileURL } from "node:url"
 import { parse } from "jsonc-parser"
 import { listOperation, toggleOperation, configSetOperation, configGetOperation } from "../../src/operations/index"
@@ -11,9 +11,9 @@ import { referenceCategory } from "../../src/categories/reference"
 import type { KitCategory } from "../../src/core/category"
 import { categories } from "../../src/catalog"
 
-function deps(home: string) {
+function deps(home: string, options?: import("../../src/config/types").KitConfigFile) {
   let out = "", err = ""
-  return { d: { cwd: home, home, out: (s: string) => { out += s }, err: (s: string) => { err += s } }, out: () => out, err: () => err }
+  return { d: { cwd: home, home, options, out: (s: string) => { out += s }, err: (s: string) => { err += s } }, out: () => out, err: () => err }
 }
 
 test("toggle resolves a skill id across categories and writes skills.<id>", async () => {
@@ -66,6 +66,30 @@ test("list tolerates a throwing describe, printing an empty description", async 
   }
   expect(await listOperation([throwing], x.d)).toEqual({ exitCode: 0 })
   expect(x.out()).toContain("w\tenabled\t\n")
+})
+
+test("list reflects a plugin-options disable", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const x = deps(home, { tools: { "background-subagents": { enabled: false } } })
+  await listOperation(categories, x.d)
+  expect(x.out()).toMatch(/background-subagents\s+disabled/)
+})
+
+test("configGet reads the effective value from the plugin-options layer", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const x = deps(home, { tools: { "background-subagents": { settings: { greeting: "yo" } } } })
+  expect(await configGetOperation(categories, x.d, "background-subagents", "greeting")).toEqual({ exitCode: 0 })
+  expect(x.out()).toBe(`"yo"`)
+})
+
+test("configGet reads a value set in a project config, not just global", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const projectConfig = join(home, ".opencode", "openkit.jsonc")
+  mkdirSync(dirname(projectConfig), { recursive: true })
+  writeFileSync(projectConfig, '{ "tools": { "background-subagents": { "settings": { "greeting": "proj" } } } }')
+  const x = deps(home)
+  expect(await configGetOperation(categories, x.d, "background-subagents", "greeting")).toEqual({ exitCode: 0 })
+  expect(x.out()).toBe(`"proj"`)
 })
 
 test("configSet writes a tool setting and configGet reads it back", async () => {

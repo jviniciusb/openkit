@@ -3,15 +3,14 @@ import { coerceScalar } from "../config/coerce"
 import { globalConfigPath } from "../config/discover"
 import { setEntrySetting } from "../config/edit"
 import { buildConfigLayers, valuesEqual } from "../config/effective"
-import { loadKitConfig } from "../config/load"
-import { resolveCategoryEffective, resolveCategoryEntry } from "../core/engine"
+import { resolveCategoryEffective } from "../core/engine"
 import { findCategoryItem, type OperationDeps, type OperationResult } from "./list"
 
 /**
  * Resolves an id to a settings-bearing item, or reports the error to `deps`.
  *
  * An id in a settings-less category is rejected with a category-specific "has
- * no settings" message; an unknown id keeps the existing "unknown tool" error.
+ * no settings" message; an unknown id is reported as unknown.
  */
 function resolveSettingsItem(
   categories: readonly KitCategory<unknown>[],
@@ -19,12 +18,12 @@ function resolveSettingsItem(
   id: string | undefined,
 ): { category: KitCategory<unknown>; item: unknown; id: string } | undefined {
   if (id === undefined || id.length === 0) {
-    deps.err(`openkit: unknown tool "${id ?? ""}"`)
+    deps.err(`openkit: unknown id "${id ?? ""}"`)
     return undefined
   }
   const found = findCategoryItem(categories, id)
   if (found === undefined) {
-    deps.err(`openkit: unknown tool "${id}"`)
+    deps.err(`openkit: unknown id "${id}"`)
     return undefined
   }
   if (!found.category.hasSettings) {
@@ -37,8 +36,9 @@ function resolveSettingsItem(
 /**
  * Handles `config get <id> <key>`.
  *
- * Prints the item's effective setting (defaults merged with the global config)
- * as JSON. Settings-less categories and unknown ids are user errors.
+ * Prints the item's effective setting across every layer (defaults, discovered
+ * config files, then the plugin `options` layer) as JSON. Settings-less
+ * categories and unknown ids are user errors.
  */
 export async function configGetOperation(
   categories: readonly KitCategory<unknown>[],
@@ -49,13 +49,13 @@ export async function configGetOperation(
   const found = resolveSettingsItem(categories, deps, id)
   if (found === undefined) return { exitCode: 1 }
   if (key === undefined || key.length === 0) {
-    deps.err(`openkit: config get requires a tool id and key`)
+    deps.err(`openkit: config get requires an item id and key`)
     return { exitCode: 1 }
   }
 
-  const sources = await loadKitConfig([globalConfigPath(deps.home)])
-  const { settings } = resolveCategoryEntry(found.category, found.item, sources)
-  const value = (settings as Record<string, unknown> | undefined)?.[key]
+  const layers = await buildConfigLayers(deps.cwd, deps.home, deps.env, deps.options)
+  const { settings } = resolveCategoryEffective(found.category, found.item, layers)
+  const value = settings?.[key]
 
   if (value === undefined) {
     deps.err(`openkit: "${found.id}.${key}" is not set`)
@@ -84,7 +84,7 @@ export async function configSetOperation(
   const found = resolveSettingsItem(categories, deps, id)
   if (found === undefined) return { exitCode: 1 }
   if (key === undefined || key.length === 0 || valueParts.length === 0) {
-    deps.err(`openkit: config set requires a tool id, key, and value`)
+    deps.err(`openkit: config set requires an item id, key, and value`)
     return { exitCode: 1 }
   }
 
@@ -95,7 +95,7 @@ export async function configSetOperation(
 
   // A typo can be written but never take effect: the item silently degrades to
   // defaults at load. Surface that here instead of reporting a clean success.
-  const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, deps.options)
+  const layers = await buildConfigLayers(deps.cwd, deps.home, deps.env, deps.options)
   const effective = resolveCategoryEffective(category, item, layers)
   const degraded = category.inspect?.(item, {
     enabled: effective.enabled,

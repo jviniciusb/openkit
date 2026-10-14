@@ -4,6 +4,7 @@ import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 import { categories as catalogCategories } from "../../catalog"
 import { discoverKitConfigFiles, globalOpencodePaths, opencodeConfigPaths } from "../../config/discover"
 import type { KitConfigFile } from "../../config/types"
+import { readPluginOptions } from "../../config/effective"
 import type { KitCategory } from "../../core/category"
 import { itemId, resolveCategoryEntry } from "../../core/engine"
 import pkg from "../../../package.json"
@@ -120,11 +121,17 @@ export async function doctorCommand(
     for (const error of errors) io.stdout(`config: error ${error}`)
   }
 
+  // Fold the plugin-options layer (highest precedence) into resolution so
+  // `inspect` sees the same effective config the runtime bootstrap would use,
+  // matching `list`/`config get` and the toggle/set warnings.
+  const optionLayer = readPluginOptions(io.cwd, io.home)
+  const sources = optionLayer === undefined ? configs : [...configs, optionLayer]
+
   let fatal = 0
   for (const category of categories) {
     const issues: CategoryIssue[] = []
     for (const item of category.items) {
-      const resolved = resolveCategoryEntry(category, item, configs)
+      const resolved = resolveCategoryEntry(category, item, sources)
       const reason = category.inspect?.(item, resolved)
       if (reason === undefined) continue
       issues.push({ id: itemId(item), reason, fatal: category.inspectFatal ?? true })

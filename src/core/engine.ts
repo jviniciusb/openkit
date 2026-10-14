@@ -16,58 +16,30 @@ export function itemId<T>(item: T): string {
   return (item as { id: string }).id
 }
 
-/**
- * Resolves an item's effective config from sources ordered low → high precedence.
- *
- * Starts from the category's defaults — `enabled` from `defaultEnabled`, and,
- * for settings-bearing categories, `settings` from `defaultSettings`. Then folds
- * each source that mentions the item: `enabled` replaces, `settings` deep-merges.
- * Settings-less categories ignore `settings` entirely. Sources for other ids or
- * other categories are ignored.
- */
-export function resolveCategoryEntry<T>(
-  category: KitCategory<T>,
-  item: T,
-  sources: KitConfigFile[],
-): ResolvedEntry {
-  const id = itemId(item)
-  let enabled = category.defaultEnabled(item)
-  let settings: Record<string, unknown> | undefined
-
-  if (category.hasSettings) {
-    settings = { ...(category.defaultSettings?.(item) ?? {}) }
-  }
-
-  for (const source of sources) {
-    const entry = categoryEntries(source, category.key)?.[id]
-    if (entry === undefined) continue
-    if (entry.enabled !== undefined) enabled = entry.enabled
-    if (category.hasSettings && entry.settings !== undefined) {
-      settings = deepMerge(settings ?? {}, entry.settings)
-    }
-  }
-
-  return category.hasSettings ? { enabled, settings } : { enabled }
-}
-
-/**
- * Resolves an item's effective `enabled`/`settings` across `layers`.
- *
- * Layer order is low → high: `enabled` is replaced, `settings` deep-merge, only
- * for settings-bearing categories. The returned bookkeeping identifies which
- * layer last set `enabled` and which layer supplied each settings key, so
- * callers can name an overriding layer.
- */
-export function resolveCategoryEffective<T>(
-  category: KitCategory<T>,
-  item: T,
-  layers: ConfigLayer[],
-): {
+/** An item's state after folding every layer; bookkeeping names the winning layer. */
+interface FoldedState {
   enabled: boolean
   enabledLayer?: ConfigLayer
   settings?: Record<string, unknown>
   settingLayers?: Record<string, ConfigLayer>
-} {
+}
+
+/**
+ * Folds an item's effective config across `layers`, ordered low → high.
+ *
+ * Starts from the category's defaults — `enabled` from `defaultEnabled`, and,
+ * for settings-bearing categories, `settings` from `defaultSettings`. Then folds
+ * each layer that mentions the item: `enabled` replaces, `settings` deep-merges.
+ * Settings-less categories ignore `settings` entirely. Layers for other ids or
+ * other categories are ignored. The returned bookkeeping identifies which layer
+ * last set `enabled` and which layer supplied each settings key, so callers can
+ * name an overriding layer.
+ */
+function foldCategoryState<T>(
+  category: KitCategory<T>,
+  item: T,
+  layers: readonly ConfigLayer[],
+): FoldedState {
   const id = itemId(item)
   let enabled = category.defaultEnabled(item)
   let enabledLayer: ConfigLayer | undefined
@@ -96,6 +68,47 @@ export function resolveCategoryEffective<T>(
   return category.hasSettings
     ? { enabled, enabledLayer, settings, settingLayers }
     : { enabled, enabledLayer }
+}
+
+/**
+ * Resolves an item's effective config from config-file `sources` ordered low →
+ * high precedence.
+ *
+ * A thin view over {@link foldCategoryState} for callers that only have raw
+ * config files and need no layer bookkeeping.
+ */
+export function resolveCategoryEntry<T>(
+  category: KitCategory<T>,
+  item: T,
+  sources: KitConfigFile[],
+): ResolvedEntry {
+  const state = foldCategoryState(
+    category,
+    item,
+    sources.map((config) => ({ label: "", config })),
+  )
+  return category.hasSettings
+    ? { enabled: state.enabled, settings: state.settings }
+    : { enabled: state.enabled }
+}
+
+/**
+ * Resolves an item's effective `enabled`/`settings` across `layers`.
+ *
+ * A thin view over {@link foldCategoryState}, surfacing the layer bookkeeping so
+ * callers can name an overriding layer.
+ */
+export function resolveCategoryEffective<T>(
+  category: KitCategory<T>,
+  item: T,
+  layers: ConfigLayer[],
+): {
+  enabled: boolean
+  enabledLayer?: ConfigLayer
+  settings?: Record<string, unknown>
+  settingLayers?: Record<string, ConfigLayer>
+} {
+  return foldCategoryState(category, item, layers)
 }
 
 /**
