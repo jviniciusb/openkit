@@ -34,6 +34,15 @@ export const BUILT_IN_RULES = [
 /** Stable identifiers of the built-in rules. */
 export type RuleId = (typeof BUILT_IN_RULES)[number]["id"]
 
+/**
+ * Framing for the injected rules. A named, imperative block reads as an
+ * instructions document; bare appended paragraphs read as ambient context and
+ * carry far less weight against a project's `AGENTS.md`.
+ */
+export const RULES_HEADING = "# Operating rules (mandatory)"
+export const RULES_PREAMBLE =
+  "Apply every rule below to every task. They are standing instructions, not suggestions, and take precedence over default habits where they conflict."
+
 /** Settings accepted by the `context-injections` tool. */
 export interface ContextInjectionsSettings {
   /** Per-rule toggles; omitted rules keep their default (on). Deep-merged. */
@@ -46,7 +55,9 @@ export interface ContextInjectionsSettings {
  * Injects instruction rules into the model's system prompt on every model
  * request (the `context` session hook). Built-in rules ship with the tool and
  * can be toggled individually; `extra` appends user instructions after them.
- * With no enabled rules and no extra instructions, no hook is registered.
+ * The enabled rules are sent as one headed, imperative block so the model
+ * treats them as standing instructions rather than ambient context. With no
+ * enabled rules and no extra instructions, no hook is registered.
  */
 export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<ContextInjectionsSettings>({
   id: "context-injections",
@@ -84,15 +95,16 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
     additionalProperties: false,
   },
   register(_ctx, settings, kit) {
-    const blocks = [
+    const rules = [
       ...BUILT_IN_RULES.filter((rule) => settings.rules[rule.id] !== false).map((rule) => rule.text),
       ...settings.extra.map((text) => text.trim()).filter((text) => text.length > 0),
     ]
-    if (blocks.length === 0) return
+    if (rules.length === 0) return
+    const block = [RULES_HEADING, "", RULES_PREAMBLE, "", ...rules.map((rule) => `- ${rule}`)].join("\n")
     return kit.on("context", (event) => {
       const system = (event as { system?: Array<{ type: string; text: string }> }).system
       if (!Array.isArray(system)) return
-      for (const text of blocks) system.push({ type: "text", text })
+      system.push({ type: "text", text: block })
     })
   },
 })
