@@ -6,7 +6,12 @@ import { join } from "node:path"
 import { createFakeContext } from "../../src/core/testing"
 import { bootstrap } from "../../src/plugin"
 import { toolCategory } from "../../src/categories/tool"
-import { BUILT_IN_RULES, contextInjections } from "../../src/tools/context-injections"
+import {
+  BUILT_IN_RULES,
+  contextInjections,
+  RULES_HEADING,
+  RULES_PREAMBLE,
+} from "../../src/tools/context-injections"
 
 const tempDirs: string[] = []
 
@@ -34,9 +39,18 @@ test("enabling registers the hook; settings.rules deep-merges the defaults", asy
 
   const event = { system: [] as Array<{ type: string; text: string }> }
   await calls.hookHandlers[0]!(event)
-  expect(event.system.map((part) => part.text)).toEqual(
-    BUILT_IN_RULES.filter((rule) => rule.id !== "subagent-driven").map((rule) => rule.text),
-  )
+  expect(event.system).toEqual([
+    {
+      type: "text",
+      text: [
+        RULES_HEADING,
+        "",
+        RULES_PREAMBLE,
+        "",
+        ...BUILT_IN_RULES.filter((rule) => rule.id !== "subagent-driven").map((rule) => `- ${rule.text}`),
+      ].join("\n"),
+    },
+  ])
   await res.dispose()
 })
 
