@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs"
 import { parse } from "jsonc-parser"
 
+import { PLUGIN_ID } from "../constants"
 import {
   discoverKitConfigFiles,
   globalConfigPath,
@@ -9,11 +10,8 @@ import {
   type Env,
 } from "./discover"
 import { loadKitConfig } from "./load"
-import { deepMerge } from "./merge"
+import { deepMerge, isPlainObject } from "./merge"
 import type { KitConfigFile } from "./types"
-
-/** The plugin id this kit registers under, as listed in `opencode.json`. */
-const PLUGIN_ID = "openkit"
 
 /** JSONC read options; mirrors the config loaders. */
 const READ_OPTIONS = { allowTrailingComma: true, disallowComments: false } as const
@@ -25,9 +23,31 @@ export interface ConfigLayer {
   config: KitConfigFile
 }
 
-/** True when two resolved values are equivalent for advisory comparisons. */
+/**
+ * True when two resolved values are equal for advisory comparisons.
+ *
+ * Order-insensitive for object keys (unlike a `JSON.stringify` comparison), so
+ * a reordered settings object does not look like a change and trigger a
+ * spurious "overridden by a higher-precedence layer" warning.
+ */
 export function valuesEqual(a: unknown, b: unknown): boolean {
-  return JSON.stringify(a) === JSON.stringify(b)
+  if (a === b) return true
+  if (Array.isArray(a) || Array.isArray(b)) {
+    return (
+      Array.isArray(a) &&
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every((value, index) => valuesEqual(value, b[index]))
+    )
+  }
+  if (isPlainObject(a) && isPlainObject(b)) {
+    const keys = Object.keys(a)
+    return (
+      keys.length === Object.keys(b).length &&
+      keys.every((key) => Object.hasOwn(b, key) && valuesEqual(a[key], b[key]))
+    )
+  }
+  return false
 }
 
 /** Labels a discovered config path as global or project for warning messages. */

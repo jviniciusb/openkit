@@ -28,6 +28,14 @@ test("new reference scaffolds reference.json and a barrel entry", async () => {
   expect(existsSync(join(r, "src", "skills", "my-skill", "SKILL.md"))).toBe(true)
 })
 
+test("enable, disable, and new-skill reject extra arguments", async () => {
+  const r = root()
+  const io = { cwd: r, home: r, stdout: () => {}, stderr: () => {} }
+  expect(await runCli(["enable", "background-subagents", "extra"], io)).toBe(1)
+  expect(await runCli(["disable", "sdd-flow", "extra"], io)).toBe(1)
+  expect(await runCli(["new-skill", "a", "b"], io)).toBe(1)
+})
+
 test("new tool scaffolds a tool and keeps new <id> as the tool alias", async () => {
   const r = root()
   const io = { cwd: r, home: r, stdout: () => {}, stderr: () => {} }

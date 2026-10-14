@@ -80,6 +80,9 @@ function readConfigText(path: string): string {
 /** Applies `edits` to `text` and writes the result, creating parents. */
 function applyAndWrite(path: string, text: string, edits: Edit[]): void {
   const next = applyEdits(text, edits)
+  // A no-op edit (e.g. re-setting an identical value) would bump the mtime and
+  // trigger the config watcher's reload for nothing.
+  if (next === text) return
   mkdirSync(dirname(path), { recursive: true })
   writeFileSync(path, next)
 }
@@ -150,6 +153,10 @@ export async function seedEntries(
     if (hasEntry(next, category, id)) continue
     next = applyEdits(next, modify(next, [category, id], entry, MODIFY_OPTIONS))
   }
+
+  // A repeat `init` (every entry already present) must not rewrite the file and
+  // bump its mtime, which would trigger the config watcher for nothing.
+  if (next === text) return
 
   mkdirSync(dirname(path), { recursive: true })
   writeFileSync(path, next)

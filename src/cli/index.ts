@@ -27,6 +27,12 @@ export async function runCli(argv: string[], io: CliIo): Promise<number> {
   }
 }
 
+/** Reports an unexpected extra positional argument; these commands take one id. */
+function rejectExtraArgs(io: CliIo, command: string): number {
+  io.stderr(`openkit: ${command} takes a single id`)
+  return 1
+}
+
 /** Selects and runs the requested subcommand. */
 async function dispatch(argv: string[], io: CliIo): Promise<number> {
   const [command, ...rest] = argv
@@ -43,10 +49,13 @@ async function dispatch(argv: string[], io: CliIo): Promise<number> {
     case "new":
       return newCommand(io, rest)
     case "new-skill":
+      if (rest[1] !== undefined) return rejectExtraArgs(io, "new-skill")
       return newSkillCommand(io, rest[0])
     case "enable":
+      if (rest[1] !== undefined) return rejectExtraArgs(io, "enable")
       return toggleCommand(io, rest[0], true)
     case "disable":
+      if (rest[1] !== undefined) return rejectExtraArgs(io, "disable")
       return toggleCommand(io, rest[0], false)
     case "config":
       return configCommand(io, rest)

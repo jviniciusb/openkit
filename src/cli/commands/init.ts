@@ -1,4 +1,5 @@
 import { categories } from "../../catalog"
+import { PLUGIN_ID } from "../../constants"
 import {
   globalConfigDir,
   globalConfigPath,
@@ -15,9 +16,6 @@ export interface InitOptions {
   /** Write the project-level config and OpenCode config instead of the global ones. */
   project?: boolean
 }
-
-/** The plugin id OpenCode should load for the whole kit. */
-const PLUGIN_ID = "openkit"
 
 /**
  * Handles `openkit init [--project]`.

@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test"
 import { deepMerge } from "../../src/config/merge"
+import { valuesEqual } from "../../src/config/effective"
 
 test("deep-merges nested objects", () => {
   expect(deepMerge({ a: { b: 1, c: 2 } }, { a: { c: 9 } })).toEqual({ a: { b: 1, c: 9 } })
@@ -27,4 +28,11 @@ test("keeps legitimate constructor and prototype keys", () => {
   )
   expect((merged as Record<string, any>).skills.prototype.enabled).toBe(true)
   expect(Object.getOwnPropertyDescriptor(merged, "constructor")?.value).toBe("kept")
+})
+test("valuesEqual is order-insensitive for object keys", () => {
+  expect(valuesEqual({ a: 1, b: 2 }, { b: 2, a: 1 })).toBe(true)
+  expect(valuesEqual({ a: [1, { x: 2, y: 3 }] }, { a: [1, { y: 3, x: 2 }] })).toBe(true)
+  expect(valuesEqual({ a: 1 }, { a: 2 })).toBe(false)
+  expect(valuesEqual({ a: 1 }, { a: 1, b: 2 })).toBe(false)
+  expect(valuesEqual([1, 2], [2, 1])).toBe(false)
 })
