@@ -102,6 +102,17 @@ test("decomposition marks the parallel-ready pieces without prescribing dispatch
   expect(text).not.toMatch(/background|dispatch/)
 })
 
+test("think-in-code writes one program for multi-call composition, not bulk only", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "think-in-code")!.text.toLowerCase()
+  expect(text).toContain("several tool calls")
+  expect(text).toContain("returns only the derived value")
+  expect(text).toContain("a single call stays direct")
+  expect(text).toContain("await every call")
+  expect(text).toContain("run independent calls concurrently")
+  expect(text).toContain("small, plain value")
+  expect(text).toContain("exact tool path and signature")
+})
+
 test("injects all built-in rules in order by default", async () => {
   const { calls, handler } = await register(defaults())
   expect(calls.hook).toEqual(["context"])
