@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.0] - 2026-10-14
+
+### Changed
+
+- `context-injections` built-in rules: a consistency and simplification pass,
+  judged against `writing-for-agents`. Deduplicated the facts/decisions,
+  trivial-work, and evidence guidance; removed a definition no-op in
+  `functional-programming`; tightened `proactive`, `think-in-code`,
+  `decomposition`, and `subagent-driven`; rephrased the raw-context guardrail
+  positively. Every leading word, completion criterion, guardrail, and the
+  `proactive` gate qualifier are preserved, and no instruction was dropped
+  (636 → 571 words). No rule id, default, or schema changed.
+
 ## [0.17.0] - 2026-10-14
 
 ### Added
@@ -267,7 +280,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.14.0...v0.15.0
