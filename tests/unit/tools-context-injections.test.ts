@@ -113,6 +113,17 @@ test("think-in-code uses skills for applicable workflows without speculative tri
   expect(text).toContain("relevant fields")
   expect(text).toContain("small sample")
   expect(text).toContain("semantic understanding")
+  expect(text).toContain("current facts")
+  expect(text).toContain("shape reads and queries")
+})
+
+test("functional-programming keeps the idiomatic-otherwise escape hatch", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "functional-programming")!.text.toLowerCase()
+  expect(text).toContain("referentially transparent")
+  expect(text).toContain("immutable data")
+  expect(text).toContain("side effects")
+  expect(text).toContain("idiomatic otherwise")
+  expect(text).toContain("codebase")
 })
 
 test("subagent-driven keeps the orchestrator free by dispatching subagents in the background", () => {
