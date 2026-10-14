@@ -25,13 +25,13 @@ export async function toggleOperation(
   const verb = enabled ? "enable" : "disable"
 
   if (id === undefined || id.length === 0) {
-    deps.err(`openkit: ${verb} requires a tool id`)
+    deps.err(`openkit: ${verb} requires an item id`)
     return { exitCode: 1 }
   }
 
   const found = findCategoryItem(categories, id)
   if (found === undefined) {
-    deps.err(`openkit: unknown tool "${id}"`)
+    deps.err(`openkit: unknown id "${id}"`)
     return { exitCode: 1 }
   }
 
@@ -40,7 +40,7 @@ export async function toggleOperation(
   deps.out(`${id} ${enabled ? "enabled" : "disabled"}`)
 
   // Resolve after the write so the global layer reflects the new value.
-  const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, deps.options)
+  const layers = await buildConfigLayers(deps.cwd, deps.home, deps.env, deps.options)
   const effective = resolveCategoryEffective(category, item, layers)
   if (effective.enabled !== enabled) {
     deps.err(

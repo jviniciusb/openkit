@@ -1,7 +1,7 @@
 import type { KitCategory } from "../core/category"
-import { itemId, resolveCategoryEntry } from "../core/engine"
-import { discoverKitConfigFiles } from "../config/discover"
-import { loadKitConfig } from "../config/load"
+import { itemId, resolveCategoryEffective } from "../core/engine"
+import type { Env } from "../config/discover"
+import { buildConfigLayers } from "../config/effective"
 import type { KitConfigFile } from "../config/types"
 
 /**
@@ -15,6 +15,8 @@ export interface OperationDeps {
   home: string
   /** Plugin-options layer (highest precedence), when the caller has one. */
   options?: KitConfigFile
+  /** Environment used for `XDG_CONFIG_HOME` discovery; defaults to `process.env`. */
+  env?: Env
   /** Sink for successful output. */
   out(s: string): void
   /** Sink for warnings and errors. */
@@ -51,20 +53,21 @@ export function findCategoryItem(
  * Each non-empty category gets a `<label>:` header, then one
  * `<id>\t<enabled|disabled>\t<description>` row per item. A `describe` hook
  * that throws degrades that row's description to `""` rather than failing the
- * whole listing. Enabled state is folded from the discovered config files (low
- * → high precedence) via the generic category resolver.
+ * whole listing. Enabled state is folded from every layer (discovered config
+ * files low → high, then the plugin `options` layer) via the generic category
+ * resolver, so it matches what the runtime bootstrap will register.
  */
 export async function listOperation(
   categories: readonly KitCategory<unknown>[],
   deps: OperationDeps,
 ): Promise<OperationResult> {
-  const sources = await loadKitConfig(discoverKitConfigFiles(deps.cwd, deps.home))
+  const layers = await buildConfigLayers(deps.cwd, deps.home, deps.env, deps.options)
 
   for (const category of categories) {
     if (category.items.length === 0) continue
     deps.out(`${category.label}:\n`)
     for (const item of category.items) {
-      const { enabled } = resolveCategoryEntry(category, item, sources)
+      const { enabled } = resolveCategoryEffective(category, item, layers)
       let description = ""
       try {
         description = category.describe?.(item) ?? ""

@@ -53,6 +53,22 @@ test("doctor reports degraded tools without failing", async () => {
   expect(h.out()).toContain("degraded")
 })
 
+test("doctor folds the plugin-options layer into inspect", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = dirname(globalConfigPath(home))
+  mkdirSync(dir, { recursive: true })
+  // Invalid settings supplied only through `plugins[].options` must still
+  // surface, matching list/config get and the runtime bootstrap.
+  writeFileSync(
+    join(dir, "opencode.json"),
+    '{ "plugins": [["openkit", { "tools": { "context-injections": { "settings": { "extra": 42 } } } }]] }',
+  )
+  const h = io(home)
+  const code = await doctorCommand(h.io)
+  expect(code).toBe(0)
+  expect(h.out()).toContain("degraded")
+})
+
 test("doctor reports plugin active when listed in opencode.json", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const dir = dirname(globalConfigPath(home))
