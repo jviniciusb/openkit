@@ -109,3 +109,25 @@ test("init seeds a references section", async () => {
   const cfg = JSON.parse(readFileSync(globalConfigPath(home), "utf8"))
   expect(cfg.references).toEqual({})
 })
+
+test("init targets an existing opencode.jsonc instead of creating opencode.json", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = dirname(globalConfigPath(home))
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(join(dir, "opencode.jsonc"), '{ "plugins": ["other-plugin"] }\n')
+  const io = { cwd: home, home, stdout: () => {}, stderr: () => {} }
+  await initCommand(io, {})
+  const oc = JSON.parse(readFileSync(join(dir, "opencode.jsonc"), "utf8"))
+  expect(oc.plugins).toEqual(["other-plugin", "openkit"])
+  expect(existsSync(join(dir, "opencode.json"))).toBe(false)
+})
+
+test("init --project targets an existing project opencode.jsonc", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
+  writeFileSync(join(cwd, "opencode.jsonc"), '{ "plugins": [] }\n')
+  const io = { cwd, home, stdout: () => {}, stderr: () => {} }
+  await initCommand(io, { project: true })
+  expect(JSON.parse(readFileSync(join(cwd, "opencode.jsonc"), "utf8")).plugins).toEqual(["openkit"])
+  expect(existsSync(join(cwd, "opencode.json"))).toBe(false)
+})
