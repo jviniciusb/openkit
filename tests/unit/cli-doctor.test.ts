@@ -64,6 +64,48 @@ test("doctor reports plugin active when listed in opencode.json", async () => {
   expect(h.out()).toContain("plugin: active")
 })
 
+test("doctor reports plugin active when listed in opencode.jsonc", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = dirname(globalConfigPath(home))
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(
+    join(dir, "opencode.jsonc"),
+    '{ "plugins": ["openkit@git+ssh://git@github.com/jviniciusb/openkit.git#v0.20.0"] }',
+  )
+  const h = io(home)
+  const code = await doctorCommand(h.io)
+  expect(code).toBe(0)
+  expect(h.out()).toContain("plugin: active")
+})
+
+test("doctor matches the plugin by package name across spec forms", async () => {
+  const specs = [
+    "openkit@git+https://github.com/jviniciusb/openkit.git",
+    "openkit",
+    { package: "openkit", options: {} },
+  ]
+  for (const spec of specs) {
+    const home = mkdtempSync(join(tmpdir(), "home-"))
+    const dir = dirname(globalConfigPath(home))
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, "opencode.json"), JSON.stringify({ plugins: [spec] }))
+    const h = io(home)
+    await doctorCommand(h.io)
+    expect(h.out()).toContain("plugin: active")
+  }
+})
+
+test("doctor does not match a different package name", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const dir = dirname(globalConfigPath(home))
+  mkdirSync(dir, { recursive: true })
+  // A different package, including a scoped one, must not match by prefix.
+  writeFileSync(join(dir, "opencode.json"), '{ "plugins": ["openkit-fork", "@acme/openkit"] }')
+  const h = io(home)
+  await doctorCommand(h.io)
+  expect(h.out()).toContain("plugin: not listed")
+})
+
 test("version prints CLI and plugin versions", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const h = io(home)
