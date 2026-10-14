@@ -6,7 +6,7 @@ import { loadKitConfig } from "../../src/config/load"
 
 test("parses JSONC with comments and trailing commas", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{\n  // c\n  "tools": { "t": { "enabled": true, }, },\n}`)
   expect(await loadKitConfig([f])).toEqual([{ tools: { t: { enabled: true } } }])
 })

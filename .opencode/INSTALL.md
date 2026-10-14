@@ -1,13 +1,13 @@
-# Install opencode-kit
+# Install openkit
 
-Instructions for an AI coding agent to install **opencode-kit** into a user's
+Instructions for an AI coding agent to install **openkit** into a user's
 OpenCode V2 setup. If you can read this file, follow it.
 
 > Canonical instruction to give an agent:
 > *Fetch and follow instructions from
-> https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/.opencode/INSTALL.md*
+> https://raw.githubusercontent.com/jviniciusb/openkit/main/.opencode/INSTALL.md*
 
-opencode-kit is one OpenCode V2 plugin that hosts independently toggleable
+openkit is one OpenCode V2 plugin that hosts independently toggleable
 items — tools, skills, and references. Installing it means: register the plugin,
 seed its config, restart OpenCode, and verify. Do the four steps below in order
 and report the result to the user.
@@ -16,7 +16,7 @@ and report the result to the user.
 
 - Confirm OpenCode V2 `>= 2.0.4` is installed (`opencode --version`).
 - The CLI is in the repo (not on npm). If the user has a checkout they can run
-  `bun bin/opencode-kit.js <command>`; otherwise use the `/kit` command or edit
+  `bun bin/openkit.js <command>`; otherwise use the `/kit` command or edit
   the config by hand.
 - Locate the user's OpenCode config. It may be `opencode.json` or
   `opencode.jsonc`, either globally (`~/.config/opencode/opencode.json`) or in
@@ -28,7 +28,7 @@ instead of replacing it.
 
 ## Step 1 — Add the plugin entry
 
-> **Status:** `opencode-kit` is distributed directly from GitHub (there is no npm
+> **Status:** `openkit` is distributed directly from GitHub (there is no npm
 > package). Add the git spec below. To pin a release, append a tag:
 > `#v0.1.0`.
 
@@ -37,28 +37,28 @@ Add the git spec to the `plugins` array of `opencode.json(c)`:
 ```jsonc
 {
   "plugins": [
-    "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git"
+    "openkit@git+https://github.com/jviniciusb/openkit.git"
   ]
 }
 ```
 
-If `opencode-kit` or its git spec is already present, skip this step. If the
+If `openkit` or its git spec is already present, skip this step. If the
 array already has entries, append — do not remove or reorder existing ones. If
 there is no `plugins` key, add one.
 
 ## Step 2 — Seed the kit config
 
-The kit reads `opencode-kit.jsonc` from the global
-(`~/.config/opencode/opencode-kit.jsonc`) and/or project
-(`<project>/.opencode/opencode-kit.jsonc`) locations.
+The kit reads `openkit.jsonc` from the global
+(`~/.config/opencode/openkit.jsonc`) and/or project
+(`<project>/.opencode/openkit.jsonc`) locations.
 
 **Preferred:** in an OpenCode session, use `/kit list` (and `/kit enable <id>`,
 `/kit disable <id>`) to see and toggle items. To seed a config file from every
 category's item defaults, run the CLI from a checkout:
 
 ```bash
-bun bin/opencode-kit.js init            # global config + global opencode.json
-bun bin/opencode-kit.js init --project  # project config + project opencode.json
+bun bin/openkit.js init            # global config + global opencode.json
+bun bin/openkit.js init --project  # project config + project opencode.json
 ```
 
 `init` is idempotent — it never overwrites existing tool, skill, or reference
@@ -72,9 +72,9 @@ compaction after related sessions, tool calls, and shells go idle, once the last
 prompt exceeds `thresholdTokens`):
 
 ```jsonc
-// ~/.config/opencode/opencode-kit.jsonc
+// ~/.config/opencode/openkit.jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
+  "$schema": "https://raw.githubusercontent.com/jviniciusb/openkit/main/openkit.schema.json",
   "configVersion": 1,
   "tools": {
     "background-subagents": { "enabled": false },
@@ -143,12 +143,12 @@ interactive script for steps only a human can take), `router` (invoked with
 why a past session went wrong). Skills take no `settings` — only `enabled`.
 Disable one with
 `/kit disable <skill-id>` in a session, or
-`bun bin/opencode-kit.js disable <skill-id>` from a checkout.
+`bun bin/openkit.js disable <skill-id>` from a checkout.
 
 **References** are the third category (a `references` config section). A
 reference packages a content source (local path or git repository) for the
 session; references are opt-in and settings-bearing, and none ship today. See the
-[README references section](https://github.com/jviniciusb/opencode-kit#references).
+[README references section](https://github.com/jviniciusb/openkit#references).
 
 Do not create a config if the user already has one; merge missing tool, skill, and
 reference entries into it instead.
@@ -175,7 +175,7 @@ about, tell them a restart is required before continuing.
 From a checkout:
 
 ```bash
-bun bin/opencode-kit.js doctor
+bun bin/openkit.js doctor
 ```
 
 Or in-session, `/kit list`.
@@ -199,10 +199,10 @@ plugin: active
 - `reference: error …` means a reference's `reference.json` is missing or
   invalid; the kit still loads the others. Report it (doctor exits non-zero).
 - `plugin: not listed (best effort)` means no `opencode.json` in the project or
-  global location lists `opencode-kit`. If you added the entry, confirm the file
+  global location lists `openkit`. If you added the entry, confirm the file
   path and restart.
 
-You can also run `/kit list` in a session, or `bun bin/opencode-kit.js list` from
+You can also run `/kit list` in a session, or `bun bin/openkit.js list` from
 a checkout, to show every item and its enabled state.
 
 ## Fallback: the `/kit` command
@@ -223,7 +223,7 @@ fresh install.
 
 Tell the user, concisely:
 
-1. Which `opencode.json(c)` you edited and that `opencode-kit` was added.
+1. Which `opencode.json(c)` you edited and that `openkit` was added.
 2. Which config file you created or updated.
 3. That OpenCode needs a restart (done or pending).
 4. The `doctor` output showing config/tools/skills/references/plugin status.

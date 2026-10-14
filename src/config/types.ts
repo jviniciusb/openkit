@@ -3,7 +3,7 @@ import type { CategoryEntry } from "../core/category"
 /** Per-item entry inside a kit config file, shared by every category. */
 export type { CategoryEntry }
 
-/** Shape of a single `opencode-kit.json[c]` file. */
+/** Shape of a single `openkit.json[c]` file. */
 export interface KitConfigFile {
   configVersion?: number
   tools?: Record<string, CategoryEntry>

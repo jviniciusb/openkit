@@ -9,7 +9,7 @@ import { toggleCommand } from "./commands/toggle"
 export type { CliIo }
 
 /**
- * Entry point for the `opencode-kit` CLI.
+ * Entry point for the `openkit` CLI.
  *
  * Dispatches the requested subcommand and returns a process exit code. No
  * process globals are read or written here, so callers (including tests) can
@@ -22,7 +22,7 @@ export async function runCli(argv: string[], io: CliIo): Promise<number> {
     return await dispatch(argv, io)
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    io.stderr(`opencode-kit: ${message}`)
+    io.stderr(`openkit: ${message}`)
     return 1
   }
 }
@@ -51,10 +51,10 @@ async function dispatch(argv: string[], io: CliIo): Promise<number> {
     case "config":
       return configCommand(io, rest)
     case undefined:
-      io.stderr("opencode-kit: missing command")
+      io.stderr("openkit: missing command")
       return 1
     default:
-      io.stderr(`opencode-kit: unknown command "${command}"`)
+      io.stderr(`openkit: unknown command "${command}"`)
       return 1
   }
 }

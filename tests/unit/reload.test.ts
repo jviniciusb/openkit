@@ -11,7 +11,7 @@ test("a failing reload leaves no generation to double-dispose", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const proj = join(home, "proj")
   mkdirSync(join(proj, ".opencode"), { recursive: true })
-  writeFileSync(join(proj, ".opencode", "opencode-kit.jsonc"),
+  writeFileSync(join(proj, ".opencode", "openkit.jsonc"),
     `{ "tools": { "a": { "enabled": true } } }`)
 
   let disposed = 0
@@ -46,7 +46,7 @@ test("a failing reload leaves no generation to double-dispose", async () => {
 test("reload disposes previous registrations then re-registers", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const proj = join(home, "proj"); mkdirSync(join(proj, ".opencode"), { recursive: true })
-  const cfg = join(proj, ".opencode", "opencode-kit.jsonc")
+  const cfg = join(proj, ".opencode", "openkit.jsonc")
   writeFileSync(cfg, `{ "tools": { "a": { "enabled": true } } }`)
   let disposed = 0
   const { ctx, calls } = createFakeContext({ directory: proj,
@@ -64,7 +64,7 @@ test("reload disposes previous registrations then re-registers", async () => {
 test("dispose during an in-flight reload releases the newest generation exactly once", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const proj = join(home, "proj"); mkdirSync(join(proj, ".opencode"), { recursive: true })
-  writeFileSync(join(proj, ".opencode", "opencode-kit.jsonc"),
+  writeFileSync(join(proj, ".opencode", "openkit.jsonc"),
     `{ "tools": { "a": { "enabled": true } } }`)
   // Tag each registration with its creation order so we can prove the *right*
   // generation was disposed — a double-dispose of gen1 with gen2 leaked would

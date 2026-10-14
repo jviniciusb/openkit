@@ -19,16 +19,16 @@ function resolveSettingsItem(
   id: string | undefined,
 ): { category: KitCategory<unknown>; item: unknown; id: string } | undefined {
   if (id === undefined || id.length === 0) {
-    deps.err(`opencode-kit: unknown tool "${id ?? ""}"`)
+    deps.err(`openkit: unknown tool "${id ?? ""}"`)
     return undefined
   }
   const found = findCategoryItem(categories, id)
   if (found === undefined) {
-    deps.err(`opencode-kit: unknown tool "${id}"`)
+    deps.err(`openkit: unknown tool "${id}"`)
     return undefined
   }
   if (!found.category.hasSettings) {
-    deps.err(`opencode-kit: ${found.category.label} have no settings: "${id}"`)
+    deps.err(`openkit: ${found.category.label} have no settings: "${id}"`)
     return undefined
   }
   return { category: found.category, item: found.item, id }
@@ -49,7 +49,7 @@ export async function configGetOperation(
   const found = resolveSettingsItem(categories, deps, id)
   if (found === undefined) return { exitCode: 1 }
   if (key === undefined || key.length === 0) {
-    deps.err(`opencode-kit: config get requires a tool id and key`)
+    deps.err(`openkit: config get requires a tool id and key`)
     return { exitCode: 1 }
   }
 
@@ -58,7 +58,7 @@ export async function configGetOperation(
   const value = (settings as Record<string, unknown> | undefined)?.[key]
 
   if (value === undefined) {
-    deps.err(`opencode-kit: "${found.id}.${key}" is not set`)
+    deps.err(`openkit: "${found.id}.${key}" is not set`)
     return { exitCode: 1 }
   }
 
@@ -84,7 +84,7 @@ export async function configSetOperation(
   const found = resolveSettingsItem(categories, deps, id)
   if (found === undefined) return { exitCode: 1 }
   if (key === undefined || key.length === 0 || valueParts.length === 0) {
-    deps.err(`opencode-kit: config set requires a tool id, key, and value`)
+    deps.err(`openkit: config set requires a tool id, key, and value`)
     return { exitCode: 1 }
   }
 
@@ -102,7 +102,7 @@ export async function configSetOperation(
     settings: effective.settings ?? {},
   })
   if (degraded !== undefined) {
-    deps.err(`opencode-kit: warning: ${degraded}`)
+    deps.err(`openkit: warning: ${degraded}`)
   }
 
   // A higher-precedence layer (project config or plugin options) can override
@@ -111,7 +111,7 @@ export async function configSetOperation(
   if (!valuesEqual(effectiveValue, value)) {
     const layer = effective.settingLayers?.[key]
     deps.err(
-      `opencode-kit: warning: "${resolvedId}.${key}" is effectively ${JSON.stringify(effectiveValue)}; your change is overridden by ${layer?.label ?? "a higher-precedence layer"}`,
+      `openkit: warning: "${resolvedId}.${key}" is effectively ${JSON.stringify(effectiveValue)}; your change is overridden by ${layer?.label ?? "a higher-precedence layer"}`,
     )
   }
 

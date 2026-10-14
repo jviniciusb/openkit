@@ -1,10 +1,10 @@
 # AGENTS.md
 
-Guidance for AI agents working in the **opencode-kit** repository.
+Guidance for AI agents working in the **openkit** repository.
 
 ## What this repo is
 
-`opencode-kit` is an OpenCode V2 plugin that hosts independently toggleable items
+`openkit` is an OpenCode V2 plugin that hosts independently toggleable items
 grouped into **categories**: tools, skills, and references. The framework (config,
 category engine, CLI, contracts) is the product; items are added on top. Every
 category is one `KitCategory` descriptor consumed by the generic engine, so
@@ -103,9 +103,9 @@ src/
   skills/index.ts       # explicit barrel with <kit:skills> markers
   references/<id>/reference.json  # one folder per reference
   references/index.ts   # explicit barrel with <kit:references> markers
-bin/opencode-kit.js     # CLI entry (runs the TS CLI via Bun)
+bin/openkit.js     # CLI entry (runs the TS CLI via Bun)
 index.js                # package plugin entry -> src/plugin.ts
-opencode-kit.schema.json
+openkit.schema.json
 tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptance (real opencode)
 .opencode/INSTALL.md    # agent-driven install for consumers
 ```
@@ -125,7 +125,7 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 - **Explicit registration.** Items are discovered from typed barrels
   (`src/tools/index.ts`, `src/skills/index.ts`, `src/references/index.ts`), not
   runtime globbing. Keep the `<kit:tools>`, `<kit:skills>`, and
-  `<kit:references>` markers intact; `opencode-kit new <category> <id>` inserts
+  `<kit:references>` markers intact; `openkit new <category> <id>` inserts
   between them.
 - **Tests accompany behavior.** Use `createFakeContext` from
   `src/core/testing.ts` for harness-style assertions. Add tests for new config
@@ -146,8 +146,8 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 
 Locations:
 
-- Global: `~/.config/opencode/opencode-kit.jsonc`
-- Project: `<project>/.opencode/opencode-kit.jsonc`, discovered upward from the
+- Global: `~/.config/opencode/openkit.jsonc`
+- Project: `<project>/.opencode/openkit.jsonc`, discovered upward from the
   instance directory, nearest wins.
 
 Precedence, low → high:
@@ -163,11 +163,11 @@ category-keyed (`tools`, `skills`, `references`).
 
 ## Adding a tool
 
-1. `opencode-kit new tool my-tool` (run from the repo root; `new my-tool` is an
+1. `openkit new tool my-tool` (run from the repo root; `new my-tool` is an
    alias for `new tool my-tool`).
 2. Implement `register(ctx, settings, kit)` in `src/tools/my-tool/index.ts`.
 3. Add tests.
-4. Add an example entry to `docs/examples/opencode-kit.jsonc`.
+4. Add an example entry to `docs/examples/openkit.jsonc`.
 5. `bun run typecheck && bun test`.
 
 ## Adding a skill
@@ -176,12 +176,12 @@ Prefer `@skill-recipe` (`src/skills/skill-recipe/SKILL.md`) to derive a skill
 from a brief plus source skills: it drafts in the kit house style and adds the
 barrel entry. The steps below are the manual equivalent.
 
-1. `opencode-kit new skill my-skill` (run from the repo root; `new-skill` is an
+1. `openkit new skill my-skill` (run from the repo root; `new-skill` is an
    alias for `new skill`).
 2. Write `src/skills/my-skill/SKILL.md` (frontmatter `name`/`description` plus
    the instruction body; add support files beside it as needed).
 3. Add tests.
-4. Add an example entry to `docs/examples/opencode-kit.jsonc`.
+4. Add an example entry to `docs/examples/openkit.jsonc`.
 5. `bun run typecheck && bun test`.
 
 A skill is declarative: a directory plus one barrel line, no code. `defineSkill`
@@ -190,12 +190,12 @@ model's advertised list while keeping it loadable by id (`@my-skill`).
 
 ## Adding a reference
 
-1. `opencode-kit new reference my-reference` (run from the repo root).
+1. `openkit new reference my-reference` (run from the repo root).
 2. Point `src/references/my-reference/reference.json` at real content: `"path"`
    for a local source, or `"type": "git"` with `"repository"` (and optional
    `"branch"`).
 3. Add tests.
-4. Add an example entry to `docs/examples/opencode-kit.jsonc`.
+4. Add an example entry to `docs/examples/openkit.jsonc`.
 5. `bun run typecheck && bun test`.
 
 A reference is declarative: a directory plus one barrel line, no code. It is

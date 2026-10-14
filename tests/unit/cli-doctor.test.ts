@@ -32,7 +32,7 @@ test("doctor returns non-zero and reports a malformed config", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
-  writeFileSync(join(dir, "opencode-kit.jsonc"), '{ "tools": { ')
+  writeFileSync(join(dir, "openkit.jsonc"), '{ "tools": { ')
   const h = io(home)
   const code = await doctorCommand(h.io)
   expect(code).not.toBe(0)
@@ -44,7 +44,7 @@ test("doctor reports degraded tools without failing", async () => {
   const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
   writeFileSync(
-    join(dir, "opencode-kit.jsonc"),
+    join(dir, "openkit.jsonc"),
     '{ "tools": { "context-injections": { "settings": { "extra": 42 } } } }',
   )
   const h = io(home)
@@ -57,7 +57,7 @@ test("doctor reports plugin active when listed in opencode.json", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const dir = dirname(globalConfigPath(home))
   mkdirSync(dir, { recursive: true })
-  writeFileSync(join(dir, "opencode.json"), '{ "plugins": ["opencode-kit"] }')
+  writeFileSync(join(dir, "opencode.json"), '{ "plugins": ["openkit"] }')
   const h = io(home)
   const code = await doctorCommand(h.io)
   expect(code).toBe(0)

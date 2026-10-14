@@ -17,6 +17,6 @@ export async function configCommand(io: CliIo, args: string[]): Promise<number> 
   if (action === "set") {
     return (await configSetOperation(categories, deps, toolId, key, valueParts)).exitCode
   }
-  io.stderr(`opencode-kit: config expects "get" or "set"`)
+  io.stderr(`openkit: config expects "get" or "set"`)
   return 1
 }

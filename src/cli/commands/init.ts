@@ -14,16 +14,16 @@ export interface InitOptions {
 }
 
 /** The plugin id OpenCode should load for the whole kit. */
-const PLUGIN_ID = "opencode-kit"
+const PLUGIN_ID = "openkit"
 
 /**
- * Handles `opencode-kit init [--project]`.
+ * Handles `openkit init [--project]`.
  *
  * Creates the kit config (global by default, project with `--project`) and seeds
  * every shipped item of every category with its declared defaults: `enabled`
  * from the category's `defaultEnabled`, plus `settings` for settings-bearing
  * categories. It also ensures the matching `opencode.json` lists
- * `"opencode-kit"` in `plugins`, creating that file when absent. Both writes are
+ * `"openkit"` in `plugins`, creating that file when absent. Both writes are
  * idempotent: existing entries, and plugin entries, are never overwritten or
  * duplicated.
  */
