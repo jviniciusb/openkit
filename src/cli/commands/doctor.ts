@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs"
 import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 
 import { categories as catalogCategories } from "../../catalog"
+import { PLUGIN_ID } from "../../constants"
 import { discoverKitConfigFiles, globalOpencodePaths, opencodeConfigPaths } from "../../config/discover"
 import type { KitConfigFile } from "../../config/types"
 import { readPluginOptions } from "../../config/effective"
@@ -150,7 +151,7 @@ export async function doctorCommand(
   }
 
   const candidates = [...opencodeConfigPaths(io.cwd), ...globalOpencodePaths(io.home)]
-  const active = candidates.some((path) => opencodeListsPlugin(path, "openkit"))
+  const active = candidates.some((path) => opencodeListsPlugin(path, PLUGIN_ID))
   io.stdout(`plugin: ${active ? "active" : "not listed (best effort)"}`)
 
   return errors.length > 0 || fatal > 0 ? 1 : 0

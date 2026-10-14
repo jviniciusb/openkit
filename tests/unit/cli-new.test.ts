@@ -56,7 +56,7 @@ test("refuses to overwrite an existing tool", async () => {
 })
 
 test("rejects invalid ids without writing anything", async () => {
-  for (const bad of ["../evil", "123bad", "foo/bar", "Upper", "with_underscore"]) {
+  for (const bad of ["../evil", "123bad", "foo/bar", "Upper", "with_underscore", "foo-", "-foo", "foo--bar"]) {
     const { root, barrelPath, barrel } = fixture()
 
     await expect(scaffoldTool(root, bad)).rejects.toThrow()
