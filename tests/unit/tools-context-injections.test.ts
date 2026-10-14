@@ -86,6 +86,22 @@ test("think-in-code uses skills for applicable workflows without speculative tri
   expect(text).toContain("semantic understanding")
 })
 
+test("subagent-driven keeps the orchestrator free by dispatching subagents in the background", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "subagent-driven")!.text.toLowerCase()
+  expect(text).toContain("orchestrator")
+  expect(text).toContain("background")
+  expect(text).toContain("stay free")
+  expect(text).toContain("not stuck waiting")
+  expect(text).toContain("fan out")
+  expect(text).toContain("fan in")
+})
+
+test("decomposition marks the parallel-ready pieces without prescribing dispatch", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "decomposition")!.text.toLowerCase()
+  expect(text).toContain("ready pieces can proceed in parallel")
+  expect(text).not.toMatch(/background|dispatch/)
+})
+
 test("injects all built-in rules in order by default", async () => {
   const { calls, handler } = await register(defaults())
   expect(calls.hook).toEqual(["context"])
