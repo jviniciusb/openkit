@@ -73,6 +73,35 @@ test("careful-changes is accepted by the settings schema", () => {
   expect(resolveValidated(contextInjections, { enabled: true, settings }).degraded).toBeUndefined()
 })
 
+test("proactive is enabled by default, injected, and defers to gates", async () => {
+  const rules = contextInjections.defaultSettings.rules as Record<string, boolean>
+  expect(rules["proactive"]).toBe(true)
+
+  const rule = BUILT_IN_RULES.find(({ id }) => id === "proactive")
+  expect(rule).toBeDefined()
+  if (rule === undefined) return
+
+  const { handler } = await register(defaults())
+  const event = { system: [] as Array<{ type: string; text: string }> }
+  await handler!(event)
+  expect(event.system.map((part) => part.text)).toContain(rule.text)
+
+  const text = rule.text.toLowerCase()
+  expect(text).toContain("proactively")
+  expect(text).toContain("no gate or instruction says to stop")
+  expect(text).toContain("settle the facts yourself")
+  expect(text).toContain("put the remaining decisions to the user")
+  expect(text).toContain("high-confidence evidence")
+})
+
+test("proactive is accepted by the settings schema", () => {
+  const settings = {
+    ...defaults(),
+    rules: { ...defaults().rules, proactive: false },
+  }
+  expect(resolveValidated(contextInjections, { enabled: true, settings }).degraded).toBeUndefined()
+})
+
 test("think-in-code uses skills for applicable workflows without speculative triggers", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "think-in-code")!.text.toLowerCase()
   expect(text).toContain("skill descriptions")
