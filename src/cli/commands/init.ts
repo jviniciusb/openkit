@@ -12,7 +12,7 @@ import type { CliIo } from "./list"
 
 /** Options accepted by {@link initCommand}. */
 export interface InitOptions {
-  /** Write the project-level config and `opencode.json` instead of the global ones. */
+  /** Write the project-level config and OpenCode config instead of the global ones. */
   project?: boolean
 }
 
