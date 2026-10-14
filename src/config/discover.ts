@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs"
 import { dirname, join, resolve } from "node:path"
 
-const CONFIG_FILE_NAME = "opencode-kit.jsonc"
+const CONFIG_FILE_NAME = "openkit.jsonc"
 
 /** Environment lookup used to honor `XDG_CONFIG_HOME`. */
 export interface Env {
@@ -40,7 +40,7 @@ export function projectConfigPath(directory: string): string {
  *
  * Returns existing config files, global first then project farthest → nearest;
  * the global file is included only when it exists, symmetric with the
- * project-level files. Project candidates are `<dir>/.opencode/opencode-kit.jsonc`
+ * project-level files. Project candidates are `<dir>/.opencode/openkit.jsonc`
  * for `locationDirectory` and each ancestor up to the filesystem root, ordered
  * farthest → nearest so that nearer directories override farther ones.
  */

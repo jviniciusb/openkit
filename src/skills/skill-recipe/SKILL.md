@@ -1,6 +1,6 @@
 ---
 name: skill-recipe
-description: Use when the author wants to derive a new opencode-kit skill from a brief and one or more source skills. Trigger on an explicit `@skill-recipe` invocation, or on requests such as "turn this skill into a kit skill", "derive a skill from these sources", or "use the skill recipe". Do not auto-activate for ordinary feature, bug, or documentation work.
+description: Use when the author wants to derive a new openkit skill from a brief and one or more source skills. Trigger on an explicit `@skill-recipe` invocation, or on requests such as "turn this skill into a kit skill", "derive a skill from these sources", or "use the skill recipe". Do not auto-activate for ordinary feature, bug, or documentation work.
 ---
 
 # Skill Recipe
@@ -44,7 +44,7 @@ Present the drafted file, or the diff when the target already exists. Wait for t
 
 ### 6. Add the barrel entry
 
-Insert the skill between the `<kit:skills>` markers in `src/skills/index.ts`, in the shape `opencode-kit new skill <id>` produces:
+Insert the skill between the `<kit:skills>` markers in `src/skills/index.ts`, in the shape `openkit new skill <id>` produces:
 
 ```ts
 defineSkill({ id: "<id>", dir: new URL("./<id>/", import.meta.url) }),
@@ -70,7 +70,7 @@ Write `tests/unit/<id>.test.ts`, mirroring `tests/unit/interview.test.ts`: asser
 
 ### 9. Add the example entry
 
-Add the new skill to `docs/examples/opencode-kit.jsonc`, in the shape the existing entries use.
+Add the new skill to `docs/examples/openkit.jsonc`, in the shape the existing entries use.
 
 Then run `bun run typecheck && bun test`.
 

@@ -1,5 +1,5 @@
 {
-  "name": "opencode-kit",
+  "name": "openkit",
   "version": "0.19.0",
   "description": "A framework of toggleable, configurable tools, skills, and references for OpenCode V2",
   "keywords": [
@@ -12,20 +12,20 @@
     "skills",
     "references"
   ],
-  "homepage": "https://github.com/jviniciusb/opencode-kit#readme",
+  "homepage": "https://github.com/jviniciusb/openkit#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jviniciusb/opencode-kit.git"
+    "url": "git+https://github.com/jviniciusb/openkit.git"
   },
   "bugs": {
-    "url": "https://github.com/jviniciusb/opencode-kit/issues"
+    "url": "https://github.com/jviniciusb/openkit/issues"
   },
   "author": "Jader Barbosa",
   "license": "MIT",
   "type": "module",
   "main": "./src/plugin.ts",
-  "bin": { "opencode-kit": "./bin/opencode-kit.js" },
-  "files": ["src", "bin", "index.js", ".opencode", "opencode-kit.schema.json", "README.md", "LICENSE"],
+  "bin": { "openkit": "./bin/openkit.js" },
+  "files": ["src", "bin", "index.js", ".opencode", "openkit.schema.json", "README.md", "LICENSE"],
   "engines": { "bun": ">=1.1.39" },
   "scripts": {
     "typecheck": "tsc --noEmit",

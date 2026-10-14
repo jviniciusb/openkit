@@ -18,7 +18,7 @@ function readConfig(path: string): { text: string; data: KitConfigFile } {
 
 test("enable flips value and preserves comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{\n  // keep me\n  "tools": { "a": { "enabled": false } },\n}`)
   await setEntryEnabled(f, "tools", "a", true)
   const text = readFileSync(f, "utf8")
@@ -28,7 +28,7 @@ test("enable flips value and preserves comments", async () => {
 
 test("setEntryEnabled creates the file and parents from scratch", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "nested", "dir", "opencode-kit.jsonc")
+  const f = join(d, "nested", "dir", "openkit.jsonc")
 
   await setEntryEnabled(f, "tools", "a", true)
 
@@ -40,7 +40,7 @@ test("setEntryEnabled creates the file and parents from scratch", async () => {
 
 test("setEntrySetting writes a nested setting and keeps comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{\n  // keep me\n  "tools": { "a": { "enabled": false } },\n}`)
 
   await setEntrySetting(f, "tools", "a", "count", 3)
@@ -53,7 +53,7 @@ test("setEntrySetting writes a nested setting and keeps comments", async () => {
 
 test("setEntrySetting creates a new tool entry without touching others", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{ "tools": { "a": { "enabled": true } } }`)
 
   await setEntrySetting(f, "tools", "b", "name", "hi")
@@ -67,7 +67,7 @@ test("setEntryEnabled rejects when the target lies under a file, without overwri
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const blocker = join(d, "blocker")
   writeFileSync(blocker, "not a directory")
-  const f = join(blocker, "opencode-kit.jsonc")
+  const f = join(blocker, "openkit.jsonc")
 
   await expect(setEntryEnabled(f, "tools", "a", true)).rejects.toThrow()
 
@@ -77,7 +77,7 @@ test("setEntryEnabled rejects when the target lies under a file, without overwri
 
 test("setEntryEnabled refuses to edit a malformed config and leaves it intact", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, "{ this is not json")
 
   await expect(setEntryEnabled(f, "tools", "a", true)).rejects.toThrow(/malformed/)
@@ -91,7 +91,7 @@ test.each([
   ["comment-only", "// nothing here\n/* block */\n"],
 ])("setEntryEnabled seeds a default for a %s config", async (_name, contents) => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, contents)
 
   await setEntryEnabled(f, "tools", "a", true)
@@ -106,19 +106,19 @@ test("ensurePluginEntry appends through the element path and preserves the array
   const f = join(d, "opencode.json")
   writeFileSync(f, `{\n  "plugins": [\n    // keep this comment\n    "other-plugin"\n  ]\n}`)
 
-  await ensurePluginEntry(f, "opencode-kit")
+  await ensurePluginEntry(f, "openkit")
 
   const text = readFileSync(f, "utf8")
   expect(text).toContain("// keep this comment")
   expect(text).toContain('"other-plugin"')
   const data = parse(text) as { plugins: unknown[] }
-  expect(data.plugins).toEqual(["other-plugin", "opencode-kit"])
+  expect(data.plugins).toEqual(["other-plugin", "openkit"])
 
   // Idempotent: a second call must not duplicate the entry.
-  await ensurePluginEntry(f, "opencode-kit")
+  await ensurePluginEntry(f, "openkit")
   expect((parse(readFileSync(f, "utf8")) as { plugins: unknown[] }).plugins).toEqual([
     "other-plugin",
-    "opencode-kit",
+    "openkit",
   ])
 })
 
@@ -127,27 +127,27 @@ test("ensurePluginEntry creates the plugins array when it is absent", async () =
   const f = join(d, "opencode.json")
   writeFileSync(f, `{ "theme": "dark" }`)
 
-  await ensurePluginEntry(f, "opencode-kit")
+  await ensurePluginEntry(f, "openkit")
 
   const data = parse(readFileSync(f, "utf8")) as { plugins: unknown[]; theme: string }
-  expect(data.plugins).toEqual(["opencode-kit"])
+  expect(data.plugins).toEqual(["openkit"])
   expect(data.theme).toBe("dark")
 })
 
 test("ensurePluginEntry refuses a non-array plugins value and leaves the file intact", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const f = join(d, "opencode.json")
-  const original = `{ "plugins": "opencode-kit" }\n`
+  const original = `{ "plugins": "openkit" }\n`
   writeFileSync(f, original)
 
-  await expect(ensurePluginEntry(f, "opencode-kit")).rejects.toThrow(/not an array/)
+  await expect(ensurePluginEntry(f, "openkit")).rejects.toThrow(/not an array/)
 
   expect(readFileSync(f, "utf8")).toBe(original)
 })
 
 test("setEntryEnabled flips value under skills and preserves comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{\n  // keep me\n  "skills": { "sdd-flow": { "enabled": true } },\n}`)
   await setEntryEnabled(f, "skills", "sdd-flow", false)
   const text = readFileSync(f, "utf8")
@@ -157,7 +157,7 @@ test("setEntryEnabled flips value under skills and preserves comments", async ()
 
 test("setEntryEnabled refuses to edit a malformed config and leaves it intact", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, "{ not json")
   await expect(setEntryEnabled(f, "skills", "s", false)).rejects.toThrow(/malformed/)
   expect(readFileSync(f, "utf8")).toBe("{ not json")
@@ -165,7 +165,7 @@ test("setEntryEnabled refuses to edit a malformed config and leaves it intact", 
 
 test("seedEntries only adds missing entries under skills", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{ "skills": { "a": { "enabled": false } } }`)
   await seedEntries(f, "skills", { a: { enabled: true }, b: { enabled: true } })
   const data = parse(readFileSync(f, "utf8")) as KitConfigFile
@@ -175,7 +175,7 @@ test("seedEntries only adds missing entries under skills", async () => {
 
 test("setEntryEnabled flips enabled under an arbitrary category and preserves comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{\n  // keep me\n  "tools": { "a": { "enabled": false } },\n}`)
 
   await setEntryEnabled(f, "tools", "a", true)
@@ -187,7 +187,7 @@ test("setEntryEnabled flips enabled under an arbitrary category and preserves co
 
 test("setEntryEnabled works for the skills category", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
 
   await setEntryEnabled(f, "skills", "sdd-flow", false)
 
@@ -197,7 +197,7 @@ test("setEntryEnabled works for the skills category", async () => {
 
 test("setEntrySetting writes a nested setting for any settings category", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{ "references": { "r": { "enabled": true } } }`)
   await setEntrySetting(f, "references", "r", "branch", "main")
   expect((parse(readFileSync(f, "utf8")) as KitConfigFile).references?.r?.settings).toEqual({ branch: "main" })
@@ -205,7 +205,7 @@ test("setEntrySetting writes a nested setting for any settings category", async 
 
 test("setEntrySetting keeps the existing enabled value and comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{\n  // keep me\n  "references": { "r": { "enabled": false } },\n}`)
 
   await setEntrySetting(f, "references", "r", "branch", "main")
@@ -218,7 +218,7 @@ test("setEntrySetting keeps the existing enabled value and comments", async () =
 
 test("seedEntries only adds missing entries under an arbitrary category", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, `{ "references": { "a": { "enabled": false } } }`)
 
   await seedEntries(f, "references", { a: { enabled: true }, b: { enabled: true } })
@@ -230,7 +230,7 @@ test("seedEntries only adds missing entries under an arbitrary category", async 
 
 test("seedEntries tolerates a config whose text is exactly null", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
   writeFileSync(f, "null")
 
   await seedEntries(f, "tools", { a: { enabled: true } })
@@ -241,7 +241,7 @@ test("seedEntries tolerates a config whose text is exactly null", async () => {
 
 test("setEntryEnabled seeds a default config that includes a references map", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode-kit.jsonc")
+  const f = join(d, "openkit.jsonc")
 
   await setEntryEnabled(f, "references", "r", true)
 

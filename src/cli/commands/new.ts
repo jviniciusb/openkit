@@ -17,7 +17,7 @@ async function report(io: CliIo, scaffold: () => Promise<{ dir: string }>): Prom
 }
 
 /**
- * Handles `opencode-kit new <category> <id>`, `new <id>`, and their aliases.
+ * Handles `openkit new <category> <id>`, `new <id>`, and their aliases.
  *
  * `new <id>` (one argument) is an alias for `new tool <id>`, except that a lone
  * category name (`tool`/`tools`, `skill`/`skills`, `reference`/`references`) is
@@ -30,14 +30,14 @@ async function report(io: CliIo, scaffold: () => Promise<{ dir: string }>): Prom
 export async function newCommand(io: CliIo, args: string[]): Promise<number> {
   const [first, ...rest] = args
   if (first === undefined || first.trim().length === 0) {
-    io.stderr("opencode-kit: new requires a tool id")
+    io.stderr("openkit: new requires a tool id")
     return 1
   }
 
   // A lone category name (key or singular) is a missing-id error, not a tool id.
   if (rest.length === 0) {
     if (categories.some((category) => category.key === first || category.singular === first)) {
-      io.stderr("opencode-kit: new <category> requires an id")
+      io.stderr("openkit: new <category> requires an id")
       return 1
     }
     // `new <id>` stays an alias for `new tool <id>`.
@@ -45,19 +45,19 @@ export async function newCommand(io: CliIo, args: string[]): Promise<number> {
   }
 
   if (rest.length > 1) {
-    io.stderr(`opencode-kit: new ${first} accepts a single id`)
+    io.stderr(`openkit: new ${first} accepts a single id`)
     return 1
   }
 
   const id = rest[0] ?? ""
   if (id.trim().length === 0) {
-    io.stderr(`opencode-kit: new ${first} requires an id`)
+    io.stderr(`openkit: new ${first} requires an id`)
     return 1
   }
 
   const category = findCategory(first)
   if (category === undefined || category.scaffold === undefined) {
-    io.stderr(`opencode-kit: unknown category "${first}"`)
+    io.stderr(`openkit: unknown category "${first}"`)
     return 1
   }
 

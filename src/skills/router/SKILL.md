@@ -1,6 +1,6 @@
 ---
 name: router
-description: Use when explicitly invoked to be pointed at the right opencode-kit skill or flow for a request. Trigger on requests to route a situation to a skill, to ask which skill or flow fits, or what to do next. Do not use to run the work the skill names.
+description: Use when explicitly invoked to be pointed at the right openkit skill or flow for a request. Trigger on requests to route a situation to a skill, to ask which skill or flow fits, or what to do next. Do not use to run the work the skill names.
 ---
 
 # Router

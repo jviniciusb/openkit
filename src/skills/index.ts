@@ -1,7 +1,7 @@
 import { defineSkill, type KitSkill } from "../core/skill"
 
 /**
- * Every skill shipped by opencode-kit.
+ * Every skill shipped by openkit.
  *
  * The skill scaffolder inserts new entries between the `<kit:skills>` markers
  * below; keep those comments intact.
