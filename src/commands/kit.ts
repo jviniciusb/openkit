@@ -41,10 +41,10 @@ function outputWriter(
     return (text) => {
       try {
         void Promise.resolve(prompt.call(ctx.session, { sessionID, text })).catch((error) => {
-          console.warn("opencode-kit: failed to deliver /kit output", error)
+          console.warn("openkit: failed to deliver /kit output", error)
         })
       } catch (error) {
-        console.warn("opencode-kit: failed to deliver /kit output", error)
+        console.warn("openkit: failed to deliver /kit output", error)
       }
     }
   }
@@ -85,7 +85,7 @@ export async function registerKitCommand(
   return ctx.command.transform((editor) => {
     editor.add({
       name: "kit",
-      description: "Manage opencode-kit tools, skills, and references (list, enable, disable, config)",
+      description: "Manage openkit tools, skills, and references (list, enable, disable, config)",
       execute: (input: KitCommandInput) => executeKitCommand(input, ctx, deps),
     })
   })

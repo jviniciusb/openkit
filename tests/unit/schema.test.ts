@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs"
 import { join } from "node:path"
 
 const schema = JSON.parse(
-  readFileSync(join(import.meta.dir, "..", "..", "opencode-kit.schema.json"), "utf8"),
+  readFileSync(join(import.meta.dir, "..", "..", "openkit.schema.json"), "utf8"),
 )
 
 const ajv = new Ajv({ allErrors: true, strict: false })
@@ -12,7 +12,7 @@ const validate = ajv.compile(schema)
 
 test("config with $schema, configVersion and a tool is valid", () => {
   const config = {
-    $schema: "./opencode-kit.schema.json",
+    $schema: "./openkit.schema.json",
     configVersion: 1,
     tools: {
       hello: { enabled: true, settings: { name: "world" } },

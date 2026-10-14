@@ -60,7 +60,7 @@ export async function bootstrap(
   // Surface every degraded item so a silently broken registration or invalid
   // setting is visible in the session logs (spec §5.1/§6.3).
   for (const entry of degraded) {
-    console.warn(`opencode-kit: ${entry.category} "${entry.id}" degraded: ${entry.error}`)
+    console.warn(`openkit: ${entry.category} "${entry.id}" degraded: ${entry.error}`)
   }
 
   return {
@@ -70,7 +70,7 @@ export async function bootstrap(
       const settled = await Promise.allSettled(registrations.map((r) => r.dispose()))
       for (const outcome of settled) {
         if (outcome.status === "rejected") {
-          console.warn("opencode-kit: a registration disposer threw", outcome.reason)
+          console.warn("openkit: a registration disposer threw", outcome.reason)
         }
       }
     },
@@ -109,7 +109,7 @@ export function defaultWatch(paths: string[], cb: () => void): () => void {
       // Watch errors are emitted asynchronously; log them rather than throwing
       // from an event callback, which would crash the process.
       watcher.on("error", (error) => {
-        console.warn("opencode-kit: config watcher error", error)
+        console.warn("openkit: config watcher error", error)
       })
       watchers.push(watcher)
     } catch {
@@ -173,7 +173,7 @@ export async function createLifecycle(
   const paths = discoverKitConfigFiles(ctx.location.directory, resolveHome(ctx))
   const unwatch = watch(paths, () => {
     reload().catch((error) => {
-      console.warn("opencode-kit: config reload failed", error)
+      console.warn("openkit: config reload failed", error)
     })
   })
 
@@ -213,7 +213,7 @@ export async function createLifecycle(
 }
 
 export default {
-  id: "opencode-kit",
+  id: "openkit",
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
     const life = await createLifecycle(ctx, categories, ctx.options as Record<string, unknown>)
     // Register the `/kit` command alongside the tool lifecycle so it is

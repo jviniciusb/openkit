@@ -25,13 +25,13 @@ export async function toggleOperation(
   const verb = enabled ? "enable" : "disable"
 
   if (id === undefined || id.length === 0) {
-    deps.err(`opencode-kit: ${verb} requires a tool id`)
+    deps.err(`openkit: ${verb} requires a tool id`)
     return { exitCode: 1 }
   }
 
   const found = findCategoryItem(categories, id)
   if (found === undefined) {
-    deps.err(`opencode-kit: unknown tool "${id}"`)
+    deps.err(`openkit: unknown tool "${id}"`)
     return { exitCode: 1 }
   }
 
@@ -44,7 +44,7 @@ export async function toggleOperation(
   const effective = resolveCategoryEffective(category, item, layers)
   if (effective.enabled !== enabled) {
     deps.err(
-      `opencode-kit: warning: "${id}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
+      `openkit: warning: "${id}" is effectively ${effective.enabled ? "enabled" : "disabled"}; your change is overridden by ${effective.enabledLayer?.label ?? "a higher-precedence layer"}`,
     )
   }
 

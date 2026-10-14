@@ -1,8 +1,8 @@
-# opencode-kit
+# openkit
 
 A framework of toggleable, configurable **tools, skills, and references** for [OpenCode](https://opencode.ai) V2.
 
-`opencode-kit` is one plugin you install once. Inside it live independent items
+`openkit` is one plugin you install once. Inside it live independent items
 grouped into **categories** — tools may contribute agent-callable functions,
 slash commands, skills, hook injections, and bundled scripts; skills are
 self-contained instruction packages you enable on their own; references package a
@@ -92,16 +92,16 @@ curated content sources. See [References](#references).
 ## Requirements
 
 - OpenCode V2 `>= 2.0.4`.
-- [Bun](https://bun.sh) to run the CLI from a checkout (`bun bin/opencode-kit.js <command>`). The plugin ships TypeScript and is transpiled by OpenCode's Bun at load — there is no build step, and the package is not consumable by plain Node.
+- [Bun](https://bun.sh) to run the CLI from a checkout (`bun bin/openkit.js <command>`). The plugin ships TypeScript and is transpiled by OpenCode's Bun at load — there is no build step, and the package is not consumable by plain Node.
 
 ## Install
 
 ### 1. Add the plugin
 
-opencode-kit is distributed directly from GitHub (there is no npm package).
+openkit is distributed directly from GitHub (there is no npm package).
 
 ```bash
-opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git"
 ```
 
 This installs the package into OpenCode's cache and loads every item that is
@@ -111,7 +111,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit.git#v0.1.0"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.1.0"
 ```
 
 ### 2. Configure (optional)
@@ -119,8 +119,8 @@ opencode plugin add "opencode-kit@git+https://github.com/jviniciusb/opencode-kit
 Seeding is optional — an item that defaults to enabled works without a config
 file (every bundled skill does; the shipped tools are opt-in). To make the
 effective configuration explicit, create
-`~/.config/opencode/opencode-kit.jsonc` (or
-`<project>/.opencode/opencode-kit.jsonc`):
+`~/.config/opencode/openkit.jsonc` (or
+`<project>/.opencode/openkit.jsonc`):
 
 ```jsonc
 {
@@ -149,11 +149,11 @@ checkout (see [CLI access](#cli-access)). Restart OpenCode after changing
 ### 3. Verify
 
 In a session, run `/kit list` to show every item and its resolved state; or from
-a checkout run `bun bin/opencode-kit.js doctor` (see
+a checkout run `bun bin/openkit.js doctor` (see
 [CLI access](#cli-access)).
 
 `doctor` checks that your kit config files parse, that no item is degraded, that
-every skill and reference loads, and — best effort — that `opencode-kit` is
+every skill and reference loads, and — best effort — that `openkit` is
 listed in `opencode.json`.
 
 ### Let an agent install it
@@ -161,7 +161,7 @@ listed in `opencode.json`.
 Paste this into your OpenCode session:
 
 > Fetch and follow instructions from
-> https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/.opencode/INSTALL.md
+> https://raw.githubusercontent.com/jviniciusb/openkit/main/.opencode/INSTALL.md
 
 The agent installs the plugin, seeds the config, restarts OpenCode, and verifies
 with `doctor`.
@@ -171,9 +171,9 @@ with `doctor`.
 The CLI lives in the repo (it is not published to npm). Run it from a clone:
 
 ```bash
-git clone https://github.com/jviniciusb/opencode-kit.git
-cd opencode-kit && bun install
-bun bin/opencode-kit.js <command>
+git clone https://github.com/jviniciusb/openkit.git
+cd openkit && bun install
+bun bin/openkit.js <command>
 ```
 
 The plugin also registers a `/kit` slash command for use inside a session (see
@@ -200,12 +200,12 @@ schema machinery beyond the closed config shape.
 
 ## Configuration
 
-opencode-kit reads JSONC (comments allowed) from two places:
+openkit reads JSONC (comments allowed) from two places:
 
 | Scope   | Path                                              |
 | ------- | ------------------------------------------------- |
-| Global  | `~/.config/opencode/opencode-kit.jsonc`           |
-| Project | `<project>/.opencode/opencode-kit.jsonc`          |
+| Global  | `~/.config/opencode/openkit.jsonc`           |
+| Project | `<project>/.opencode/openkit.jsonc`          |
 
 Project config is discovered from the OpenCode instance directory upward; the
 nearest file wins. Both are optional.
@@ -214,8 +214,8 @@ nearest file wins. Both are optional.
 
 ```text
 item defaultSettings (in code, settings-bearing categories)
-  < global opencode-kit.jsonc
-    < project opencode-kit.jsonc (farther → nearer)
+  < global openkit.jsonc
+    < project openkit.jsonc (farther → nearer)
       < opencode.json plugins[].options
 ```
 
@@ -226,9 +226,9 @@ concatenated). Settings apply only to settings-bearing categories (`tools` and
 ### Example
 
 ```jsonc
-// ~/.config/opencode/opencode-kit.jsonc
+// ~/.config/opencode/openkit.jsonc
 {
-  "$schema": "https://raw.githubusercontent.com/jviniciusb/opencode-kit/main/opencode-kit.schema.json",
+  "$schema": "https://raw.githubusercontent.com/jviniciusb/openkit/main/openkit.schema.json",
   "configVersion": 1,
   "tools": {
     "background-subagents": { "enabled": true },
@@ -249,7 +249,7 @@ concatenated). Settings apply only to settings-bearing categories (`tools` and
 A project file only needs what differs:
 
 ```jsonc
-// <project>/.opencode/opencode-kit.jsonc
+// <project>/.opencode/openkit.jsonc
 {
   "tools": {
     "background-subagents": { "enabled": false }
@@ -257,7 +257,7 @@ A project file only needs what differs:
 }
 ```
 
-More in [`docs/examples/opencode-kit.jsonc`](docs/examples/opencode-kit.jsonc).
+More in [`docs/examples/openkit.jsonc`](docs/examples/openkit.jsonc).
 
 If a **tool**'s settings fail validation, the kit logs a warning and falls back
 to that tool's defaults, and the tool still registers. An invalid
@@ -339,7 +339,7 @@ section, with the same discovery and precedence:
 
 Unlike tools, a skill takes no `settings`; only `enabled` is configurable. A
 disabled skill is not registered at all. Toggle one with the CLI
-(`bun bin/opencode-kit.js disable sdd-flow`) or in-session with
+(`bun bin/openkit.js disable sdd-flow`) or in-session with
 `/kit disable sdd-flow`.
 
 `sdd-flow` is a self-contained orchestrator: it sequences spec-driven
@@ -396,13 +396,13 @@ curated bundles. Add one with `new reference <id>` (see
 
 ## CLI reference
 
-Run from a checkout: `bun bin/opencode-kit.js <command>`.
+Run from a checkout: `bun bin/openkit.js <command>`.
 Edits made by `enable`, `disable`, and `config set` go to the **global** config
 and preserve comments and formatting.
 
 | Command | What it does |
 | --- | --- |
-| `init [--project]` | Create the kit config (global, or project with `--project`) seeded with every category's item defaults, and ensure `opencode-kit` is listed in the matching `opencode.json`. |
+| `init [--project]` | Create the kit config (global, or project with `--project`) seeded with every category's item defaults, and ensure `openkit` is listed in the matching `opencode.json`. |
 | `list` | List every item with its resolved enabled state and description. |
 | `enable <id>` | Set `<category>.<id>.enabled` to `true` in the global config. |
 | `disable <id>` | Set `<category>.<id>.enabled` to `false` in the global config. |
@@ -443,8 +443,8 @@ stdout sink (as when driving the command from a test harness).
 From a checkout of the repo:
 
 ```bash
-opencode-kit new tool my-tool
-# `opencode-kit new my-tool` is an alias for `new tool my-tool`
+openkit new tool my-tool
+# `openkit new my-tool` is an alias for `new tool my-tool`
 ```
 
 This creates `src/tools/my-tool/index.ts` from the standard template and inserts
@@ -454,7 +454,7 @@ Then:
 1. Implement `register(ctx, settings, kit)` in the generated `index.ts` to declare
    what the tool contributes.
 2. Add unit and harness tests under `tests/`.
-3. Add an entry to `docs/examples/opencode-kit.jsonc`.
+3. Add an entry to `docs/examples/openkit.jsonc`.
 
 A tool is a `KitTool`: a unique kebab-case `id`, a display `name`, a one-line
 `description`, typed `defaultSettings`, an optional `settingsSchema` (JSON
@@ -488,8 +488,8 @@ See `src/tools/hello/index.ts` for a complete, working example.
 From a checkout of the repo:
 
 ```bash
-opencode-kit new skill my-skill
-# `opencode-kit new-skill my-skill` is an alias for `new skill my-skill`
+openkit new skill my-skill
+# `openkit new-skill my-skill` is an alias for `new skill my-skill`
 ```
 
 This creates `src/skills/my-skill/SKILL.md` from the standard template and
@@ -500,7 +500,7 @@ inserts it into the skills barrel (`src/skills/index.ts`) between the
    `description` (when the model should use the skill), followed by the
    instruction body. Add any supporting files beside it; relative paths in the
    body resolve against the skill directory.
-2. Add an entry to `docs/examples/opencode-kit.jsonc`.
+2. Add an entry to `docs/examples/openkit.jsonc`.
 3. `bun run typecheck && bun test`.
 
 A skill is a `KitSkill`: a unique kebab-case `id` and the directory holding its
@@ -514,7 +514,7 @@ the skill off the model's advertised list while still loading it by id
 From a checkout of the repo:
 
 ```bash
-opencode-kit new reference my-reference
+openkit new reference my-reference
 ```
 
 This creates `src/references/my-reference/reference.json` from the standard
@@ -523,7 +523,7 @@ between the `<kit:references>` markers. Then:
 
 1. Point the `reference.json` at real content: set `"path"` for a local source,
    or switch to `"type": "git"` with `"repository"` (and an optional `"branch"`).
-2. Add an entry to `docs/examples/opencode-kit.jsonc`.
+2. Add an entry to `docs/examples/openkit.jsonc`.
 3. `bun run typecheck && bun test`.
 
 A reference is a `KitReference`: a unique kebab-case `id` and the directory

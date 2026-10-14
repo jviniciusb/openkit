@@ -18,7 +18,7 @@ export interface KitTool<S = unknown> {
   id: string
   /** Display name. */
   name: string
-  /** One line, shown in `opencode-kit list`. */
+  /** One line, shown in `openkit list`. */
   description: string
   /** Default false: tools are opt-in unless they say otherwise. */
   defaultEnabled?: boolean

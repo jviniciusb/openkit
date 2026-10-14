@@ -25,7 +25,7 @@ export async function loadKitConfig(paths: string[]): Promise<KitConfigFile[]> {
       const details = errors
         .map((e) => `${printParseErrorCode(e.error)} at offset ${e.offset}`)
         .join(", ")
-      console.warn(`opencode-kit: skipping malformed config ${path}: ${details}`)
+      console.warn(`openkit: skipping malformed config ${path}: ${details}`)
       continue
     }
 

@@ -13,7 +13,7 @@ import { deepMerge } from "./merge"
 import type { KitConfigFile } from "./types"
 
 /** The plugin id this kit registers under, as listed in `opencode.json`. */
-const PLUGIN_ID = "opencode-kit"
+const PLUGIN_ID = "openkit"
 
 /** JSONC read options; mirrors the config loaders. */
 const READ_OPTIONS = { allowTrailingComma: true, disallowComments: false } as const
@@ -80,7 +80,7 @@ function pluginOptionsFrom(plugins: unknown): KitConfigFile | undefined {
 }
 
 /**
- * Best-effort read of the `opencode-kit` plugin options from the global and
+ * Best-effort read of the `openkit` plugin options from the global and
  * project (`cwd`) `opencode.json`, lower precedence first.
  *
  * The CLI has no access to the live plugin context, so it re-reads the plugin's

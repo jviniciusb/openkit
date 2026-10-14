@@ -43,7 +43,7 @@ function check(name: string, ok: boolean, detail = "") {
 
 function writeKitConfig(enabled: boolean) {
   writeFileSync(
-    join(project, ".opencode", "opencode-kit.jsonc"),
+    join(project, ".opencode", "openkit.jsonc"),
     JSON.stringify({ tools: { "background-subagents": { enabled } } }, null, 2),
   )
 }

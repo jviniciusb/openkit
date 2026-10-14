@@ -154,7 +154,7 @@ test("config set warns when a project config overrides the value", async () => {
   const h = home()
   const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
   mkdirSync(join(cwd, ".opencode"), { recursive: true })
-  const project = join(cwd, ".opencode", "opencode-kit.jsonc")
+  const project = join(cwd, ".opencode", "openkit.jsonc")
   writeFileSync(project, '{ "tools": { "background-subagents": { "settings": { "greeting": "Project" } } } }')
 
   const { io: streams, err } = io(h)
@@ -171,7 +171,7 @@ test("enable warns when a project config overrides the global write", async () =
   const h = home()
   const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
   mkdirSync(join(cwd, ".opencode"), { recursive: true })
-  const project = join(cwd, ".opencode", "opencode-kit.jsonc")
+  const project = join(cwd, ".opencode", "openkit.jsonc")
   writeFileSync(project, '{ "tools": { "background-subagents": { "enabled": false } } }')
 
   const { io: streams, err } = io(h)
@@ -190,7 +190,7 @@ test("enable warns when opencode.json plugin options override the global write",
   const cwd = mkdtempSync(join(tmpdir(), "cwd-"))
   writeFileSync(
     join(cwd, "opencode.json"),
-    '{ "plugins": [["opencode-kit", { "tools": { "background-subagents": { "enabled": false } } }]] }',
+    '{ "plugins": [["openkit", { "tools": { "background-subagents": { "enabled": false } } }]] }',
   )
 
   const { io: streams, err } = io(h)
@@ -241,7 +241,7 @@ test("CLI honors an explicit XDG_CONFIG_HOME and restores the ambient value", as
   const xdg = mkdtempSync(join(tmpdir(), "xdg-"))
   const dir = join(xdg, "opencode")
   mkdirSync(dir, { recursive: true })
-  writeFileSync(join(dir, "opencode-kit.jsonc"), '{ "tools": { "background-subagents": { "enabled": true } } }')
+  writeFileSync(join(dir, "openkit.jsonc"), '{ "tools": { "background-subagents": { "enabled": true } } }')
 
   const previous = process.env.XDG_CONFIG_HOME
   process.env.XDG_CONFIG_HOME = xdg

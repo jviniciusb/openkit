@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in opencode-kit. This is a Bun + TypeScript project for
+Thanks for your interest in openkit. This is a Bun + TypeScript project for
 building OpenCode V2 tools.
 
 ## Development setup
@@ -37,12 +37,12 @@ bun test            # bun test
 ## Adding a tool
 
 ```bash
-opencode-kit new my-tool
+openkit new my-tool
 ```
 
 The scaffolder creates `src/tools/my-tool/index.ts` and registers it in the tool
 barrel between the `<kit:tools>` markers. Then implement `register`, add tests,
-and add an example entry to `docs/examples/opencode-kit.jsonc`.
+and add an example entry to `docs/examples/openkit.jsonc`.
 
 Every tool must:
 
@@ -53,8 +53,8 @@ Every tool must:
 
 ## Reporting bugs
 
-Open an issue with a minimal reproduction: the relevant `opencode-kit.jsonc`,
-the command or session action, and the output of `opencode-kit doctor`.
+Open an issue with a minimal reproduction: the relevant `openkit.jsonc`,
+the command or session action, and the output of `openkit doctor`.
 
 ## License
 
