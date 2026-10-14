@@ -1,13 +1,17 @@
 import { existsSync } from "node:fs"
 import { mkdir, readFile, writeFile } from "node:fs/promises"
 import { join } from "node:path"
-import { referenceCategory } from "../categories/reference"
 import { skillCategory } from "../categories/skill"
 import { toolCategory } from "../categories/tool"
 import type { CategoryScaffold, KitCategory } from "../core/category"
 
-/** Valid tool, skill, and reference ids: kebab-case, starting with a lowercase letter. */
-const ITEM_ID_RE = /^[a-z][a-z0-9-]*$/
+/**
+ * Valid tool, skill, and reference ids: kebab-case, starting with a lowercase
+ * letter. Hyphens separate non-empty segments, so a trailing or doubled hyphen
+ * (`foo-`, `foo--bar`) is rejected — those would collide with `foo`/`foo-bar`
+ * once camel-cased into a barrel import.
+ */
+const ITEM_ID_RE = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/
 
 /**
  * Inserts a new item's entry (and import, when the category needs one) into its
@@ -120,17 +124,4 @@ export async function scaffoldTool(root: string, toolId: string): Promise<{ dir:
  */
 export async function scaffoldSkill(root: string, skillId: string): Promise<{ dir: string }> {
   return scaffoldCategory(skillCategory, root, skillId)
-}
-
-/**
- * Scaffolds a new kit reference under `root`.
- *
- * Thin wrapper over {@link scaffoldCategory} using the references category
- * metadata.
- */
-export async function scaffoldReference(
-  root: string,
-  referenceId: string,
-): Promise<{ dir: string }> {
-  return scaffoldCategory(referenceCategory, root, referenceId)
 }

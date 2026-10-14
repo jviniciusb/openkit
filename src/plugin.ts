@@ -3,6 +3,7 @@ import { homedir } from "node:os"
 
 import { categories } from "./catalog"
 import { registerKitCommand } from "./commands/kit"
+import { PLUGIN_ID } from "./constants"
 import type { KitCategory } from "./core/category"
 import type { KitContext } from "./core/context"
 import { registerCategories, type DegradedItem } from "./core/engine"
@@ -213,7 +214,7 @@ export async function createLifecycle(
 }
 
 export default {
-  id: "openkit",
+  id: PLUGIN_ID,
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
     const life = await createLifecycle(ctx, categories, ctx.options as Record<string, unknown>)
     // Register the `/kit` command alongside the tool lifecycle so it is
