@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.18.1] - 2026-10-14
+
+### Fixed
+
+- `auto-compact` now checks idle sessions when OpenCode emits `session.viewed`,
+  so resumed sessions with an unviewed idle transition are checked against the
+  configured threshold.
+
 ## [0.18.0] - 2026-10-14
 
 ### Changed
@@ -280,7 +288,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.18.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.18.1...HEAD
+[0.18.1]: https://github.com/jviniciusb/opencode-kit/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.15.0...v0.16.0

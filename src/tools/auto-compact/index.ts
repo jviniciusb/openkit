@@ -171,6 +171,12 @@ export const autoCompact: KitTool<AutoCompactSettings> = defineTool<AutoCompactS
                 void checkCandidate(sessionID)
               }
               break
+            case "session.viewed":
+              if (sessionID) {
+                idleCandidates.add(sessionID)
+                void checkCandidate(sessionID)
+              }
+              break
             case "session.tool.called": {
               const id = stringField(data, "id")
               if (sessionID && id) activeTools.set(`${sessionID}\0${id}`, sessionID)
