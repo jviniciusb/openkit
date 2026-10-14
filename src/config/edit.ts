@@ -154,6 +154,10 @@ export async function seedEntries(
     next = applyEdits(next, modify(next, [category, id], entry, MODIFY_OPTIONS))
   }
 
+  // A repeat `init` (every entry already present) must not rewrite the file and
+  // bump its mtime, which would trigger the config watcher for nothing.
+  if (next === text) return
+
   mkdirSync(dirname(path), { recursive: true })
   writeFileSync(path, next)
 }
