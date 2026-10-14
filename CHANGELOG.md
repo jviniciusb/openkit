@@ -4,6 +4,37 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.2] - 2026-10-14
+
+### Fixed
+
+- `list`, `config get`, and `doctor` now resolve config across the full
+  precedence chain, including the plugin `plugins[].options` layer, so they
+  agree with what the runtime registers and with the `enable`/`disable`
+  warnings.
+- `openkit init` edits the existing `opencode.jsonc` when present instead of
+  always writing `opencode.json`, so the plugin is listed in the file OpenCode
+  actually reads.
+- A quoted `enabled` (`"true"`/`"false"`) is now honored and any other
+  non-boolean value is ignored, instead of silently flipping an item; a
+  non-object `settings` layer no longer wipes accumulated settings.
+- `deepMerge` ignores a `__proto__` key, so config read from `opencode.json` or
+  `plugins[].options` cannot pollute a prototype.
+- Tool settings schemas that share an `$id` no longer collide on compile, and
+  the invalid-settings fallback clones `defaultSettings`.
+- `config set` no longer warns about an override when only key order differs.
+- The CLI sets `process.exitCode` instead of calling `process.exit`, so piped
+  output is not truncated.
+
+### Changed
+
+- `enable`, `disable`, and `new-skill` reject extra positional arguments.
+- Scaffolder ids reject trailing or doubled hyphens (`foo-`, `foo--bar`).
+
+### Removed
+
+- The unused `scaffoldReference` helper.
+
 ## [0.20.1] - 2026-10-14
 
 ### Fixed
@@ -326,7 +357,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.20.1...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.20.2...HEAD
+[0.20.2]: https://github.com/jviniciusb/openkit/compare/v0.20.1...v0.20.2
 [0.20.1]: https://github.com/jviniciusb/openkit/compare/v0.20.0...v0.20.1
 [0.20.0]: https://github.com/jviniciusb/openkit/compare/v0.19.0...v0.20.0
 [0.19.0]: https://github.com/jviniciusb/openkit/compare/v0.18.1...v0.19.0
