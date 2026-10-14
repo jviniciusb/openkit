@@ -9,6 +9,7 @@ import {
   globalOpencodePath,
   globalOpencodePaths,
   opencodeConfigPaths,
+  resolveOpencodeConfigPath,
 } from "../../src/config/discover"
 
 test("includes global then project ancestors farthest->nearest", () => {
@@ -68,6 +69,17 @@ test("opencodeConfigPaths and globalOpencodePaths cover both .json and .jsonc", 
     join("/xdg", "opencode", "opencode.json"),
     join("/xdg", "opencode", "opencode.jsonc"),
   ])
+})
+
+test("resolveOpencodeConfigPath prefers an existing .jsonc, then .json, else defaults to .json", () => {
+  const dir = mkdtempSync(join(tmpdir(), "oc-"))
+  expect(resolveOpencodeConfigPath(dir)).toBe(join(dir, "opencode.json"))
+
+  writeFileSync(join(dir, "opencode.json"), "{}\n")
+  expect(resolveOpencodeConfigPath(dir)).toBe(join(dir, "opencode.json"))
+
+  writeFileSync(join(dir, "opencode.jsonc"), "{}\n")
+  expect(resolveOpencodeConfigPath(dir)).toBe(join(dir, "opencode.jsonc"))
 })
 
 test("discoverKitConfigFiles honors XDG_CONFIG_HOME", () => {
