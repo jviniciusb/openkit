@@ -40,7 +40,7 @@ export async function toggleOperation(
   deps.out(`${id} ${enabled ? "enabled" : "disabled"}`)
 
   // Resolve after the write so the global layer reflects the new value.
-  const layers = await buildConfigLayers(deps.cwd, deps.home, process.env, deps.options)
+  const layers = await buildConfigLayers(deps.cwd, deps.home, deps.env, deps.options)
   const effective = resolveCategoryEffective(category, item, layers)
   if (effective.enabled !== enabled) {
     deps.err(
