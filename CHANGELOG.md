@@ -4,6 +4,22 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.20.0] - 2026-10-14
+
+### Changed
+
+- **Renamed the project from `opencode-kit` to `openkit`.** The package name,
+  CLI (`bin/openkit.js`, invoked as `openkit`), log prefixes, plugin id, kit
+  config filename (`openkit.jsonc`), schema file (`openkit.schema.json`), and
+  repository URL (`github.com/jviniciusb/openkit`) all change. The `/kit`
+  command and the `<kit:*>` barrel markers are unchanged. Historical notes
+  under `docs/superpowers/` keep the old name.
+
+  **Breaking:** rename an existing `~/.config/opencode/opencode-kit.jsonc` to
+  `openkit.jsonc`, and update the `plugins` entry in `opencode.json` to the
+  `openkit@…` spec. Renaming the plugin id re-scopes `ctx.storage`, resetting
+  auto-compact's idle tracking.
+
 ## [0.19.0] - 2026-10-14
 
 ### Changed
