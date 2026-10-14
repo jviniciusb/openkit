@@ -18,9 +18,13 @@ test("ignores prototype-polluting keys", () => {
   expect(({} as Record<string, unknown>).polluted).toBeUndefined()
   expect(Object.getPrototypeOf(merged)).toBe(Object.prototype)
 })
-test("ignores constructor and prototype keys", () => {
-  const malicious = JSON.parse('{"constructor": {"x": 1}, "prototype": {"y": 1}, "ok": true}')
-  const merged = deepMerge({ a: 1 } as Record<string, unknown>, malicious)
-  expect(merged.ok).toBe(true)
-  expect(Object.hasOwn(merged, "prototype")).toBe(false)
+test("keeps legitimate constructor and prototype keys", () => {
+  // The kit ships a `prototype` skill and settings may use these names, so the
+  // pollution guard must not drop them.
+  const merged = deepMerge(
+    { skills: { prototype: { enabled: false } } },
+    { skills: { prototype: { enabled: true } }, constructor: "kept" },
+  )
+  expect((merged as Record<string, any>).skills.prototype.enabled).toBe(true)
+  expect(Object.getOwnPropertyDescriptor(merged, "constructor")?.value).toBe("kept")
 })

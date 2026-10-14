@@ -1,7 +1,15 @@
 import type { KitConfigFile } from "./types"
 
-/** Keys whose assignment would mutate an object's prototype; never merged. */
-const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"])
+/**
+ * The only key whose plain assignment mutates a prototype.
+ *
+ * `result[key] = …` on a fresh object literal invokes the `__proto__` accessor;
+ * `constructor` and `prototype` are ordinary data keys and must NOT be skipped
+ * (the kit ships a `prototype` skill, and settings may legitimately use those
+ * names). Item ids cannot be `__proto__` (they must start with a lowercase
+ * letter), so skipping it never drops a real entry.
+ */
+const UNSAFE_KEYS = new Set(["__proto__"])
 
 /** True when `value` is a non-null, non-array object. */
 export function isPlainObject(value: unknown): value is Record<string, unknown> {
@@ -14,9 +22,10 @@ export function isPlainObject(value: unknown): value is Record<string, unknown> 
  * - Plain objects merge recursively.
  * - Arrays and scalars replace.
  * - `undefined` in `override` never removes a value from `base`.
- * - `__proto__`, `constructor`, and `prototype` keys are ignored, so untrusted
- *   config (e.g. `ctx.options` or a parsed `opencode.json`) cannot pollute a
- *   prototype through the assignment below.
+ * - A `__proto__` key is ignored, so untrusted config (e.g. `ctx.options` or a
+ *   parsed `opencode.json`) cannot pollute a prototype through the assignment
+ *   below. Other keys — including `constructor` and `prototype` — merge
+ *   normally, since assigning them creates ordinary data properties.
  */
 export function deepMerge<T>(base: T, override: unknown): T {
   if (override === undefined) return base
