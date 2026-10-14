@@ -35,3 +35,20 @@ test("malformed schema does not throw; degrades to defaults", () => {
   expect(r.degraded).toBeDefined()
   expect(r.degraded).toContain("t")
 })
+
+test("two schemas sharing an $id compile independently", () => {
+  const first = { $id: "https://example.test/shared", type: "object", properties: { a: { type: "integer" } } }
+  const second = { $id: "https://example.test/shared", type: "object", properties: { b: { type: "string" } } }
+  expect(validateToolSettings(first, { a: 1 }).valid).toBe(true)
+  expect(validateToolSettings(second, { b: "x" }).valid).toBe(true)
+  expect(validateToolSettings(second, { b: 1 }).valid).toBe(false)
+})
+
+test("fallback defaults are cloned, not shared with the tool", () => {
+  const defaults = { nested: { n: 1 } }
+  const tool = defineTool({ id: "t", name: "T", description: "d",
+    defaultSettings: defaults, settingsSchema: schema, register() {} })
+  const r = resolveValidated(tool, { enabled: true, settings: { n: "x" } })
+  ;(r.config.settings as typeof defaults).nested.n = 99
+  expect(defaults.nested.n).toBe(1)
+})

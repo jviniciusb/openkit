@@ -1,5 +1,5 @@
 import type { ConfigLayer } from "../config/effective"
-import { deepMerge } from "../config/merge"
+import { deepMerge, isPlainObject } from "../config/merge"
 import { categoryEntries, type KitConfigFile } from "../config/types"
 import type { KitCategory, ResolvedEntry } from "./category"
 import type { KitContext, Registration } from "./context"
@@ -14,6 +14,20 @@ export interface DegradedItem {
 /** Reads an item's config id; `KitCategory` stays unconstrained for bivariance. */
 export function itemId<T>(item: T): string {
   return (item as { id: string }).id
+}
+
+/**
+ * Normalizes a config `enabled` value.
+ *
+ * Booleans pass through; the JSON string forms `"true"`/`"false"` are accepted
+ * so a hand-written config cannot silently flip an item by quoting the value.
+ * Anything else returns `undefined` (ignored, keeping the prior value).
+ */
+function normalizeEnabled(value: unknown): boolean | undefined {
+  if (typeof value === "boolean") return value
+  if (value === "true") return true
+  if (value === "false") return false
+  return undefined
 }
 
 /** An item's state after folding every layer; bookkeeping names the winning layer. */
@@ -55,11 +69,12 @@ function foldCategoryState<T>(
     const entry = categoryEntries(layer.config, category.key)?.[id]
     if (entry === undefined) continue
 
-    if (entry.enabled !== undefined) {
-      enabled = entry.enabled
+    const nextEnabled = normalizeEnabled(entry.enabled)
+    if (nextEnabled !== undefined) {
+      enabled = nextEnabled
       enabledLayer = layer
     }
-    if (category.hasSettings && entry.settings !== undefined) {
+    if (category.hasSettings && isPlainObject(entry.settings)) {
       for (const key of Object.keys(entry.settings)) settingLayers![key] = layer
       settings = deepMerge(settings ?? {}, entry.settings)
     }

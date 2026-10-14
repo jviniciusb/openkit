@@ -10,3 +10,21 @@ test("arrays replace, not concat", () => {
 test("undefined does not remove a base value", () => {
   expect(deepMerge({ a: 1, b: 2 }, { a: undefined })).toEqual({ a: 1, b: 2 })
 })
+test("ignores prototype-polluting keys", () => {
+  const malicious = JSON.parse('{"__proto__": {"polluted": true}, "b": 2}')
+  const merged = deepMerge({ a: 1 } as Record<string, unknown>, malicious)
+  expect(merged.b).toBe(2)
+  expect((merged as Record<string, unknown>).polluted).toBeUndefined()
+  expect(({} as Record<string, unknown>).polluted).toBeUndefined()
+  expect(Object.getPrototypeOf(merged)).toBe(Object.prototype)
+})
+test("keeps legitimate constructor and prototype keys", () => {
+  // The kit ships a `prototype` skill and settings may use these names, so the
+  // pollution guard must not drop them.
+  const merged = deepMerge(
+    { skills: { prototype: { enabled: false } } },
+    { skills: { prototype: { enabled: true } }, constructor: "kept" },
+  )
+  expect((merged as Record<string, any>).skills.prototype.enabled).toBe(true)
+  expect(Object.getOwnPropertyDescriptor(merged, "constructor")?.value).toBe("kept")
+})
