@@ -6,6 +6,10 @@ import { defineTool, type KitTool } from "../../core/tool"
  */
 export const BUILT_IN_RULES = [
   {
+    id: "proactive",
+    text: "Act proactively. When the instructions make the next step clear and no gate or instruction says to stop, continue without pausing to confirm. When they are not clear, keep the job moving without crossing a gate: settle the facts yourself (directly or with a subagent) with research, exploration, or a quick throwaway prototype, and put the remaining decisions to the user rather than stalling. Do not assume — act on high-confidence evidence, and say plainly when you do not have it.",
+  },
+  {
     id: "think-in-code",
     text: "Before substantive work, consider available skill descriptions and load the best fit when its workflow meaningfully applies, even if the request doesn't name it. Skip only speculative matches. For current facts, repository state, or requested operations, prefer available tools over memory and use the most specific MCP tool, CLI, or project script before shell; look up the exact tool path and signature rather than guessing. Shape reads and queries to the relevant fields, ranges, matches, or excerpts. When size or structure is unknown, inspect metadata or a small sample first and expand selectively. When a task needs several tool calls whose results you only use to compute one answer — chaining, fan-out, joins, filtering, counting, parsing, aggregation — write one short program (Code Mode, a script, or a CLI pipeline) that returns only the derived value, so the intermediates never enter your context; reserve it for several calls, a single call stays direct. Await every call whose result you use, run independent calls concurrently, and return a small, plain value. Read source directly when semantic understanding is needed; use code to reduce mechanical processing, not judgment.",
   },
@@ -51,6 +55,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
   defaultEnabled: false,
   defaultSettings: {
     rules: {
+      proactive: true,
       "think-in-code": true,
       "functional-programming": true,
       decomposition: true,
@@ -65,6 +70,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
       rules: {
         type: "object",
         properties: {
+          proactive: { type: "boolean" },
           "think-in-code": { type: "boolean" },
           "functional-programming": { type: "boolean" },
           decomposition: { type: "boolean" },
