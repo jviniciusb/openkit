@@ -33,6 +33,22 @@ export function globalOpencodePath(home: string, env: Env = process.env): string
   return join(globalConfigDir(env, home), "opencode.json")
 }
 
+/**
+ * Chooses the OpenCode config file to edit in `directory`.
+ *
+ * Prefers an existing `opencode.jsonc`, then an existing `opencode.json` (the
+ * JSONC file wins when both exist, matching `readPluginOptions` precedence),
+ * and falls back to `opencode.json` when neither exists so a new file is
+ * created under the default name.
+ */
+export function resolveOpencodeConfigPath(directory: string): string {
+  for (const name of [...OPENCODE_FILE_NAMES].reverse()) {
+    const candidate = join(directory, name)
+    if (existsSync(candidate)) return candidate
+  }
+  return join(directory, OPENCODE_FILE_NAMES[0])
+}
+
 /** Candidate OpenCode config paths in `directory` (`.json` and `.jsonc`). */
 export function opencodeConfigPaths(directory: string): string[] {
   return OPENCODE_FILE_NAMES.map((name) => join(directory, name))
