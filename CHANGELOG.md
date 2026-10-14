@@ -4,6 +4,19 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.17.0] - 2026-10-14
+
+### Added
+
+- `context-injections` rule `proactive` (default on): act proactively — continue
+  when the instructions make the next step clear and no gate or instruction says
+  to stop; when they are not clear, keep the job moving without crossing a gate by
+  settling facts yourself (directly or with a subagent) through research,
+  exploration, or a quick throwaway prototype, and putting the remaining decisions
+  to the user rather than stalling; do not assume — act on high-confidence
+  evidence. A separate, individually toggleable rule, so it defers to every
+  existing gate (`sdd-flow`, `interview`, `finishing-a-branch`).
+
 ## [0.16.0] - 2026-10-14
 
 ### Changed
@@ -254,7 +267,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/opencode-kit/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/jviniciusb/opencode-kit/compare/v0.13.0...v0.14.0
