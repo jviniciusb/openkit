@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.21.0] - 2026-10-15
+
+### Changed
+
+- `context-injections`: the injected rules block no longer claims to take
+  precedence over other instructions. The heading is now `# Operating rules`
+  (was `# Operating rules (mandatory)`) and the preamble reads "Apply these to
+  every task. They are requirements, not suggestions." The comparative framing
+  made the block compete for ranking, which recency-weighted attention decides;
+  a plain statement of status keeps its authority without depending on where
+  the block sits. No rule text, id, default, or schema change.
+
 ## [0.20.2] - 2026-10-14
 
 ### Fixed
@@ -358,6 +370,7 @@ The first release of the opencode-kit framework.
   `docs/examples/opencode-kit.jsonc`.
 
 [Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.20.2...HEAD
+[0.21.0]: https://github.com/jviniciusb/openkit/compare/v0.20.2...v0.21.0
 [0.20.2]: https://github.com/jviniciusb/openkit/compare/v0.20.1...v0.20.2
 [0.20.1]: https://github.com/jviniciusb/openkit/compare/v0.20.0...v0.20.1
 [0.20.0]: https://github.com/jviniciusb/openkit/compare/v0.19.0...v0.20.0
