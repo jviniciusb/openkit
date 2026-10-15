@@ -39,9 +39,8 @@ export type RuleId = (typeof BUILT_IN_RULES)[number]["id"]
  * instructions document; bare appended paragraphs read as ambient context and
  * carry far less weight against a project's `AGENTS.md`.
  */
-export const RULES_HEADING = "# Operating rules (mandatory)"
-export const RULES_PREAMBLE =
-  "Apply every rule below to every task. They are standing instructions, not suggestions, and take precedence over default habits where they conflict."
+export const RULES_HEADING = "# Operating rules"
+export const RULES_PREAMBLE = "Apply these to every task. They are requirements, not suggestions."
 
 /** Settings accepted by the `context-injections` tool. */
 export interface ContextInjectionsSettings {
