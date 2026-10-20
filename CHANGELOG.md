@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `proactive` clarifies when to ask about consequential choices or decisions the
+  user owns, and to use and state sensible defaults for other reversible details.
+- `careful-changes` now requires outcome verification, final-diff inspection, and
+  transparent reporting of checks run and anything left unverified.
+
 ## [0.21.2] - 2026-10-20
 
 ### Changed

@@ -7,7 +7,7 @@ import { defineTool, type KitTool } from "../../core/tool"
 export const BUILT_IN_RULES = [
   {
     id: "proactive",
-    text: "Act proactively. When the instructions make the next step clear and no gate or instruction says to stop, continue without pausing to confirm. When it is not clear, keep moving without crossing a gate: settle the facts yourself — research, explore, build a throwaway prototype, or dispatch a subagent — and put the remaining decisions to the user. Act only on high-confidence evidence, and say plainly when you lack it.",
+    text: "Act proactively. When the instructions make the next step clear and no gate or instruction says to stop, continue without pausing to confirm. When it is not clear, keep moving without crossing a gate: settle the facts yourself — research, explore, build a throwaway prototype, or dispatch a subagent. Ask the user about unresolved choices that materially affect behavior, scope, risk, or a decision they own; for low-impact, reversible details, choose a sensible default and state the assumption. Act only on high-confidence evidence, and say plainly when you lack it.",
   },
   {
     id: "think-in-code",
@@ -27,7 +27,7 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "careful-changes",
-    text: "Before editing, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff: when adding a feature, change or refactor existing design where that materially improves the integrated result; do not preserve existing structure merely because it is already there. Keep refactors within the request and any agreed scope; do not expand behavior or scope without authorization. Re-read each target immediately before changing it, and preserve unrelated or concurrent work. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
+    text: "Before editing, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff: when adding a feature, change or refactor existing design where that materially improves the integrated result; do not preserve existing structure merely because it is already there. Keep refactors within the request and any agreed scope; do not expand behavior or scope without authorization. Re-read each target immediately before changing it, and preserve unrelated or concurrent work. Verify the outcome, not just the edit: run relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
   },
 ] as const
 
