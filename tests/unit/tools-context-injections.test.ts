@@ -141,20 +141,26 @@ test("functional-programming keeps the idiomatic-otherwise escape hatch", () => 
   expect(text).toContain("codebase")
 })
 
-test("subagent-driven keeps the orchestrator free by dispatching subagents in the background", () => {
+test("subagent-driven fans out the ready work and distinguishes tool batches", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "subagent-driven")!.text.toLowerCase()
   expect(text).toContain("orchestrator")
   expect(text).toContain("background")
   expect(text).toContain("stay free")
   expect(text).toContain("not stuck waiting")
-  expect(text).toContain("fan out")
+  expect(text).toContain("all ready, independent pieces")
+  expect(text).toContain("same dispatch")
+  expect(text).toContain("concurrent tool calls")
+  expect(text).toContain("do not delegate dependent work")
   expect(text).toContain("fan in")
 })
 
-test("decomposition marks the parallel-ready pieces without prescribing dispatch", () => {
+test("decomposition actively favors safe parallel work without crossing gates", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "decomposition")!.text.toLowerCase()
-  expect(text).toContain("ready pieces can proceed in parallel")
-  expect(text).not.toMatch(/background|dispatch/)
+  expect(text).toContain("actively look for safe parallelism")
+  expect(text).toContain("rather than defaulting to serial work")
+  expect(text).toContain("start all ready, independent pieces concurrently")
+  expect(text).toContain("keep dependent or shared-state work together")
+  expect(text).toContain("never cross an approval gate")
 })
 
 test("think-in-code writes one program for multi-call composition, not bulk only", () => {
