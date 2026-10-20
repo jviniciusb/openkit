@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `context-injections` `careful-changes` now explicitly favors the best coherent
+  integrated result over the smallest diff, allowing feature-relevant refactors
+  while preserving unrelated or concurrent work.
+
 ## [0.21.0] - 2026-10-15
 
 ### Changed

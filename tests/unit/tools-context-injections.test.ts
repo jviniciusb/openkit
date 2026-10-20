@@ -49,6 +49,12 @@ test("careful-changes is enabled by default and injected", async () => {
   expect(text).toContain("unrelated")
   expect(text).toContain("concurrent")
   expect(text).toContain("reachable")
+  expect(text).toContain("best coherent end state")
+  expect(text).toContain("not the smallest diff")
+  expect(text).toContain("change or refactor existing design")
+  expect(text).toContain("within the request and any agreed scope")
+  expect(text).toContain("without authorization")
+  expect(text).toContain("unrelated or concurrent")
   expect(text).toContain("public paste")
 })
 
