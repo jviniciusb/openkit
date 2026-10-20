@@ -15,18 +15,19 @@ The whole value depends on the tasks being independent. Work that is related, sh
 
 ## When to Use
 
-- Two or more tasks can be worked without shared state or sequential dependencies.
+- For any non-trivial task, actively check whether two or more ready pieces can be worked without shared state or sequential dependencies.
 - Several unrelated failures or subsystems each have their own cause.
 - Each problem can be understood without context from the others.
 - No shared state exists between the tasks: no common files, resources, or mutable state.
-- You already know what is broken and each domain is separable.
+- The task domains are sufficiently understood to delegate safely. If they are not, do a bounded investigation first; then reassess whether independent investigations or work can proceed concurrently.
 
 Do not parallelize when:
 
+- A task depends on unfinished work; wait until its prerequisites are complete.
 - The failures are related, so fixing one may fix the others; investigate them together first.
 - The tasks share state, so agents would interfere by editing the same files or using the same resources.
 - Understanding a task requires seeing the whole system rather than one domain.
-- You are still exploring and do not yet know what is broken.
+- You are considering speculative implementation before enough investigation to establish independence. Independently scoped investigations may proceed concurrently when their scope and inputs are clear.
 
 ## Process
 
@@ -43,9 +44,9 @@ Give each agent a prompt that is:
 - **Specific about output:** state exactly what the agent should return, such as a summary of the root cause and the changes made.
 - **Constrained:** name what the agent must not touch, so it does not refactor beyond its scope.
 
-### 3. Dispatch in parallel
+### 3. Dispatch the ready set together
 
-Issue every subagent call in the same response so they run concurrently. One call per response is sequential, not parallel; the parallelism comes from batching the dispatches together.
+When at least two independent pieces are ready and the time saved justifies coordination, dispatch all of them in the same response so they run concurrently. Do not send one subagent at a time for work that is already known to be independent. For bounded queries that only need returned values, use batched tool calls instead of creating subagents. Never dispatch work across an approval gate or before its prerequisites are met.
 
 ### 4. Review and integrate
 
@@ -63,7 +64,7 @@ When the agents return:
 - **One domain per agent.** A prompt covers a single problem domain, not several.
 - **Self-contained prompts.** Each agent gets all the context it needs, since it does not inherit the coordinator's session.
 - **Constraints are stated.** Each prompt names what the agent must not change.
-- **Parallel dispatch.** All calls go out in one response.
+- **Parallel dispatch.** Once independent work is ready and authorized, dispatch the full ready set together; use batched tool calls for bounded queries.
 - **Integrated and verified afterward.** The results are reviewed, checked for conflicts, and run against the full suite before they are accepted.
 
 ## Anti-patterns
@@ -71,7 +72,7 @@ When the agents return:
 - Parallelizing related failures that one fix might resolve together.
 - Fanning out tasks that share state, so agents interfere with each other.
 - Splitting a task that needs full-system context into domains that cannot stand alone.
-- Dispatching during exploratory debugging, before you know what is broken.
+- Dispatching speculative implementation before enough investigation to establish independence; do bounded investigation, then reassess parallel work.
 - Sending a broad prompt such as "fix all the tests" instead of one focused domain.
 - Omitting the context, so an agent cannot understand the problem on its own.
 - Leaving constraints implicit, so an agent refactors beyond its scope.

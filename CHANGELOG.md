@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `context-injections` now explicitly prompts agents to seek worthwhile safe
+  parallelism and dispatch the full ready set together. The
+  `dispatching-parallel-agents` skill clarifies when to use parallel subagents
+  versus batched tool calls, with approval-gate and shared-state safeguards.
+
 ## [0.21.1] - 2026-10-20
 
 ### Changed
