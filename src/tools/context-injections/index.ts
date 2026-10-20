@@ -27,7 +27,7 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "careful-changes",
-    text: "Before editing, read the relevant code and trace the real flow. Re-read each target immediately before changing it, keep edits scoped to the request, and preserve unrelated or concurrent work. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
+    text: "Before editing, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff: when adding a feature, change or refactor existing design where that materially improves the integrated result; do not preserve existing structure merely because it is already there. Keep refactors within the request and any agreed scope; do not expand behavior or scope without authorization. Re-read each target immediately before changing it, and preserve unrelated or concurrent work. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
   },
 ] as const
 
