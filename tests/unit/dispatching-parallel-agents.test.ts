@@ -35,8 +35,19 @@ test("dispatching-parallel-agents body is self-contained and carries the provena
   expect(body).toContain("license: MIT")
 })
 
+test("dispatching-parallel-agents dispatches the authorized ready set together", () => {
+  const body = loadSkill(skill!).content
+  expect(body).toContain("actively check whether two or more ready pieces")
+  expect(body).toContain("dispatch all of them in the same response")
+  expect(body).toContain("Do not send one subagent at a time")
+  expect(body).toContain("batched tool calls")
+  expect(body).toContain("Never dispatch work across an approval gate")
+})
+
 test("dispatching-parallel-agents keeps the do-not-parallelize guard", () => {
   const body = loadSkill(skill!).content
   expect(body).toContain("shared state")
   expect(body).toContain("Do not parallelize")
+  expect(body).toContain("A task depends on unfinished work")
+  expect(body).toContain("Independently scoped investigations may proceed concurrently")
 })
