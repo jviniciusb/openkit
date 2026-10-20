@@ -1,6 +1,6 @@
 {
   "name": "openkit",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "description": "A framework of toggleable, configurable tools, skills, and references for OpenCode V2",
   "keywords": [
     "opencode",
