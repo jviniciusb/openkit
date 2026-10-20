@@ -4,13 +4,13 @@ All notable changes to this project are documented in this file. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this
 project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.21.1] - 2026-10-20
 
 ### Changed
 
 - `context-injections` `careful-changes` now explicitly favors the best coherent
   integrated result over the smallest diff, allowing feature-relevant refactors
-  while preserving unrelated or concurrent work.
+  while preserving unrelated or concurrent work and agreed scope.
 
 ## [0.21.0] - 2026-10-15
 
@@ -377,7 +377,7 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.20.2...HEAD
+[0.21.1]: https://github.com/jviniciusb/openkit/compare/v0.21.0...v0.21.1
 [0.21.0]: https://github.com/jviniciusb/openkit/compare/v0.20.2...v0.21.0
 [0.20.2]: https://github.com/jviniciusb/openkit/compare/v0.20.1...v0.20.2
 [0.20.1]: https://github.com/jviniciusb/openkit/compare/v0.20.0...v0.20.1
