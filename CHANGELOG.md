@@ -6,6 +6,8 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-10-21
+
 ### Added
 
 - `/kit config get <id> <key>` prints a settings-bearing item's effective value.
@@ -411,7 +413,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.21.3...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.22.0...HEAD
+[0.22.0]: https://github.com/jviniciusb/openkit/compare/v0.21.3...v0.22.0
 [0.21.3]: https://github.com/jviniciusb/openkit/compare/v0.21.2...v0.21.3
 [0.21.2]: https://github.com/jviniciusb/openkit/compare/v0.21.1...v0.21.2
 [0.21.1]: https://github.com/jviniciusb/openkit/compare/v0.21.0...v0.21.1
