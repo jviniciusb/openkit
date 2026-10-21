@@ -29,7 +29,7 @@ instead of replacing it.
 
 > **Status:** `openkit` is distributed directly from GitHub (there is no npm
 > package). Add the git spec below. To pin a release, append a tag:
-> `#v0.22.0`.
+> `#v0.22.1`.
 
 Add the git spec to the `plugins` array of `opencode.json(c)`:
 
