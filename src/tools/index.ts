@@ -1,5 +1,4 @@
 import type { KitTool } from "../core/tool"
-import { autoCompact } from "./auto-compact/index"
 import { backgroundSubagents } from "./background-subagents/index"
 import { contextInjections } from "./context-injections/index"
 
@@ -11,7 +10,6 @@ import { contextInjections } from "./context-injections/index"
  */
 export const tools: KitTool[] = [
   // <kit:tools>
-  autoCompact,
   backgroundSubagents,
   contextInjections,
   // </kit:tools>
