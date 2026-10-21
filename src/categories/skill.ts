@@ -1,7 +1,6 @@
 import { loadSkill, registerSkill, skillDescription, type KitSkill } from "../core/skill"
 import type { KitCategory } from "../core/category"
 import { skills } from "../skills/index"
-import { skillScaffold } from "./scaffold"
 
 /**
  * The skills category.
@@ -18,7 +17,6 @@ export const skillCategory: KitCategory<KitSkill> = {
   items: skills,
   defaultEnabled: (skill) => skill.defaultEnabled ?? true,
   hasSettings: false,
-  scaffold: skillScaffold,
   describe: skillDescription,
   inspect: (skill) => {
     try {

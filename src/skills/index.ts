@@ -3,8 +3,8 @@ import { defineSkill, type KitSkill } from "../core/skill"
 /**
  * Every skill shipped by openkit.
  *
- * The skill scaffolder inserts new entries between the `<kit:skills>` markers
- * below; keep those comments intact.
+ * Add new skills between the `<kit:skills>` markers below; keep those comments
+ * intact.
  */
 export const skills: KitSkill[] = [
   // <kit:skills>

@@ -5,7 +5,7 @@ import { buildConfigLayers } from "../config/effective"
 import type { KitConfigFile } from "../config/types"
 
 /**
- * Environment an operation runs against, injected so the CLI and `/kit` can
+ * Environment an operation runs against, injected so `/kit` and tests can
  * share the same logic while owning their own I/O and lifecycle.
  */
 export interface OperationDeps {

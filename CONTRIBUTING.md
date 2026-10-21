@@ -36,13 +36,10 @@ bun test            # bun test
 
 ## Adding a tool
 
-```bash
-openkit new my-tool
-```
-
-The scaffolder creates `src/tools/my-tool/index.ts` and registers it in the tool
-barrel between the `<kit:tools>` markers. Then implement `register`, add tests,
-and add an example entry to `docs/examples/openkit.jsonc`.
+Create `src/tools/my-tool/index.ts` and add it to the tool barrel
+(`src/tools/index.ts`) between the `<kit:tools>` markers. Then implement
+`register`, add tests, and add an example entry to
+`docs/examples/openkit.jsonc`.
 
 Every tool must:
 
@@ -51,10 +48,21 @@ Every tool must:
 - provide `defaultSettings` and, where practical, a `settingsSchema`;
 - do all its work in `register(ctx, settings, kit)`.
 
+## Adding a skill
+
+Prefer `@skill-recipe`. To do it manually, create `src/skills/<id>/SKILL.md` and
+add an entry to `src/skills/index.ts` between the `<kit:skills>` markers.
+
+## Adding a reference
+
+Create `src/references/<id>/reference.json` and add an entry to
+`src/references/index.ts` between the `<kit:references>` markers.
+
 ## Reporting bugs
 
-Open an issue with a minimal reproduction: the relevant `openkit.jsonc`,
-the command or session action, and the output of `openkit doctor`.
+Open an issue with a minimal reproduction: the relevant `openkit.jsonc`, the
+`/kit` action or session behavior, and — from a clone — the output of
+`bun scripts/doctor.ts`.
 
 ## License
 

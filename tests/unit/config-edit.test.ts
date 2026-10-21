@@ -7,8 +7,6 @@ import type { KitConfigFile } from "../../src/config/types"
 import {
   setEntryEnabled,
   setEntrySetting,
-  seedEntries,
-  ensurePluginEntry,
 } from "../../src/config/edit"
 
 function readConfig(path: string): { text: string; data: KitConfigFile } {
@@ -101,50 +99,6 @@ test.each([
   expect(data.tools?.a?.enabled).toBe(true)
 })
 
-test("ensurePluginEntry appends through the element path and preserves the array", async () => {
-  const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode.json")
-  writeFileSync(f, `{\n  "plugins": [\n    // keep this comment\n    "other-plugin"\n  ]\n}`)
-
-  await ensurePluginEntry(f, "openkit")
-
-  const text = readFileSync(f, "utf8")
-  expect(text).toContain("// keep this comment")
-  expect(text).toContain('"other-plugin"')
-  const data = parse(text) as { plugins: unknown[] }
-  expect(data.plugins).toEqual(["other-plugin", "openkit"])
-
-  // Idempotent: a second call must not duplicate the entry.
-  await ensurePluginEntry(f, "openkit")
-  expect((parse(readFileSync(f, "utf8")) as { plugins: unknown[] }).plugins).toEqual([
-    "other-plugin",
-    "openkit",
-  ])
-})
-
-test("ensurePluginEntry creates the plugins array when it is absent", async () => {
-  const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode.json")
-  writeFileSync(f, `{ "theme": "dark" }`)
-
-  await ensurePluginEntry(f, "openkit")
-
-  const data = parse(readFileSync(f, "utf8")) as { plugins: unknown[]; theme: string }
-  expect(data.plugins).toEqual(["openkit"])
-  expect(data.theme).toBe("dark")
-})
-
-test("ensurePluginEntry refuses a non-array plugins value and leaves the file intact", async () => {
-  const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "opencode.json")
-  const original = `{ "plugins": "openkit" }\n`
-  writeFileSync(f, original)
-
-  await expect(ensurePluginEntry(f, "openkit")).rejects.toThrow(/not an array/)
-
-  expect(readFileSync(f, "utf8")).toBe(original)
-})
-
 test("setEntryEnabled flips value under skills and preserves comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const f = join(d, "openkit.jsonc")
@@ -161,16 +115,6 @@ test("setEntryEnabled refuses to edit a malformed config and leaves it intact", 
   writeFileSync(f, "{ not json")
   await expect(setEntryEnabled(f, "skills", "s", false)).rejects.toThrow(/malformed/)
   expect(readFileSync(f, "utf8")).toBe("{ not json")
-})
-
-test("seedEntries only adds missing entries under skills", async () => {
-  const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "openkit.jsonc")
-  writeFileSync(f, `{ "skills": { "a": { "enabled": false } } }`)
-  await seedEntries(f, "skills", { a: { enabled: true }, b: { enabled: true } })
-  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
-  expect(data.skills?.a?.enabled).toBe(false)
-  expect(data.skills?.b?.enabled).toBe(true)
 })
 
 test("setEntryEnabled flips enabled under an arbitrary category and preserves comments", async () => {
@@ -214,29 +158,6 @@ test("setEntrySetting keeps the existing enabled value and comments", async () =
   expect(text).toContain("// keep me")
   expect(data.references?.r?.settings).toEqual({ branch: "main" })
   expect(data.references?.r?.enabled).toBe(false)
-})
-
-test("seedEntries only adds missing entries under an arbitrary category", async () => {
-  const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "openkit.jsonc")
-  writeFileSync(f, `{ "references": { "a": { "enabled": false } } }`)
-
-  await seedEntries(f, "references", { a: { enabled: true }, b: { enabled: true } })
-
-  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
-  expect(data.references?.a?.enabled).toBe(false)
-  expect(data.references?.b?.enabled).toBe(true)
-})
-
-test("seedEntries tolerates a config whose text is exactly null", async () => {
-  const d = mkdtempSync(join(tmpdir(), "kit-"))
-  const f = join(d, "openkit.jsonc")
-  writeFileSync(f, "null")
-
-  await seedEntries(f, "tools", { a: { enabled: true } })
-
-  const data = parse(readFileSync(f, "utf8")) as KitConfigFile
-  expect(data.tools?.a?.enabled).toBe(true)
 })
 
 test("setEntryEnabled seeds a default config that includes a references map", async () => {

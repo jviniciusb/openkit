@@ -24,8 +24,7 @@
   "license": "MIT",
   "type": "module",
   "main": "./src/plugin.ts",
-  "bin": { "openkit": "./bin/openkit.js" },
-  "files": ["src", "bin", "index.js", ".opencode", "openkit.schema.json", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md"],
+  "files": ["src", "index.js", ".opencode", "openkit.schema.json", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md"],
   "engines": { "bun": ">=1.1.39" },
   "scripts": {
     "typecheck": "tsc --noEmit",

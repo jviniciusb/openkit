@@ -20,26 +20,6 @@ export interface RegisterItemResult {
   degraded?: string
 }
 
-/** Scaffolder metadata describing how a category lays out new items. */
-export interface CategoryScaffold {
-  /** Directory holding item folders, e.g. `src/tools`. */
-  dir: string
-  /** Entry file inside each item folder, e.g. `index.ts` | `SKILL.md`. */
-  entryFile: string
-  /** Barrel file that lists the category's items. */
-  barrel: string
-  /** Marker pair the scaffolder inserts between. */
-  markers: { open: string; close: string }
-  /** Renders the new item's entry-file contents. */
-  render(id: string): string
-  /** Renders the new item's barrel entry. */
-  renderBarrelEntry(id: string): string
-  /** Optional import line added to the barrel (tools only). */
-  importLine?(id: string): string
-  /** Import name the scaffolded entry file depends on, when any. */
-  requiresImport?: string
-}
-
 /**
  * The contract every kit category implements.
  *
@@ -48,11 +28,11 @@ export interface CategoryScaffold {
  * registration hook. Items are accessed by `id` through the engine.
  */
 export interface KitCategory<TItem> {
-  /** Config key + CLI id, e.g. `"tools"`. */
+  /** Config key, e.g. `"tools"`. */
   key: string
-  /** Human label for list/doctor sections, e.g. `"tools"`. */
+  /** Human label for list/diagnostic sections, e.g. `"tools"`. */
   label: string
-  /** Singular noun for doctor messages, e.g. `"tool"`. */
+  /** Singular noun for diagnostic messages, e.g. `"tool"`. */
   singular: string
   /** Shipped items, from the category barrel. */
   items: readonly TItem[]
@@ -66,10 +46,8 @@ export interface KitCategory<TItem> {
   registerItem(item: TItem, resolved: ResolvedEntry, ctx: KitContext): Promise<RegisterItemResult>
   /** One-line description for list; may throw — callers tolerate. */
   describe?(item: TItem): string
-  /** Doctor check; returns an error reason or undefined. */
+  /** Diagnostic check; returns an error reason or undefined. */
   inspect?(item: TItem, resolved: ResolvedEntry): string | undefined
-  /** Whether an `inspect` reason folds into doctor's exit code; default true. */
+  /** Whether an `inspect` reason is fatal to the diagnostic; default true. */
   inspectFatal?: boolean
-  /** Scaffolder metadata. */
-  scaffold?: CategoryScaffold
 }

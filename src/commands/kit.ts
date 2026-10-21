@@ -2,6 +2,7 @@ import { categories } from "../catalog"
 import type { KitConfigFile } from "../config/types"
 import type { KitContext, Registration } from "../core/context"
 import {
+  configGetOperation,
   configSetOperation,
   listOperation,
   toggleOperation,
@@ -29,7 +30,7 @@ interface KitCommandInput {
 
 /**
  * Resolves where command output goes: the session's `prompt` channel when the
- * harness exposes one, otherwise the injected `stdout` sink (CLI/tests).
+ * harness exposes one, otherwise the injected `stdout` sink (tests).
  */
 function outputWriter(
   ctx: KitContext,
@@ -56,7 +57,9 @@ const USAGE = [
   "kit list",
   "kit enable <id>",
   "kit disable <id>",
-  "kit config <id> <key> <value>",
+  "kit config get <id> <key>",
+  "kit config set <id> <key> <value>",
+  "kit config <id> <key> <value>  (alias for config set)",
   "<id> is a tool, skill, or reference id; config applies to settings-bearing categories (tools and references).",
 ].join("\n")
 
@@ -67,13 +70,17 @@ const USAGE = [
  * - `list` — print every shipped item with its resolved enabled state;
  * - `enable <id>` / `disable <id>` — write `<category>[id].enabled` (tools,
  *   skills, or references) to the global kit config, then reload;
- * - `config <id> <key> <value>` — write `<category>[id].settings[key]` for a
+ * - `config get <id> <key>` — print a settings-bearing item's effective
+ *   setting as JSON, resolving defaults, discovered config files, and plugin
+ *   `options`;
+ * - `config set <id> <key> <value>` — write `<category>[id].settings[key]` for a
  *   settings-bearing item (tools and references) to the global kit config
  *   (scalar coercion, comment-preserving), then reload. Skill ids are rejected:
- *   skills have no settings.
+ *   skills have no settings. The legacy `config <id> <key> <value>` form is an
+ *   alias for `config set`.
  *
- * Each form delegates to the shared operations so `/kit` and the CLI never
- * diverge; this adapter only owns I/O routing and the `/kit`-specific usage and
+ * Each form delegates to the shared operations so behavior stays in one place;
+ * this adapter only owns I/O routing and the `/kit`-specific usage and
  * positional guards.
  *
  * The returned registration disposes the command; the caller owns its lifetime.
@@ -85,7 +92,7 @@ export async function registerKitCommand(
   return ctx.command.transform((editor) => {
     editor.add({
       name: "kit",
-      description: "Manage openkit tools, skills, and references (list, enable, disable, config)",
+      description: "Manage openkit tools, skills, and references (list, enable, disable, config get/set)",
       execute: (input: KitCommandInput) => executeKitCommand(input, ctx, deps),
     })
   })
@@ -132,19 +139,31 @@ async function executeKitCommand(
 }
 
 /**
- * Guards `/kit`'s positional `config` form, then delegates to the shared
- * setter.
+ * Dispatches `/kit config [get|set]` to the shared operations.
  *
- * `/kit` keeps its own arity message (rather than the operation's) so a bare
- * `config` reads as usage error, not as an unknown empty id.
+ * Supports `config get <id> <key>`, `config set <id> <key> <value>`, and the
+ * legacy `config <id> <key> <value>` setter. `/kit` keeps its own arity messages
+ * (rather than the operation's) so a bare `config` reads as usage error, not as
+ * an unknown empty id.
  */
 async function configure(deps: OperationDeps, parts: string[]): Promise<void> {
-  const [toolId, key, ...valueParts] = parts
+  const [action, ...rest] = parts
 
-  if (toolId === undefined || key === undefined || valueParts.length === 0) {
-    deps.out("kit: config requires <id> <key> <value>")
+  if (action === "get") {
+    const [id, key] = rest
+    if (id === undefined || key === undefined) {
+      deps.out("kit: config get requires <id> <key>")
+      return
+    }
+    await configGetOperation(categories, deps, id, key)
     return
   }
 
-  await configSetOperation(categories, deps, toolId, key, valueParts)
+  const [id, key, ...valueParts] = action === "set" ? rest : parts
+  if (id === undefined || key === undefined || valueParts.length === 0) {
+    deps.out(`kit: config ${action === "set" ? "set " : ""}requires <id> <key> <value>`)
+    return
+  }
+
+  await configSetOperation(categories, deps, id, key, valueParts)
 }

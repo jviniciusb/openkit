@@ -9,15 +9,14 @@ OpenCode V2 setup. If you can read this file, follow it.
 
 openkit is one OpenCode V2 plugin that hosts independently toggleable
 items — tools, skills, and references. Installing it means: register the plugin,
-seed its config, restart OpenCode, and verify. Do the four steps below in order
-and report the result to the user.
+optionally configure it, restart OpenCode, and verify. Do the four steps below in
+order and report the result to the user.
 
 ## Before you start
 
 - Confirm OpenCode V2 `>= 2.0.4` is installed (`opencode --version`).
-- The CLI is in the repo (not on npm). If the user has a checkout they can run
-  `bun bin/openkit.js <command>`; otherwise use the `/kit` command or edit
-  the config by hand.
+- No CLI or checkout is required. The plugin registers `/kit` after OpenCode
+  restarts; use it to list, toggle, and configure items in-session.
 - Locate the user's OpenCode config. It may be `opencode.json` or
   `opencode.jsonc`, either globally (`~/.config/opencode/opencode.json`) or in
   the project root. Prefer the file the user already uses.
@@ -46,25 +45,19 @@ If `openkit` or its git spec is already present, skip this step. If the
 array already has entries, append — do not remove or reorder existing ones. If
 there is no `plugins` key, add one.
 
-## Step 2 — Seed the kit config
+## Step 2 — Configure (optional)
 
 The kit reads `openkit.jsonc` from the global
 (`~/.config/opencode/openkit.jsonc`) and/or project
-(`<project>/.opencode/openkit.jsonc`) locations.
+(`<project>/.opencode/openkit.jsonc`) locations. Both are optional: shipped
+skills default to on and tools default to off, so the plugin works without a
+config file.
 
-**Preferred:** in an OpenCode session, use `/kit list` (and `/kit enable <id>`,
-`/kit disable <id>`) to see and toggle items. To seed a config file from every
-category's item defaults, run the CLI from a checkout:
+**Preferred:** after restart, use `/kit list` to see items, `/kit enable <id>` or
+`/kit disable <id>` to toggle them, and `/kit config set <id> <key> <value>` to
+write a setting.
 
-```bash
-bun bin/openkit.js init            # global config + global opencode.json
-bun bin/openkit.js init --project  # project config + project opencode.json
-```
-
-`init` is idempotent — it never overwrites existing tool, skill, or reference
-entries, or duplicates the plugin entry.
-
-**Fallback:** create the file by hand, seeded with the shipped tools —
+**Manual:** create the file by hand, seeded with the shipped tools —
 `background-subagents` (opt-in; forces every subagent call to run in the
 background) and `context-injections` (opt-in; injects built-in behavioral rules,
 each individually toggleable, plus your own):
@@ -134,9 +127,7 @@ interactive script for steps only a human can take), `router` (invoked with
 `@router`; points a request at the one kit skill or flow that fits), and
 `diagnosing-sessions` (invoked with `@diagnosing-sessions`; forensically explains
 why a past session went wrong). Skills take no `settings` — only `enabled`.
-Disable one with
-`/kit disable <skill-id>` in a session, or
-`bun bin/openkit.js disable <skill-id>` from a checkout.
+Disable one with `/kit disable <skill-id>` in a session.
 
 **References** are the third category (a `references` config section). A
 reference packages a content source (local path or git repository) for the
@@ -165,58 +156,46 @@ about, tell them a restart is required before continuing.
 
 ## Step 4 — Verify
 
-From a checkout:
-
-```bash
-bun bin/openkit.js doctor
-```
-
-Or in-session, `/kit list`.
-
-Success looks like:
+In a session, run:
 
 ```text
-config: ok (1 file)
-tools: ok
-skills: ok
-references: ok
-plugin: active
+/kit list
 ```
 
-- `config: error …` means a kit config file does not parse — fix it or ask the
-  user.
-- `tool: degraded …` means a tool's settings failed validation. The kit still
-  loads and that tool uses its defaults; report it, and fix the settings.
-- `skill: error …` means a bundled skill's `SKILL.md` could not be loaded; the
-  kit still loads the other skills. Report it (doctor exits non-zero).
-- `reference: error …` means a reference's `reference.json` is missing or
-  invalid; the kit still loads the others. Report it (doctor exits non-zero).
-- `plugin: not listed (best effort)` means no `opencode.json` in the project or
-  global location lists `openkit`. If you added the entry, confirm the file
-  path and restart.
+Success shows `tools:`, `skills:`, and `references:` sections with each item and
+its resolved state. The two shipped tools are `background-subagents` and
+`context-injections`; twenty-one skills should be listed.
 
-You can also run `/kit list` in a session, or `bun bin/openkit.js list` from
-a checkout, to show every item and its enabled state.
+- If `/kit` is not available after a restart, the plugin did not load. Check
+  that `opencode.json(c)` parses, that the `plugins` entry is present, and check
+  the OpenCode logs.
+- If an item is missing or unexpectedly disabled, check the config files and
+  plugin `options`.
+- For a deeper check from a clone, run `bun scripts/doctor.ts`. It reports config
+  parse errors, degraded items, and whether `openkit` is listed; it is
+  maintainer tooling and is not shipped with the plugin.
 
 ## Fallback: the `/kit` command
 
-The plugin exposes these operations from inside a session (no CLI needed):
+The plugin exposes these operations from inside a session:
 
 ```text
-/kit list                        # show every item and its state
-/kit enable <id>                 # enable an item (global config)
-/kit disable <id>                # disable an item (global config)
-/kit config <id> <key> <value>   # set a settings-bearing item's setting (global config)
+/kit list                          # show every item and its state
+/kit enable <id>                   # enable an item (global config)
+/kit disable <id>                  # disable an item (global config)
+/kit config get <id> <key>         # print an item's effective setting
+/kit config set <id> <key> <value> # write a settings-bearing item's setting
+/kit config <id> <key> <value>     # alias for config set
 ```
 
-Use `/kit` to seed state or verify, but the manual edits above still cover a
-fresh install.
+Use `/kit` to configure or verify after installation, or edit the config files
+manually when you need a project-scoped setup.
 
 ## What to report back
 
 Tell the user, concisely:
 
 1. Which `opencode.json(c)` you edited and that `openkit` was added.
-2. Which config file you created or updated.
+2. Whether you created or updated a config file (optional).
 3. That OpenCode needs a restart (done or pending).
-4. The `doctor` output showing config/tools/skills/references/plugin status.
+4. The `/kit list` result, or the error if `/kit` is unavailable.

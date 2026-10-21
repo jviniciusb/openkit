@@ -1,15 +1,24 @@
 import { readFileSync } from "node:fs"
+import { homedir } from "node:os"
 import { parse, printParseErrorCode, type ParseError } from "jsonc-parser"
 
-import { categories as catalogCategories } from "../../catalog"
-import { PLUGIN_ID } from "../../constants"
-import { discoverKitConfigFiles, globalOpencodePaths, opencodeConfigPaths } from "../../config/discover"
-import type { KitConfigFile } from "../../config/types"
-import { readPluginOptions } from "../../config/effective"
-import type { KitCategory } from "../../core/category"
-import { itemId, resolveCategoryEntry } from "../../core/engine"
-import pkg from "../../../package.json"
-import type { CliIo } from "./list"
+import { categories as catalogCategories } from "../src/catalog"
+import { PLUGIN_ID } from "../src/constants"
+import { discoverKitConfigFiles, globalOpencodePaths, opencodeConfigPaths } from "../src/config/discover"
+import type { KitConfigFile } from "../src/config/types"
+import { readPluginOptions } from "../src/config/effective"
+import type { KitCategory } from "../src/core/category"
+import { itemId, resolveCategoryEntry } from "../src/core/engine"
+
+/** IO the maintainer doctor script needs. */
+export interface DoctorIo {
+  /** Directory used to discover project-level config files. */
+  cwd: string
+  /** Home directory used to discover the global config file. */
+  home: string
+  stdout(s: string): void
+  stderr(s: string): void
+}
 
 /** JSONC read options; mirrors the config loaders. */
 const READ_OPTIONS = { allowTrailingComma: true, disallowComments: false } as const
@@ -31,9 +40,9 @@ interface CategoryIssue {
  * Reads and parses every discovered kit config file.
  *
  * Unlike the plugin loader (which skips malformed files so boot never fails),
- * `doctor` surfaces parse failures as errors so they can affect the exit code.
+ * the doctor surfaces parse failures as errors so they can affect the exit code.
  */
-function scanConfigs(io: CliIo): ConfigScan {
+function scanConfigs(io: DoctorIo): ConfigScan {
   const configs: KitConfigFile[] = []
   const errors: string[] = []
 
@@ -96,22 +105,21 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
 }
 
 /**
- * Handles `openkit doctor`.
+ * Handles the maintainer doctor script (`bun scripts/doctor.ts`).
  *
  * Reports whether every discovered kit config parses, runs each category's
  * `inspect` over its shipped items (invalid tool settings degrade, a skill or
  * reference whose file is missing errors), and — best effort — whether the
  * `openkit` plugin is listed in the relevant OpenCode config (`opencode.json`
- * or `opencode.jsonc`). Config parse
- * errors and fatal inspect reasons make the command return non-zero; a
- * non-fatal reason (e.g. invalid tool settings) and a missing plugin entry are
- * advisory.
+ * or `opencode.jsonc`). Config parse errors and fatal inspect reasons make the
+ * command return non-zero; a non-fatal reason (e.g. invalid tool settings) and
+ * a missing plugin entry are advisory.
  *
  * `categories` is injectable so tests can exercise a category without touching
  * the shipped catalog; it defaults to the catalog.
  */
 export async function doctorCommand(
-  io: CliIo,
+  io: DoctorIo,
   categories: readonly KitCategory<unknown>[] = catalogCategories,
 ): Promise<number> {
   const { configs, errors } = scanConfigs(io)
@@ -124,7 +132,7 @@ export async function doctorCommand(
 
   // Fold the plugin-options layer (highest precedence) into resolution so
   // `inspect` sees the same effective config the runtime bootstrap would use,
-  // matching `list`/`config get` and the toggle/set warnings.
+  // matching list/config get and the toggle/set warnings.
   const optionLayer = readPluginOptions(io.cwd, io.home)
   const sources = optionLayer === undefined ? configs : [...configs, optionLayer]
 
@@ -157,9 +165,11 @@ export async function doctorCommand(
   return errors.length > 0 || fatal > 0 ? 1 : 0
 }
 
-/** Handles `openkit version`: prints the CLI and plugin versions. */
-export async function versionCommand(io: CliIo): Promise<number> {
-  io.stdout(`openkit CLI ${pkg.version}`)
-  io.stdout(`openkit plugin ${pkg.version}`)
-  return 0
+if (import.meta.main) {
+  process.exitCode = await doctorCommand({
+    cwd: process.cwd(),
+    home: process.env.HOME ?? homedir(),
+    stdout: (s) => console.log(s),
+    stderr: (s) => console.error(s),
+  })
 }

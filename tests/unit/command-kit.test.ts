@@ -130,3 +130,32 @@ test("`kit enable` warns when plugin options override the global write", async (
   expect(out).toContain("overridden")
   expect(out).toContain("plugin options")
 })
+
+test("`kit config set` then `kit config get` round-trips the value", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let out = ""
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+
+  await cmd.execute({ arguments: "config set background-subagents count 42", sessionID: "s" })
+  out = ""
+  await cmd.execute({ arguments: "config get background-subagents count", sessionID: "s" })
+
+  expect(out).toBe("42")
+})
+
+test("`kit config get` reports missing arguments and settings-less categories", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let out = ""
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+
+  await cmd.execute({ arguments: "config get background-subagents", sessionID: "s" })
+  expect(out).toContain("config get requires")
+
+  out = ""
+  await cmd.execute({ arguments: "config get sdd-flow x", sessionID: "s" })
+  expect(out).toContain("skills have no settings")
+})

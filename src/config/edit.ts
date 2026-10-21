@@ -9,7 +9,7 @@ import {
   type ModificationOptions,
   type ParseError,
 } from "jsonc-parser"
-import { categoryEntries, type CategoryEntry, type KitConfigFile } from "./types"
+import type { KitConfigFile } from "./types"
 
 /** Options used when `modify` has to create a JSON property. */
 const MODIFY_OPTIONS: ModificationOptions = {
@@ -123,78 +123,5 @@ export async function setEntrySetting(
 ): Promise<void> {
   const text = readConfigText(path)
   const edits = modify(text, [category, id, "settings", key], value, MODIFY_OPTIONS)
-  applyAndWrite(path, text, edits)
-}
-
-/** True when a config document already declares `<category>[id]`. */
-function hasEntry(text: string, category: string, id: string): boolean {
-  // `parse("null")` yields `null`, so guard both nullish cases before indexing.
-  const parsed = parse(text, [], READ_OPTIONS) as KitConfigFile | undefined
-  return parsed != null && categoryEntries(parsed, category)?.[id] !== undefined
-}
-
-/**
- * Seeds entries into the kit config at `path` under `category`.
- *
- * Each seed is written only when `category[id]` is absent, so re-running
- * `init` (and any hand-edited entry) is left untouched. Edits still go through
- * `modify`/`applyEdits`, preserving comments and formatting; a missing file is
- * created from the default config seed.
- */
-export async function seedEntries(
-  path: string,
-  category: string,
-  seeds: Record<string, CategoryEntry>,
-): Promise<void> {
-  const text = readConfigText(path)
-
-  let next = text
-  for (const [id, entry] of Object.entries(seeds)) {
-    if (hasEntry(next, category, id)) continue
-    next = applyEdits(next, modify(next, [category, id], entry, MODIFY_OPTIONS))
-  }
-
-  // A repeat `init` (every entry already present) must not rewrite the file and
-  // bump its mtime, which would trigger the config watcher for nothing.
-  if (next === text) return
-
-  mkdirSync(dirname(path), { recursive: true })
-  writeFileSync(path, next)
-}
-
-/** Whether `plugins` already references `pluginId` (as a string or `[id, opts]`). */
-function hasPluginEntry(plugins: unknown[], pluginId: string): boolean {
-  return plugins.some(
-    (entry) => entry === pluginId || (Array.isArray(entry) && entry[0] === pluginId),
-  )
-}
-
-/**
- * Ensures the `opencode.json` at `path` lists `pluginId` in its `plugins` array.
- *
- * The plugin id is appended only when absent, so repeated calls never duplicate
- * an entry. A missing file (or missing `plugins` key) is created with
- * `[pluginId]`. When `plugins` is an existing array, the element is appended via
- * its index path so comments, trailing commas, and formatting inside the array
- * survive. A non-array `plugins` value is refused rather than overwritten.
- */
-export async function ensurePluginEntry(path: string, pluginId: string): Promise<void> {
-  const text = readEditableText(path, "{}\n")
-  const parsed = parse(text, [], READ_OPTIONS) as { plugins?: unknown } | undefined
-  const plugins = parsed?.plugins
-
-  if (plugins !== undefined && !Array.isArray(plugins)) {
-    throw new Error(`refusing to edit ${path}: "plugins" is not an array`)
-  }
-
-  if (Array.isArray(plugins)) {
-    if (hasPluginEntry(plugins, pluginId)) return
-    // Append through the element path so the existing array text is untouched.
-    const edits = modify(text, ["plugins", plugins.length], pluginId, MODIFY_OPTIONS)
-    applyAndWrite(path, text, edits)
-    return
-  }
-
-  const edits = modify(text, ["plugins"], [pluginId], MODIFY_OPTIONS)
   applyAndWrite(path, text, edits)
 }

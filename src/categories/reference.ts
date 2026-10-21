@@ -8,7 +8,6 @@ import {
 } from "../core/reference"
 import type { KitCategory } from "../core/category"
 import { references } from "../references/index"
-import { referenceScaffold } from "./scaffold"
 
 /**
  * The references category.
@@ -28,7 +27,6 @@ export const referenceCategory: KitCategory<KitReference> = {
   defaultEnabled: (reference) => reference.defaultEnabled ?? false,
   hasSettings: true,
   defaultSettings: () => ({}),
-  scaffold: referenceScaffold,
   describe: referenceDescription,
   inspect: (reference, resolved) => {
     try {
