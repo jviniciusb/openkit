@@ -20,9 +20,10 @@ This directory holds pinned snapshots of upstream agent-skill kits that
 | `superpowers` | https://github.com/obra/superpowers | `v7.0.0` | MIT |
 | `mattpocock-skills` | https://github.com/mattpocock/skills | `v1.3.1` | MIT |
 
-Both are MIT. Derived skills retain the upstream copyright and license notice
-through the provenance comment at the end of their `SKILL.md`; no upstream text is
-published in the package.
+Both are MIT. The derived skills in `src/skills/` are listed with their upstream
+sources in the root `THIRD_PARTY_NOTICES.md`, which ships with the package. The
+vendored snapshots in this directory are dev-only and are not included in the
+published package.
 
 ## Tooling
 
