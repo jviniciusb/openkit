@@ -104,8 +104,9 @@ function pluginOptionsFrom(plugins: unknown): KitConfigFile | undefined {
  * project (`cwd`) OpenCode config (`opencode.json`/`opencode.jsonc`), lower
  * precedence first.
  *
- * The CLI has no access to the live plugin context, so it re-reads the plugin's
- * `options` from disk to detect a layer that overrides a global write.
+ * The doctor script has no access to the live plugin context, so it re-reads
+ * the plugin's `options` from disk to detect a layer that overrides a global
+ * write.
  */
 export function readPluginOptions(
   cwd: string,

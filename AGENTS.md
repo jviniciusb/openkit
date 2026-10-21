@@ -6,9 +6,9 @@ Guidance for AI agents working in the **openkit** repository.
 
 `openkit` is an OpenCode V2 plugin that hosts independently toggleable items
 grouped into **categories**: tools, skills, and references. The framework (config,
-category engine, CLI, contracts) is the product; items are added on top. Every
+category engine, contracts) is the product; items are added on top. Every
 category is one `KitCategory` descriptor consumed by the generic engine, so
-config resolution, registration/isolation, the CLI, and `/kit` are shared. Two
+config resolution, registration/isolation, and `/kit` are shared. Two
 tools ship today: `background-subagents`
 (`src/tools/background-subagents/index.ts`, opt-in; forces every subagent call to
 run in the background) and `context-injections`
@@ -76,6 +76,8 @@ Prepend Bun to your `PATH` (`~/.bun/bin`) if needed.
 ```bash
 bun run typecheck   # must pass before you commit
 bun test            # must pass before you commit
+bun scripts/doctor.ts             # maintainer health check
+bun scripts/skill-source.ts check # generated skill drift
 ```
 
 There is no build step: the plugin is the TypeScript source, transpiled by Bun
@@ -90,23 +92,21 @@ src/
   plugin.ts             # Plugin.define + bootstrap/lifecycle orchestration
   catalog.ts            # assembles categories from the descriptors
   constants.ts          # shared PLUGIN_ID
-  categories/           # tool, skill, reference descriptors + scaffolder metadata
-  operations/           # shared list/toggle/config ops used by the CLI and /kit
+  categories/           # tool, skill, reference descriptors
+  operations/           # shared list/toggle/config ops used by /kit
   commands/             # the /kit slash command (adapter over operations)
   config/               # discover, load, merge, effective, validate, edit, coerce, types
   core/                 # category contract + engine, item contracts, kit API, context, testing fakes
-  cli/                  # CLI entry and commands; scaffold.ts
   tools/<id>/index.ts   # one folder per tool
   tools/index.ts        # explicit barrel with <kit:tools> markers
   skills/<id>/SKILL.md  # one folder per skill (+ optional support files)
   skills/index.ts       # explicit barrel with <kit:skills> markers
   references/<id>/reference.json  # one folder per reference
   references/index.ts   # explicit barrel with <kit:references> markers
-bin/openkit.js          # CLI entry (runs the TS CLI via Bun)
 index.js                # package plugin entry -> src/plugin.ts
 openkit.schema.json     # JSON schema for openkit.jsonc
 docs/                   # examples (not published)
-scripts/                # repo tooling (not published)
+scripts/                # repo tooling (not published): doctor, skill-source
 skill-sources/          # vendored skill sources (dev-only, not published)
 tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptance (real opencode)
 .opencode/INSTALL.md    # agent-driven install for consumers
@@ -115,10 +115,8 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 ## Ground rules
 
 - **Match the real behavior.** `README.md` and `.opencode/INSTALL.md` must
-  describe what `src/` actually does. Do not document commands or commands'
-  flags that are not implemented. Implemented CLI subcommands: `init`, `list`,
-  `enable`, `disable`, `config get|set`, `new <category> <id>` (`new-skill` is
-  an alias), `doctor`, `version`.
+  describe what `src/` actually does. The user-facing interface is `/kit`;
+  maintainer tooling lives under `scripts/` and is not shipped.
 - **Isolation is a hard requirement.** Every item's registration runs in
   try/catch; failures become `degraded` entries and an item's partial
   registrations are disposed. Never let one item break the kit or its siblings.
@@ -127,11 +125,10 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 - **Explicit registration.** Items are discovered from typed barrels
   (`src/tools/index.ts`, `src/skills/index.ts`, `src/references/index.ts`), not
   runtime globbing. Keep the `<kit:tools>`, `<kit:skills>`, and
-  `<kit:references>` markers intact; `openkit new <category> <id>` inserts
-  between them.
+  `<kit:references>` markers intact; add new entries between them manually.
 - **Tests accompany behavior.** Use `createFakeContext` from
   `src/core/testing.ts` for harness-style assertions. Add tests for new config
-  precedence, registry behavior, CLI output, and tool registration.
+  precedence, registry behavior, `/kit` output, and tool registration.
 - **Conventional Commits.** Use `feat:`, `fix:`, `docs:`, `test:`, `chore:`.
   Run `bun run typecheck && bun test` before committing.
 - **No build step — the TypeScript source is the artifact.** Consumers install
@@ -165,8 +162,8 @@ category-keyed (`tools`, `skills`, `references`).
 
 ## Adding a tool
 
-1. `openkit new tool my-tool` (run from the repo root; `new my-tool` is an
-   alias for `new tool my-tool`).
+1. Create `src/tools/my-tool/index.ts` and add it to `src/tools/index.ts`
+   between the `<kit:tools>` markers.
 2. Implement `register(ctx, settings, kit)` in `src/tools/my-tool/index.ts`.
 3. Add tests.
 4. Add an example entry to `docs/examples/openkit.jsonc`.
@@ -178,8 +175,8 @@ Prefer `@skill-recipe` (`src/skills/skill-recipe/SKILL.md`) to derive a skill
 from a brief plus source skills: it drafts in the kit house style and adds the
 barrel entry. The steps below are the manual equivalent.
 
-1. `openkit new skill my-skill` (run from the repo root; `new-skill` is an
-   alias for `new skill`).
+1. Create `src/skills/my-skill/SKILL.md` and add an entry to
+   `src/skills/index.ts` between the `<kit:skills>` markers.
 2. Write `src/skills/my-skill/SKILL.md` (frontmatter `name`/`description` plus
    the instruction body; add support files beside it as needed).
 3. Add tests.
@@ -192,7 +189,8 @@ model's advertised list while keeping it loadable by id (`@my-skill`).
 
 ## Adding a reference
 
-1. `openkit new reference my-reference` (run from the repo root).
+1. Create `src/references/my-reference/reference.json` and add an entry to
+   `src/references/index.ts` between the `<kit:references>` markers.
 2. Point `src/references/my-reference/reference.json` at real content: `"path"`
    for a local source, or `"type": "git"` with `"repository"` (and optional
    `"branch"`).

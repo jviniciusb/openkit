@@ -17,8 +17,8 @@ without touching the plugin itself.
 Every category is an instance of one generic engine: a `KitCategory` descriptor
 pairs shipped items with the policy the engine needs (default enabled state,
 whether the category carries settings, and one registration hook). Adding a new
-category is a descriptor plus a folder — the config, CLI, `/kit`, scaffolder,
-schema, and lifecycle layers do not change. See
+category is a descriptor plus a folder — the config, `/kit`, schema, and
+lifecycle layers do not change. See
 [Categories](#categories).
 
 - **Framework-first:** the conventions for adding items matter more than any one
@@ -87,7 +87,7 @@ curated content sources. See [References](#references).
 ## Requirements
 
 - OpenCode V2 `>= 2.0.4`.
-- [Bun](https://bun.sh) to run the CLI from a checkout (`bun bin/openkit.js <command>`). The plugin ships TypeScript and is transpiled by OpenCode's Bun at load — there is no build step, and the package is not consumable by plain Node.
+- Bun, which OpenCode uses to load the plugin's TypeScript at runtime. There is no build step, and the package is not consumable by plain Node.
 
 ## Install
 
@@ -111,9 +111,9 @@ opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.21
 
 ### 2. Configure (optional)
 
-Seeding is optional — an item that defaults to enabled works without a config
-file (every bundled skill does; the shipped tools are opt-in). To make the
-effective configuration explicit, create
+An item that defaults to enabled works without a config file (every bundled
+skill does; the shipped tools are opt-in). To make the effective configuration
+explicit, create
 `~/.config/opencode/openkit.jsonc` (or
 `<project>/.opencode/openkit.jsonc`):
 
@@ -125,19 +125,17 @@ effective configuration explicit, create
 }
 ```
 
-The CLI's `init` seeds this from every category's item defaults; run it from a
-checkout (see [CLI access](#cli-access)). Restart OpenCode after changing
-`plugins` so it picks up the new entry.
+Restart OpenCode after changing `plugins` so it picks up the new entry. After
+restart, use `/kit enable <id>` for opt-in tools and `/kit config set` for
+settings.
 
 ### 3. Verify
 
-In a session, run `/kit list` to show every item and its resolved state; or from
-a checkout run `bun bin/openkit.js doctor` (see
-[CLI access](#cli-access)).
+In a session, run `/kit list` to show every item and its resolved state.
 
-`doctor` checks that your kit config files parse, that no item is degraded, that
-every skill and reference loads, and — best effort — that `openkit` is
-listed in `opencode.json`.
+If you are working from a clone, `bun scripts/doctor.ts` checks that config files
+parse, that no item is degraded, that every skill and reference loads, and — best
+effort — that `openkit` is listed in `opencode.json`.
 
 ### Let an agent install it
 
@@ -146,21 +144,7 @@ Paste this into your OpenCode session:
 > Fetch and follow instructions from
 > https://raw.githubusercontent.com/jviniciusb/openkit/main/.opencode/INSTALL.md
 
-The agent installs the plugin, seeds the config, restarts OpenCode, and verifies
-with `doctor`.
-
-### CLI access
-
-The CLI lives in the repo (it is not published to npm). Run it from a clone:
-
-```bash
-git clone https://github.com/jviniciusb/openkit.git
-cd openkit && bun install
-bun bin/openkit.js <command>
-```
-
-The plugin also registers a `/kit` slash command for use inside a session (see
-[The `/kit` command](#the-kit-command)).
+The agent adds the plugin, restarts OpenCode, and verifies with `/kit list`.
 
 ## Categories
 
@@ -175,11 +159,11 @@ section:
 
 The three categories are instances of one `KitCategory` descriptor consumed by a
 single generic engine, so config resolution, the skip-if-disabled registration
-loop, isolation/degraded reporting, the CLI, and `/kit` all work the same way for
-each. A category declares how items default to enabled, whether it carries
-settings, and one `registerItem` hook; everything else is shared. Adding a new
-category is a descriptor plus a folder, with no changes to the engine, CLI, or
-schema machinery beyond the closed config shape.
+loop, isolation/degraded reporting, and `/kit` all work the same way for each. A
+category declares how items default to enabled, whether it carries settings, and
+one `registerItem` hook; everything else is shared. Adding a new category is a
+descriptor plus a folder, with no changes to the engine, `/kit`, or schema
+machinery beyond the closed config shape.
 
 ## Configuration
 
@@ -218,7 +202,7 @@ concatenated). Settings apply only to settings-bearing categories (`tools` and
     "context-injections": { "enabled": true }
   },
   "references": {
-    // References ship empty today; authors add them with `new reference <id>`.
+    // References ship empty today; add one under src/references/<id>/.
     // Each reference is toggled and tuned by id, e.g.:
     // "my-docs": { "enabled": true, "settings": { "path": "./docs" } }
   }
@@ -242,8 +226,8 @@ If a **tool**'s settings fail validation, the kit logs a warning and falls back
 to that tool's defaults, and the tool still registers. An invalid
 `references.<id>.settings` override is different: the merged source fails
 validation, so the reference is not registered at all and is reported
-`degraded` (`doctor` treats it as fatal). Either way, the kit and every other
-item keep loading.
+`degraded` (the doctor script reports it as fatal). Either way, the kit and every
+other item keep loading.
 
 ## Skills
 
@@ -317,8 +301,7 @@ section, with the same discovery and precedence:
 ```
 
 Unlike tools, a skill takes no `settings`; only `enabled` is configurable. A
-disabled skill is not registered at all. Toggle one with the CLI
-(`bun bin/openkit.js disable sdd-flow`) or in-session with
+disabled skill is not registered at all. Toggle one in-session with
 `/kit disable sdd-flow`.
 
 `sdd-flow` is a self-contained orchestrator: it sequences spec-driven
@@ -367,50 +350,30 @@ project can override the source's `path`, `repository`, or `branch` without
 editing the packaged file. This replaces those fields individually (it is not a
 general deep-merge), and `type` always comes from the file. A disabled reference
 is not registered, and a reference whose file is missing or invalid degrades only
-itself (and fails `doctor`).
+itself (and fails the doctor script).
 
 No references ship with the kit today; the category is the supported home for
-curated bundles. Add one with `new reference <id>` (see
+curated bundles. Add one by creating `src/references/<id>/reference.json` and
+adding it to the barrel (see
 [Adding a reference](#adding-a-reference-authors)).
-
-## CLI reference
-
-Run from a checkout: `bun bin/openkit.js <command>`.
-Edits made by `enable`, `disable`, and `config set` go to the **global** config
-and preserve comments and formatting.
-
-| Command | What it does |
-| --- | --- |
-| `init [--project]` | Create the kit config (global, or project with `--project`) seeded with every category's item defaults, and ensure `openkit` is listed in the matching `opencode.json`. |
-| `list` | List every item with its resolved enabled state and description. |
-| `enable <id>` | Set `<category>.<id>.enabled` to `true` in the global config. |
-| `disable <id>` | Set `<category>.<id>.enabled` to `false` in the global config. |
-| `config get <id> <key>` | Print a settings-bearing item's effective setting (defaults merged with the global config) as JSON. |
-| `config set <id> <key> <value>` | Write a setting to the global config. Values are coerced to `true`/`false`/`null`/number when they look like JSON scalars. |
-| `new <category> <id>` | Scaffold a new item for `tool`, `skill`, or `reference` under the category's directory (`src/tools\|skills\|references/<id>`) and register it in the barrel (run from a checkout; for authors). |
-| `new <tool-id>` | Alias for `new tool <tool-id>`. |
-| `new-skill <skill-id>` | Alias for `new skill <skill-id>`. |
-| `doctor` | Check that config parses, that no item is degraded, that every skill and reference loads, and whether the plugin is listed in `opencode.json`. |
-| `version` | Print the CLI and plugin versions. |
-
-`enable`/`disable` resolve the id across categories in catalog order (tools, then
-skills, then references — ids share one namespace). `config get`/`config set`
-address settings-bearing categories only (`tools` and `references`); skills
-expose just `enabled`. Unknown commands and unknown ids exit non-zero; `doctor`
-and config-mutating commands fail on malformed config (`list` skips malformed
-files).
 
 ## The `/kit` command
 
-To use the kit without a checkout, the plugin registers a `/kit` slash command
-for in-session use:
+The plugin registers a `/kit` slash command for in-session use:
 
 ```text
-/kit list                        # show every item and its state
-/kit enable <id>                 # enable an item in the global config
-/kit disable <id>                # disable an item
-/kit config <id> <key> <value>   # set a settings-bearing item's setting
+/kit list                          # show every item and its state
+/kit enable <id>                   # enable an item in the global config
+/kit disable <id>                  # disable an item
+/kit config get <id> <key>         # print an item's effective setting
+/kit config set <id> <key> <value> # write a setting
+/kit config <id> <key> <value>     # alias for config set
 ```
+
+`enable`/`disable` resolve the id across categories in catalog order (tools,
+then skills, then references — ids share one namespace). `config get`/`config
+set` address settings-bearing categories only (`tools` and `references`); skills
+expose just `enabled`.
 
 Mutations edit the global config and trigger a reload, so the change takes effect
 without restarting. Results are delivered through the session's `prompt`
@@ -419,19 +382,20 @@ stdout sink (as when driving the command from a test harness).
 
 ## Adding a tool (authors)
 
-From a checkout of the repo:
+Create `src/tools/my-tool/index.ts` and add it to `src/tools/index.ts` between the
+`<kit:tools>` markers:
 
-```bash
-openkit new tool my-tool
-# `openkit new my-tool` is an alias for `new tool my-tool`
+```ts
+import { myTool } from "./my-tool/index"
+
+// <kit:tools>
+myTool,
 ```
 
-This creates `src/tools/my-tool/index.ts` from the standard template and inserts
-it into the tool barrel (`src/tools/index.ts`) between the `<kit:tools>` markers.
 Then:
 
-1. Implement `register(ctx, settings, kit)` in the generated `index.ts` to declare
-   what the tool contributes.
+1. Implement `register(ctx, settings, kit)` in `index.ts` to declare what the
+   tool contributes.
 2. Add unit and harness tests under `tests/`.
 3. Add an entry to `docs/examples/openkit.jsonc`.
 
@@ -441,7 +405,7 @@ Schema, used for validation and future docs), and a single `register` that adds
 tools/commands/skills/hooks through the kit context.
 
 ```ts
-export default defineTool({
+export const myTool = defineTool({
   id: "my-tool",
   name: "My Tool",
   description: "What it does, in one line.",
@@ -464,16 +428,15 @@ See `src/tools/hello/index.ts` for a complete, working example.
 
 ## Adding a skill (authors)
 
-From a checkout of the repo:
+Create `src/skills/my-skill/SKILL.md` and add an entry to
+`src/skills/index.ts` between the `<kit:skills>` markers:
 
-```bash
-openkit new skill my-skill
-# `openkit new-skill my-skill` is an alias for `new skill my-skill`
+```ts
+defineSkill({ id: "my-skill", dir: new URL("./my-skill/", import.meta.url) }),
 ```
 
-This creates `src/skills/my-skill/SKILL.md` from the standard template and
-inserts it into the skills barrel (`src/skills/index.ts`) between the
-`<kit:skills>` markers. Then:
+Prefer `@skill-recipe` to derive the skill from a brief and sources; it writes
+the file and the barrel entry. Then:
 
 1. Write the `SKILL.md`: a `---` frontmatter block with `name` and a
    `description` (when the model should use the skill), followed by the
@@ -490,15 +453,14 @@ the skill off the model's advertised list while still loading it by id
 
 ## Adding a reference (authors)
 
-From a checkout of the repo:
+Create `src/references/my-reference/reference.json` and add an entry to
+`src/references/index.ts` between the `<kit:references>` markers:
 
-```bash
-openkit new reference my-reference
+```ts
+defineReference({ id: "my-reference", dir: new URL("./my-reference/", import.meta.url) }),
 ```
 
-This creates `src/references/my-reference/reference.json` from the standard
-template and inserts it into the references barrel (`src/references/index.ts`)
-between the `<kit:references>` markers. Then:
+Then:
 
 1. Point the `reference.json` at real content: set `"path"` for a local source,
    or switch to `"type": "git"` with `"repository"` (and an optional `"branch"`).
@@ -516,6 +478,13 @@ under `references.<id>.settings`.
 bun install
 bun run typecheck
 bun test
+```
+
+Maintainer-only diagnostics live under `scripts/` and are not shipped:
+
+```bash
+bun scripts/doctor.ts             # config/item/plugin health
+bun scripts/skill-source.ts check # generated skill drift
 ```
 
 ## License

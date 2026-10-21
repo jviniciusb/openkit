@@ -6,9 +6,19 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `/kit config get <id> <key>` prints a settings-bearing item's effective value.
+- `/kit config set` is the explicit setter; the older `config <id> <key> <value>`
+  form remains as an alias.
+
 ### Removed
 
 - The `auto-compact` tool. OpenCode's native compaction is unchanged.
+- The published CLI (`init`, `list`, `enable`, `disable`, `config`, `doctor`,
+  `version`), the `new`/`new-skill` scaffolders, `bin/openkit.js`, and the
+  package `bin` entry. `/kit` is the runtime interface; `scripts/doctor.ts` is
+  maintainer-only tooling.
 
 ## [0.21.3] - 2026-10-20
 

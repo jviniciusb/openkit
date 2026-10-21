@@ -44,7 +44,7 @@ Present the drafted file, or the diff when the target already exists. Wait for t
 
 ### 6. Add the barrel entry
 
-Insert the skill between the `<kit:skills>` markers in `src/skills/index.ts`, in the shape `openkit new skill <id>` produces:
+Insert the skill between the `<kit:skills>` markers in `src/skills/index.ts`, matching the existing entries:
 
 ```ts
 defineSkill({ id: "<id>", dir: new URL("./<id>/", import.meta.url) }),

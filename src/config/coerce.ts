@@ -6,8 +6,8 @@ const NUMBER_RE = /^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/
  *
  * `true`/`false`/`null` and numeric literals become their typed values; every
  * other input is kept as a plain string. This is intentionally shallow — no
- * arrays or objects are parsed. Shared by the CLI and the `/kit` command so both
- * accept the same value syntax.
+ * arrays or objects are parsed. Used by the `/kit` config setter so values use
+ * the same syntax as JSON scalars.
  */
 export function coerceScalar(raw: string): unknown {
   if (raw === "true") return true

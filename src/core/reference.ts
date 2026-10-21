@@ -107,7 +107,7 @@ export function referenceDescription(ref: KitReference): string {
  * `path`/`repository`/`branch`; `type` is always taken from the loaded file, so
  * a setting cannot turn a `local` reference into an invalid `git` source. The
  * merged source is re-validated, so a setting that makes it invalid throws here
- * (and is reported by `doctor`/`config set`).
+ * (and is reported by the doctor script and `/kit config set`).
  */
 export async function registerReference(
   ctx: KitContext,
