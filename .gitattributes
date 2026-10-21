@@ -1,2 +1,5 @@
+# Normalize text to LF in the repository and working tree.
+* text=auto eol=lf
+
 # Keep skill packages LF so the frontmatter reader and relative supporting files behave identically on every OS.
 src/skills/** text eol=lf

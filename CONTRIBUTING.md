@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for your interest in openkit. This is a Bun + TypeScript project for
-building OpenCode V2 tools.
+building OpenCode V2 tools, skills, and references.
 
 ## Development setup
 

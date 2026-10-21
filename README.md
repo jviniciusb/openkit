@@ -1,5 +1,9 @@
 # openkit
 
+> **Personal project.** This is an opinionated setup shared as-is. There is no
+> support or response-time guarantee; issues and PRs are handled on a best-effort
+> basis. Fork it and adapt it to your own workflow.
+
 A framework of toggleable, configurable **tools, skills, and references** for [OpenCode](https://opencode.ai) V2.
 
 `openkit` is one plugin you install once. Inside it live independent items

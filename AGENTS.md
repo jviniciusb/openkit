@@ -108,7 +108,7 @@ src/
 bin/openkit.js          # CLI entry (runs the TS CLI via Bun)
 index.js                # package plugin entry -> src/plugin.ts
 openkit.schema.json     # JSON schema for openkit.jsonc
-docs/                   # examples + design notes (not published)
+docs/                   # examples (not published)
 scripts/                # repo tooling (not published)
 skill-sources/          # vendored skill sources (dev-only, not published)
 tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptance (real opencode)

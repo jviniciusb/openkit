@@ -17,7 +17,7 @@ updates:
         patterns: ["*"]
         update-types: ["minor", "patch"]
 
-  # GitHub Actions used by the CI and publish workflows.
+  # GitHub Actions used by CI.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

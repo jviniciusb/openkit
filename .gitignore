@@ -4,3 +4,8 @@ dist/
 .DS_Store
 .worktrees/
 .superpowers/
+
+# Local environment files
+.env
+.env.*
+!.env.example
