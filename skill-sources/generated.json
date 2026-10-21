@@ -189,7 +189,7 @@
       }
     ],
     "output": "src/skills/dispatching-parallel-agents/SKILL.md",
-    "outputHash": "7bcb6a584dfd29a4a6fdc513d1f16dd0c6b0b8fc16e9677d4aa09682363dcc5f",
+    "outputHash": "a3f4494d589bfa31907c2fd47b21d5053d4fd0ad34d71fce9961ece0b9821a2a",
     "generatedAt": "2026-10-13T21:08:06.000Z"
   },
   {
@@ -280,7 +280,7 @@
       }
     ],
     "output": "src/skills/router/SKILL.md",
-    "outputHash": "357adde75d3b3309a0027abfaeaa850829ec7486fbaddd41beed8dd6f99ebcec",
+    "outputHash": "660325994286061651ae769ba9391df082641a5b62c52d952c5c4de0a5e9319e",
     "generatedAt": "2026-10-13T21:53:26.000Z"
   },
   {

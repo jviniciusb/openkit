@@ -2,7 +2,7 @@
 
 This directory holds pinned snapshots of upstream agent-skill kits that
 `openkit` skills are derived from. It is **dev-only**: it is not listed in
-`package.json` `files`, so nothing here is published.
+`package.json` `files`, so nothing here is shipped in the package.
 
 ## Layout
 
@@ -12,6 +12,9 @@ This directory holds pinned snapshots of upstream agent-skill kits that
 - `briefs/<target-id>.md`: the per-skill brief the recipe reads.
 - `<name>/LICENSE`: the upstream license, retained verbatim.
 - `<name>/<upstream-path>/...`: the included files, mirrored at upstream paths.
+
+Some upstream files link to supporting files outside the included set; those
+links are intentionally unresolved in this dev-only tree.
 
 ## Vendored sources
 
@@ -23,7 +26,7 @@ This directory holds pinned snapshots of upstream agent-skill kits that
 Both are MIT. The derived skills in `src/skills/` are listed with their upstream
 sources in the root `THIRD_PARTY_NOTICES.md`, which ships with the package. The
 vendored snapshots in this directory are dev-only and are not included in the
-published package.
+shipped package.
 
 ## Tooling
 

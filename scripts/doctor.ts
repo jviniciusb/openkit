@@ -17,7 +17,6 @@ export interface DoctorIo {
   /** Home directory used to discover the global config file. */
   home: string
   stdout(s: string): void
-  stderr(s: string): void
 }
 
 /** JSONC read options; mirrors the config loaders. */
@@ -170,6 +169,5 @@ if (import.meta.main) {
     cwd: process.cwd(),
     home: process.env.HOME ?? homedir(),
     stdout: (s) => console.log(s),
-    stderr: (s) => console.error(s),
   })
 }

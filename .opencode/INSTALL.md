@@ -53,7 +53,7 @@ The kit reads `openkit.jsonc` from the global
 skills default to on and tools default to off, so the plugin works without a
 config file.
 
-**Preferred:** after restart, use `/kit list` to see items, `/kit enable <id>` or
+**Preferred:** after the Step 3 restart, use `/kit list` to see items, `/kit enable <id>` or
 `/kit disable <id>` to toggle them, and `/kit config set <id> <key> <value>` to
 write a setting.
 
