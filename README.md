@@ -30,22 +30,13 @@ schema, and lifecycle layers do not change. See
 - **Isolated:** one item failing to configure never stops the kit or the other
   items from loading.
 
-The package ships three tools: [`background-subagents`](src/tools/background-subagents/index.ts)
+The package ships two tools: [`background-subagents`](src/tools/background-subagents/index.ts)
 (opt-in; forces every subagent call to run in the background so the parent keeps
-control while a child works), [`context-injections`](src/tools/context-injections/index.ts)
-(opt-in; injects built-in behavioral rules — each individually toggleable — plus
-your own), and [`auto-compact`](src/tools/auto-compact/index.ts) (opt-in;
-compacts at a prompt-token threshold only after the session, child sessions,
-tool calls, and background shells are idle).
+control while a child works) and
+[`context-injections`](src/tools/context-injections/index.ts) (opt-in; injects
+built-in behavioral rules — each individually toggleable — plus your own).
 [`hello`](src/tools/hello/index.ts) remains as an authoring example, but is not
 registered or exposed at runtime.
-
-`auto-compact` relies on provider-reported prompt usage. When it is enabled,
-disable OpenCode's built-in automatic compaction separately in `opencode.json(c)`
-with `"compaction": { "auto": false }`; otherwise native compaction may run
-before related background work has finished. This also disables OpenCode's
-automatic overflow-recovery compaction. If the provider does not report prompt
-usage, the tool cannot trigger compaction.
 
 It also ships twenty-one skills, all enabled by default:
 [`english-writing-assistant`](src/skills/english-writing-assistant/SKILL.md)
@@ -129,20 +120,8 @@ effective configuration explicit, create
 ```jsonc
 {
   "tools": {
-    "background-subagents": { "enabled": true },
-    "auto-compact": {
-      "enabled": true,
-      "settings": { "thresholdTokens": 250000 }
-    }
+    "background-subagents": { "enabled": true }
   }
-}
-```
-
-Also set this in `opencode.json(c)` when using `auto-compact`:
-
-```jsonc
-{
-  "compaction": { "auto": false }
 }
 ```
 
@@ -236,11 +215,7 @@ concatenated). Settings apply only to settings-bearing categories (`tools` and
   "configVersion": 1,
   "tools": {
     "background-subagents": { "enabled": true },
-    "context-injections": { "enabled": true },
-    "auto-compact": {
-      "enabled": true,
-      "settings": { "thresholdTokens": 250000 }
-    }
+    "context-injections": { "enabled": true }
   },
   "references": {
     // References ship empty today; authors add them with `new reference <id>`.
