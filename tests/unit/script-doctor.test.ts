@@ -10,11 +10,9 @@ import { defineSkill } from "../../src/core/skill"
 
 function io(home: string) {
   let out = ""
-  let err = ""
   return {
-    io: { cwd: home, home, stdout: (s: string) => { out += s }, stderr: (s: string) => { err += s } },
+    io: { cwd: home, home, stdout: (s: string) => { out += s } },
     out: () => out,
-    err: () => err,
   }
 }
 
