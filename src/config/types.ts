@@ -8,7 +8,6 @@ export interface KitConfigFile {
   configVersion?: number
   tools?: Record<string, CategoryEntry>
   skills?: Record<string, CategoryEntry>
-  references?: Record<string, CategoryEntry>
 }
 
 /** A tool's fully resolved configuration after applying all sources. */
@@ -20,8 +19,8 @@ export interface ResolvedToolConfig<S> {
 /**
  * Reads a category's item map from a config file.
  *
- * Config stays category-keyed (`tools`, `skills`, `references`); this helper
- * looks one up by key so the generic engine never hard-codes a category.
+ * Config stays category-keyed (`tools`, `skills`); this helper looks one up by
+ * key so the generic engine never hard-codes a category.
  */
 export function categoryEntries(
   config: KitConfigFile,

@@ -1,4 +1,3 @@
-import { referenceCategory } from "./categories/reference"
 import { skillCategory } from "./categories/skill"
 import { toolCategory } from "./categories/tool"
 import type { KitCategory } from "./core/category"
@@ -12,5 +11,4 @@ import type { KitCategory } from "./core/category"
 export const categories: readonly KitCategory<unknown>[] = [
   toolCategory,
   skillCategory,
-  referenceCategory,
 ]

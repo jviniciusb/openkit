@@ -4,13 +4,12 @@
 > support or response-time guarantee; issues and PRs are handled on a best-effort
 > basis. Fork it and adapt it to your own workflow.
 
-A framework of toggleable, configurable **tools, skills, and references** for [OpenCode](https://opencode.ai) V2.
+A framework of toggleable, configurable **tools and skills** for [OpenCode](https://opencode.ai) V2.
 
 `openkit` is one plugin you install once. Inside it live independent items
 grouped into **categories** — tools may contribute agent-callable functions,
 slash commands, skills, hook injections, and bundled scripts; skills are
-self-contained instruction packages you enable on their own; references package a
-named content source (a local path or a git repository) the session can read. You
+self-contained instruction packages you enable on their own. You
 turn individual items on or off and tune their settings through configuration,
 without touching the plugin itself.
 
@@ -22,9 +21,9 @@ lifecycle layers do not change. See
 [Categories](#categories).
 
 - **Framework-first:** the conventions for adding items matter more than any one
-  item. A new tool is a folder plus a registration; a new skill or reference is a
-  folder plus a barrel line.
-- **Opt-in by default:** a tool or reference only activates when config says so
+  item. A new tool is a folder plus a registration; a new skill is a folder plus
+  a barrel line.
+- **Opt-in by default:** a tool only activates when config says so
   (or when it explicitly declares `defaultEnabled: true`); bundled skills default
   to on.
 - **Isolated:** one item failing to configure never stops the kit or the other
@@ -34,7 +33,9 @@ The package ships two tools: [`background-subagents`](src/tools/background-subag
 (opt-in; forces every subagent call to run in the background so the parent keeps
 control while a child works) and
 [`context-injections`](src/tools/context-injections/index.ts) (opt-in; injects
-built-in behavioral rules — each individually toggleable — plus your own).
+built-in behavioral rules — each individually toggleable — plus your own). It is
+global and system-level: its rules are additive to, and sit above, project
+`AGENTS.md`/`instructions`, so do not duplicate them there.
 [`hello`](src/tools/hello/index.ts) remains as an authoring example, but is not
 registered or exposed at runtime.
 
@@ -81,9 +82,6 @@ and [`diagnosing-sessions`](src/skills/diagnosing-sessions/SKILL.md) (invoked wi
 `@diagnosing-sessions`; forensically explains why a past session went wrong). See
 [Skills](#skills).
 
-The **references** category ships empty today; it is the supported home for
-curated content sources. See [References](#references).
-
 ## Requirements
 
 - OpenCode V2 `>= 2.0.4`.
@@ -106,7 +104,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.22.1"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.23.0"
 ```
 
 ### 2. Configure (optional)
@@ -134,7 +132,7 @@ settings.
 In a session, run `/kit list` to show every item and its resolved state.
 
 If you are working from a clone, `bun scripts/doctor.ts` checks that config files
-parse, that no item is degraded, that every skill and reference loads, and — best
+parse, that no item is degraded, that every skill loads, and — best
 effort — that `openkit` is listed in `opencode.json`.
 
 ### Let an agent install it
@@ -148,16 +146,15 @@ The agent adds the plugin, restarts OpenCode, and verifies with `/kit list`.
 
 ## Categories
 
-Every shipped item belongs to one of three categories, each a peer config
+Every shipped item belongs to one of two categories, each a peer config
 section:
 
 | Category | Config key | Items | Settings? | Default |
 | --- | --- | --- | --- | --- |
 | **Tools** | `tools` | `KitTool` — a `register` hook that contributes tools, commands, skills, and hooks | yes | opt-in (`defaultEnabled: false`) |
 | **Skills** | `skills` | `KitSkill` — a declarative `SKILL.md` package | no | on (`defaultEnabled: true`) |
-| **References** | `references` | `KitReference` — a `reference.json` content source | yes | opt-in (`defaultEnabled: false`) |
 
-The three categories are instances of one `KitCategory` descriptor consumed by a
+The two categories are instances of one `KitCategory` descriptor consumed by a
 single generic engine, so config resolution, the skip-if-disabled registration
 loop, isolation/degraded reporting, and `/kit` all work the same way for each. A
 category declares how items default to enabled, whether it carries settings, and
@@ -187,8 +184,10 @@ item defaultSettings (in code, settings-bearing categories)
 ```
 
 `settings` objects deep-merge; `enabled` and arrays replace (arrays are **not**
-concatenated). Settings apply only to settings-bearing categories (`tools` and
-`references`); `skills` carry just `enabled`.
+concatenated). Settings apply only to settings-bearing categories (`tools`);
+`skills` carry just `enabled`. Whether a skill is advertised to
+the model is fixed per skill, not configurable — see
+[Registered vs advertised](#registered-vs-advertised).
 
 ### Example
 
@@ -200,11 +199,6 @@ concatenated). Settings apply only to settings-bearing categories (`tools` and
   "tools": {
     "background-subagents": { "enabled": true },
     "context-injections": { "enabled": true }
-  },
-  "references": {
-    // References ship empty today; add one under src/references/<id>/.
-    // Each reference is toggled and tuned by id, e.g.:
-    // "my-docs": { "enabled": true, "settings": { "path": "./docs" } }
   }
 }
 ```
@@ -221,13 +215,6 @@ A project file only needs what differs:
 ```
 
 More in [`docs/examples/openkit.jsonc`](docs/examples/openkit.jsonc).
-
-If a **tool**'s settings fail validation, the kit logs a warning and falls back
-to that tool's defaults, and the tool still registers. An invalid
-`references.<id>.settings` override is different: the merged source fails
-validation, so the reference is not registered at all and is reported
-`degraded` (the doctor script reports it as fatal). Either way, the kit and every
-other item keep loading.
 
 ## Skills
 
@@ -301,8 +288,31 @@ section, with the same discovery and precedence:
 ```
 
 Unlike tools, a skill takes no `settings`; only `enabled` is configurable. A
-disabled skill is not registered at all. Toggle one in-session with
-`/kit disable sdd-flow`.
+disabled skill is not registered at all, so `@<id>` no longer resolves. Toggle
+one in-session with `/kit disable sdd-flow`.
+
+### Registered vs advertised
+
+Two independent switches decide what you can do with a skill:
+
+- **`enabled`** (config) decides whether the skill is registered. `false` means
+  the kit never adds it, so it cannot be loaded at all.
+- **`autoinvoke`** (packaged with the skill) decides whether it appears in the
+  model's advertised list. `false` keeps it registered and loadable by `@<id>`,
+  but hidden from the model. It comes from the `SKILL.md` frontmatter
+  (`metadata.opencode/autoinvoke: false` or `disable-model-invocation: true`) or
+  the barrel entry in `src/skills/index.ts`, which wins over the frontmatter. It
+  is not an `openkit.jsonc` setting.
+
+OpenCode's own `skill` permissions and policies apply after both: a `deny` rule
+hides a skill from the model and rejects loading it, even when openkit lists it
+as enabled.
+
+To change a packaged skill's visibility without editing the package, add a skill
+with the same id under `.opencode/skills/<id>/SKILL.md`. OpenCode registers
+discovered and configured skills after plugin skills, so the project copy wins.
+The copy is independent of the packaged file and must be maintained with it;
+editing the packaged file is overwritten on update.
 
 `sdd-flow` is a self-contained orchestrator: it sequences spec-driven
 development end to end — brainstorming candidate approaches before the interview
@@ -313,49 +323,6 @@ spec continuously current — and composes the kit's own `interview`, `research`
 `dispatching-parallel-agents` skills by id, naming `to-spec` for drafting the
 initial spec. It has no external companion skills and no `/sdd-flow` command —
 invoke it with `@sdd-flow`.
-
-## References
-
-A **reference** packages one named content source — a local path or a git
-repository — that the kit exposes to the session through OpenCode's
-`ctx.reference` domain. Like skills, a reference is entirely declarative: a
-directory with a `reference.json` and no per-reference code. Unlike skills, it is
-**settings-bearing** and **opt-in by default**.
-
-`reference.json` declares the source:
-
-```jsonc
-// local directory
-{ "description": "Project docs", "type": "local", "path": "./docs" }
-```
-
-```jsonc
-// git repository (branch optional)
-{ "description": "Shared standard", "type": "git", "repository": "https://github.com/acme/standard", "branch": "main" }
-```
-
-References are toggled and tuned per id under `references.<id>` — a peer of the
-`tools` section:
-
-```jsonc
-{
-  "references": {
-    "project-docs": { "enabled": true, "settings": { "path": "./docs/v2" } }
-  }
-}
-```
-
-`settings` are shallow-merged over the source read from `reference.json`: a
-project can override the source's `path`, `repository`, or `branch` without
-editing the packaged file. This replaces those fields individually (it is not a
-general deep-merge), and `type` always comes from the file. A disabled reference
-is not registered, and a reference whose file is missing or invalid degrades only
-itself (and fails the doctor script).
-
-No references ship with the kit today; the category is the supported home for
-curated bundles. Add one by creating `src/references/<id>/reference.json` and
-adding it to the barrel (see
-[Adding a reference](#adding-a-reference-authors)).
 
 ## The `/kit` command
 
@@ -371,14 +338,15 @@ The plugin registers a `/kit` slash command for in-session use:
 ```
 
 `enable`/`disable` resolve the id across categories in catalog order (tools,
-then skills, then references — ids share one namespace). `config get`/`config
-set` address settings-bearing categories only (`tools` and `references`); skills
-expose just `enabled`.
+then skills — ids share one namespace). `config get`/`config set` address
+settings-bearing tools only (`tools`); skills expose just `enabled`.
 
 Mutations edit the global config and trigger a reload, so the change takes effect
-without restarting. Results are delivered through the session's `prompt`
-channel when the harness exposes one; otherwise the kit falls back to its own
-stdout sink (as when driving the command from a test harness).
+without restarting. Results are delivered as a synthetic session message
+(`session.synthetic` with `resume: false`), so they do not start a model turn.
+When the harness has no synthetic channel, the kit falls back to the session's
+`prompt` channel and then to its own stdout sink (as when driving the command
+from a test harness).
 
 ## Adding a tool (authors)
 
@@ -450,27 +418,6 @@ A skill is a `KitSkill`: a unique kebab-case `id` and the directory holding its
 an optional `autoinvoke`; set `autoinvoke: false` (as `sdd-flow` does) to keep
 the skill off the model's advertised list while still loading it by id
 (`@my-skill`).
-
-## Adding a reference (authors)
-
-Create `src/references/my-reference/reference.json` and add an entry to
-`src/references/index.ts` between the `<kit:references>` markers:
-
-```ts
-defineReference({ id: "my-reference", dir: new URL("./my-reference/", import.meta.url) }),
-```
-
-Then:
-
-1. Point the `reference.json` at real content: set `"path"` for a local source,
-   or switch to `"type": "git"` with `"repository"` (and an optional `"branch"`).
-2. Add an entry to `docs/examples/openkit.jsonc`.
-3. `bun run typecheck && bun test`.
-
-A reference is a `KitReference`: a unique kebab-case `id` and the directory
-holding its `reference.json`, with `defaultEnabled` defaulting to `false`. It is
-settings-bearing, so users can override the source's `path`/`repository`/`branch`
-under `references.<id>.settings`.
 
 ## Development
 

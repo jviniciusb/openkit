@@ -61,25 +61,10 @@ export interface KitStorage {
   scan(options: { prefix: string; after?: string; limit?: number }): Promise<StorageScanResult>
 }
 
-/** Where a reference's content comes from (V2 `Reference.Source`-shaped). */
-export type ReferenceSource =
-  | { type: "local"; path: string }
-  | { type: "git"; repository: string; branch?: string }
-
-/** Editor handed to a reference transform; `add` registers one named source. */
-export interface ReferenceEditor {
-  add(name: string, source: ReferenceSource): void
-}
-
-/** Reference domain: transforms add named content sources to the session. */
-export interface ReferenceDomain {
-  transform(callback: (editor: ReferenceEditor) => void): Promise<Registration>
-}
-
 /** Namespace metadata applied to a transform editor (V2 `Tool.Namespace`). */
 export interface Namespace {
   name: string
-  description?: string
+  description: string
 }
 
 /** Result a tool executor returns (V2 `Tool.Content`-shaped). */
@@ -161,9 +146,14 @@ export interface SessionDomain {
   context(input: { sessionID: string }): Promise<readonly SessionMessageInfo[]>
   compact(input: { sessionID: string; delivery: "queue" }): Promise<unknown>
   /**
-   * Optional in-session output channel. When the harness exposes it, command
-   * results (e.g. `/kit list`) are delivered through it; callers fall back to
-   * their own stdout sink when absent.
+   * In-session message without resuming the model. Preferred for command
+   * output (e.g. `/kit list`); callers fall back to {@link prompt} and then to
+   * their own stdout sink.
+   */
+  synthetic?(input: { sessionID: string; text: string; resume?: boolean }): Promise<unknown> | unknown
+  /**
+   * In-session prompt admission. Delivers command output at the cost of a
+   * model turn; used only when `synthetic` is unavailable.
    */
   prompt?(input: { sessionID: string; text: string }): Promise<void> | void
 }
@@ -185,7 +175,6 @@ export interface KitContext {
   readonly skill: {
     transform(callback: (editor: SkillEditor) => void): Promise<Registration>
   }
-  readonly reference: ReferenceDomain
   readonly event: EventDomain
   readonly session: SessionDomain
 }

@@ -34,7 +34,9 @@
   "skills": {
     // Skills are declarative instruction packages (`src/skills/<id>/SKILL.md`).
     // Unlike tools they take no `settings` — only `enabled`. All bundled
-    // skills default to on.
+    // skills default to on. A disabled skill is not registered at all;
+    // `autoinvoke` is packaged with the skill (frontmatter or barrel), not
+    // config, and only controls whether the model sees it advertised.
     "english-writing-assistant": {
       // Model-visible: advertised to the model so it can use the skill on its own.
       "enabled": true
@@ -142,17 +144,5 @@
     }
     // Add further skills as `"<skill-id>": { "enabled": true }`.
     // `enable`/`disable` and the `/kit` command write here.
-  },
-  "references": {
-    // References are declarative content sources (`src/references/<id>/reference.json`)
-    // exposed to the session through `ctx.reference`. They are opt-in and
-    // settings-bearing; `settings` override the source's `path`/`repository`/`branch`.
-    // The category ships empty today — add one by creating
-    // `src/references/<id>/reference.json` and adding it to the barrel.
-    //
-    // "project-docs": {
-    //   "enabled": true,
-    //   "settings": { "path": "./docs/v2" }
-    // }
   }
 }

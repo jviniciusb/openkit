@@ -52,7 +52,7 @@ test("toolCategory.registerItem handles a getter-backed frozen context", async (
     get session() { return real.session },
   }
   const holder: Record<string, unknown> = {}
-  for (const key of ["app", "location", "options", "storage", "command", "skill", "reference"]) {
+  for (const key of ["app", "location", "options", "storage", "command", "skill"]) {
     holder[key] = real[key]
   }
   const getterCtx = Object.freeze(Object.assign(Object.create(proto), holder)) as unknown as KitContext

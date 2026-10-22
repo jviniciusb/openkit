@@ -8,7 +8,7 @@ OpenCode V2 setup. If you can read this file, follow it.
 > https://raw.githubusercontent.com/jviniciusb/openkit/main/.opencode/INSTALL.md*
 
 openkit is one OpenCode V2 plugin that hosts independently toggleable
-items — tools, skills, and references. Installing it means: register the plugin,
+items — tools and skills. Installing it means: register the plugin,
 optionally configure it, restart OpenCode, and verify. Do the four steps below in
 order and report the result to the user.
 
@@ -29,7 +29,7 @@ instead of replacing it.
 
 > **Status:** `openkit` is distributed directly from GitHub (there is no npm
 > package). Add the git spec below. To pin a release, append a tag:
-> `#v0.22.1`.
+> `#v0.23.0`.
 
 Add the git spec to the `plugins` array of `opencode.json(c)`:
 
@@ -93,8 +93,7 @@ each individually toggleable, plus your own):
     "wizard": { "enabled": true },
     "router": { "enabled": true },
     "diagnosing-sessions": { "enabled": true }
-  },
-  "references": {}
+  }
 }
 ```
 
@@ -126,16 +125,13 @@ conversation into a written spec), `wizard` (model-visible; builds a guided
 interactive script for steps only a human can take), `router` (invoked with
 `@router`; points a request at the one kit skill or flow that fits), and
 `diagnosing-sessions` (invoked with `@diagnosing-sessions`; forensically explains
-why a past session went wrong). Skills take no `settings` — only `enabled`.
-Disable one with `/kit disable <skill-id>` in a session.
+why a past session went wrong). Skills take no `settings` — only `enabled`. A
+disabled skill is not registered and cannot be loaded by `@<id>`; a skill
+packaged with `autoinvoke: false` stays loadable by `@<id>` but is hidden from
+the model. Disable one with `/kit disable <skill-id>` in a session.
 
-**References** are the third category (a `references` config section). A
-reference packages a content source (local path or git repository) for the
-session; references are opt-in and settings-bearing, and none ship today. See the
-[README references section](https://github.com/jviniciusb/openkit#references).
-
-Do not create a config if the user already has one; merge missing tool, skill, and
-reference entries into it instead.
+Do not create a config if the user already has one; merge missing tool and skill
+entries into it instead.
 
 A project file only needs the values that differ from global. Settings
 deep-merge (settings-bearing categories only); `enabled` and arrays replace.
@@ -162,8 +158,8 @@ In a session, run:
 /kit list
 ```
 
-Success shows `tools:`, `skills:`, and `references:` sections with each item and
-its resolved state. The two shipped tools are `background-subagents` and
+Success shows `tools:` and `skills:` sections with each item and its resolved
+state. The two shipped tools are `background-subagents` and
 `context-injections`; twenty-one skills should be listed.
 
 - If `/kit` is not available after a restart, the plugin did not load. Check

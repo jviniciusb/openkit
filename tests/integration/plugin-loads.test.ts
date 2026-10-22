@@ -43,8 +43,8 @@ test("the kit ships the english-writing-assistant, sdd-flow, and interview skill
   expect("autoinvoke" in loadSkill(interview!)).toBe(false)
 })
 
-test("the catalog loads tools, skills, and references categories", () => {
-  expect(categories.map((c) => c.key)).toEqual(["tools", "skills", "references"])
+test("the catalog loads tools and skills categories", () => {
+  expect(categories.map((c) => c.key)).toEqual(["tools", "skills"])
   for (const category of categories) {
     expect(Array.isArray(category.items)).toBe(true)
     expect(typeof category.registerItem).toBe("function")

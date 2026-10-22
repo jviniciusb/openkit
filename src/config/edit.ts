@@ -17,7 +17,7 @@ const MODIFY_OPTIONS: ModificationOptions = {
 }
 
 /** Seed for a brand-new config file. */
-const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {}, skills: {}, references: {} }
+const DEFAULT_CONFIG: KitConfigFile = { configVersion: 1, tools: {}, skills: {} }
 
 /** Parses JSONC options shared by every read in this module. */
 const READ_OPTIONS = {
@@ -90,11 +90,11 @@ function applyAndWrite(path: string, text: string, edits: Edit[]): void {
 /**
  * Sets `<category>[id].enabled` in the config at `path`.
  *
- * `category` is the top-level config map key (`tools`, `skills`, `references`,
- * …). The file is read as raw text (creating a default config when absent) and
- * edited with `jsonc-parser`'s `modify`/`applyEdits`, so existing comments,
- * key order, and indentation survive the round-trip. Missing intermediate
- * objects (`category`, the entry) are created.
+ * `category` is the top-level config map key (`tools`, `skills`). The file is
+ * read as raw text (creating a default config when absent) and edited with
+ * `jsonc-parser`'s `modify`/`applyEdits`, so existing comments, key order, and
+ * indentation survive the round-trip. Missing intermediate objects (`category`,
+ * the entry) are created.
  */
 export async function setEntryEnabled(
   path: string,
@@ -110,9 +110,9 @@ export async function setEntryEnabled(
 /**
  * Sets `<category>[id].settings[key]` in the config at `path`.
  *
- * `category` is the top-level config map key (`tools`, `skills`, `references`,
- * …). Same comment-preserving read/modify/write as {@link setEntryEnabled};
- * missing `category`, entry, or `settings` objects are created as needed.
+ * `category` is the top-level config map key (`tools`, `skills`). Same
+ * comment-preserving read/modify/write as {@link setEntryEnabled}; missing
+ * `category`, entry, or `settings` objects are created as needed.
  */
 export async function setEntrySetting(
   path: string,

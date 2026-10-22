@@ -138,10 +138,10 @@ test("doctor fails and names a skill whose SKILL.md is missing", async () => {
   expect(h.out()).toContain("skill: error broken")
 })
 
-test("doctor reports a references section", async () => {
+test("doctor reports only the shipped categories", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const h = io(home)
   const code = await doctorCommand(h.io)
   expect(code).toBe(0)
-  expect(h.out()).toContain("references: ok")
+  expect(h.out()).not.toContain("references:")
 })

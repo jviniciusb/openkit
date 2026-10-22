@@ -142,33 +142,32 @@ test("setEntryEnabled works for the skills category", async () => {
 test("setEntrySetting writes a nested setting for any settings category", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const f = join(d, "openkit.jsonc")
-  writeFileSync(f, `{ "references": { "r": { "enabled": true } } }`)
-  await setEntrySetting(f, "references", "r", "branch", "main")
-  expect((parse(readFileSync(f, "utf8")) as KitConfigFile).references?.r?.settings).toEqual({ branch: "main" })
+  writeFileSync(f, `{ "tools": { "r": { "enabled": true } } }`)
+  await setEntrySetting(f, "tools", "r", "branch", "main")
+  expect((parse(readFileSync(f, "utf8")) as KitConfigFile).tools?.r?.settings).toEqual({ branch: "main" })
 })
 
 test("setEntrySetting keeps the existing enabled value and comments", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const f = join(d, "openkit.jsonc")
-  writeFileSync(f, `{\n  // keep me\n  "references": { "r": { "enabled": false } },\n}`)
+  writeFileSync(f, `{\n  // keep me\n  "tools": { "r": { "enabled": false } },\n}`)
 
-  await setEntrySetting(f, "references", "r", "branch", "main")
+  await setEntrySetting(f, "tools", "r", "branch", "main")
 
   const { text, data } = readConfig(f)
   expect(text).toContain("// keep me")
-  expect(data.references?.r?.settings).toEqual({ branch: "main" })
-  expect(data.references?.r?.enabled).toBe(false)
+  expect(data.tools?.r?.settings).toEqual({ branch: "main" })
+  expect(data.tools?.r?.enabled).toBe(false)
 })
 
-test("setEntryEnabled seeds a default config that includes a references map", async () => {
+test("setEntryEnabled seeds a default config with tools and skills maps", async () => {
   const d = mkdtempSync(join(tmpdir(), "kit-"))
   const f = join(d, "openkit.jsonc")
 
-  await setEntryEnabled(f, "references", "r", true)
+  await setEntryEnabled(f, "tools", "r", true)
 
   const data = parse(readFileSync(f, "utf8")) as KitConfigFile
   expect(data.configVersion).toBe(1)
-  expect(data.tools).toEqual({})
   expect(data.skills).toEqual({})
-  expect(data.references?.r?.enabled).toBe(true)
+  expect(data.tools?.r?.enabled).toBe(true)
 })
