@@ -19,15 +19,15 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "decomposition",
-    text: "Before a non-trivial task, break it into small, independent pieces, each with one responsibility and explicit inputs and outputs. A piece is well-formed when it can be understood, implemented, and verified without reading the others; if two parts must change together, they are one piece. Map dependencies as a graph, not a list. Actively look for safe parallelism rather than defaulting to serial work, and start all ready, independent pieces concurrently when the time saved justifies it. Keep dependent or shared-state work together, and never cross an approval gate. For trivial or strictly sequential work, act directly.",
+    text: "Before a non-trivial task, break it into small, independent pieces, each with one responsibility and explicit inputs and outputs. A piece is well-formed when it can be understood, implemented, and verified without reading the others; if two parts must change together, they are one piece. Map dependencies as a graph, not a list. Actively look for worthwhile safe parallelism rather than defaulting to serial work. Identify which independent pieces are ready; keep dependent or shared-state work together, and never cross an approval gate. For trivial or strictly sequential work, act directly.",
   },
   {
     id: "subagent-driven",
-    text: "Keep your context small and linear — an index of consolidated, validated results, not a workspace. You are the orchestrator: dispatch subagents in the background where supported, so you stay free to receive new input and are not stuck waiting. Delegate independent, substantive exploration, research, data-heavy analysis, implementation, or validation; use concurrent tool calls instead for bounded queries. Fan out all ready, independent pieces in the same dispatch when the time saved justifies it. Do not delegate dependent work or work that shares files, state, or decisions. Then fan in: consolidate the distilled results, check conflicts, verify against the goal, and keep only what matters. Keep raw exploration, logs, and transcripts in the subagent. You still own the goal and final result; delegate only independent work.",
+    text: "Keep your context small and linear — an index of consolidated, validated results, not a workspace. You are the orchestrator: delegate independent, substantive exploration, research, data-heavy analysis, implementation, or validation to background subagents where supported, so you stay free to receive new input and are not stuck waiting. Use concurrent tool calls instead for bounded queries. Delegate only work that can proceed without shared files, state, or decisions, and dispatch ready pieces together when the time saved justifies it. Then fan in: consolidate the distilled results, check conflicts, verify against the goal, and keep only what matters. Keep raw exploration, logs, and transcripts in the subagent. You still own the goal and final result.",
   },
   {
     id: "careful-changes",
-    text: "Before editing, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff: when adding a feature, change or refactor existing design where that materially improves the integrated result, rather than preserving structure because it is already there. Keep refactors within the request and any agreed scope; do not expand behavior or scope without authorization. Re-read each target immediately before changing it, and preserve unrelated or concurrent work. Verify the outcome, not just the edit: run relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
+    text: "Before editing, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff: when adding a feature, change or refactor existing design where that materially improves the integrated result, rather than preserving structure because it is already there. Keep refactors within the request and any agreed scope; do not expand behavior or scope without authorization. Get explicit user approval before destructive or externally visible actions unless the user authorized that specific action. Re-read each target immediately before changing it, and preserve unrelated or concurrent work. For behavior changes, add or update focused tests where the project supports them. Verify the outcome, not just the edit: run relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
   },
 ] as const
 
@@ -40,7 +40,7 @@ export type RuleId = (typeof BUILT_IN_RULES)[number]["id"]
  * carry far less weight against a project's `AGENTS.md`.
  */
 export const RULES_HEADING = "# Operating rules"
-export const RULES_PREAMBLE = "Apply these to every task. They are requirements, not suggestions."
+export const RULES_PREAMBLE = "Apply these to every task, subject to higher-priority instructions and explicit approval gates."
 
 /** Settings accepted by the `context-injections` tool. */
 export interface ContextInjectionsSettings {
@@ -57,8 +57,9 @@ export interface ContextInjectionsSettings {
  * The enabled rules are sent as one headed, imperative block so the model
  * treats them as standing instructions rather than ambient context. With no
  * enabled rules and no extra instructions, no hook is registered. The block is
- * global and system-level, additive to project `AGENTS.md`/`instructions`; do
- * not duplicate its rules there.
+ * global and system-level, additive to project `AGENTS.md`/`instructions`, and
+ * does not override higher-priority instructions or approval gates; do not
+ * duplicate its rules there.
  */
 export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<ContextInjectionsSettings>({
   id: "context-injections",

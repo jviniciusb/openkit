@@ -6,6 +6,14 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.23.2] - 2026-10-22
+
+### Changed
+
+- Clarified `context-injections` priority and approval boundaries, added guidance
+  to test behavior changes, and separated task decomposition from subagent
+  delegation while preserving the existing rule IDs.
+
 ## [0.23.1] - 2026-10-21
 
 ### Fixed
@@ -451,7 +459,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.23.1...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.23.2...HEAD
+[0.23.2]: https://github.com/jviniciusb/openkit/compare/v0.23.1...v0.23.2
 [0.23.1]: https://github.com/jviniciusb/openkit/compare/v0.23.0...v0.23.1
 [0.23.0]: https://github.com/jviniciusb/openkit/compare/v0.22.1...v0.23.0
 [0.22.1]: https://github.com/jviniciusb/openkit/compare/v0.22.0...v0.22.1
