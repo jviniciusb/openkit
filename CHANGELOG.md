@@ -6,6 +6,27 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-10-21
+
+### Removed
+
+- Removed the unused references category and its `references` config section.
+  The kit now ships tools and skills only; a config that still has `references`
+  is rejected by the schema.
+
+### Changed
+
+- Trimmed the built-in `context-injections` rules by about 9% without dropping
+  an enforced behavior; the behavior tests are unchanged.
+
+### Fixed
+
+- `/kit` now reads the command text from V2's `prompt.text` instead of the
+  never-sent `arguments` field, and delivers output as a synthetic session
+  message so it does not start a model turn.
+- Tool namespaces always carry a description, matching V2's required
+  `Tool.Namespace`.
+
 ## [0.22.1] - 2026-10-21
 
 ### Changed
@@ -422,7 +443,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.22.1...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.23.0...HEAD
+[0.23.0]: https://github.com/jviniciusb/openkit/compare/v0.22.1...v0.23.0
 [0.22.1]: https://github.com/jviniciusb/openkit/compare/v0.22.0...v0.22.1
 [0.22.0]: https://github.com/jviniciusb/openkit/compare/v0.21.3...v0.22.0
 [0.21.3]: https://github.com/jviniciusb/openkit/compare/v0.21.2...v0.21.3
