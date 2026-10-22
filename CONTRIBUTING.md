@@ -1,7 +1,7 @@
 # Contributing
 
 Thanks for your interest in openkit. This is a Bun + TypeScript project for
-building OpenCode V2 tools, skills, and references.
+building OpenCode V2 tools and skills.
 
 ## Development setup
 
@@ -52,11 +52,6 @@ Every tool must:
 
 Prefer `@skill-recipe`. To do it manually, create `src/skills/<id>/SKILL.md` and
 add an entry to `src/skills/index.ts` between the `<kit:skills>` markers.
-
-## Adding a reference
-
-Create `src/references/<id>/reference.json` and add an entry to
-`src/references/index.ts` between the `<kit:references>` markers.
 
 ## Reporting bugs
 

@@ -116,15 +116,14 @@ test("registerCategories tags a registerItem's own degraded reason", async () =>
   expect(res.degraded).toEqual([{ category: "tools", id: "a", error: "bad settings" }])
 })
 
-test("createTrackingContext tracks and disposes the tool/reference domains", async () => {
+test("createTrackingContext tracks and disposes the tool domain", async () => {
   let disposed = 0
   const { ctx } = createFakeContext({ onRegistration: () => ({ dispose: async () => { disposed++ } }) })
   const { ctx: tracked, created } = createTrackingContext(ctx)
   await tracked.tool.transform(() => {})
-  await tracked.reference.transform(() => {})
-  expect(created.length).toBe(2)
+  expect(created.length).toBe(1)
   for (const r of created) await r.dispose()
-  expect(disposed).toBe(2)
+  expect(disposed).toBe(1)
 })
 
 test("createTrackingContext forwards session hook opts to the real context", async () => {

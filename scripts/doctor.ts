@@ -107,8 +107,8 @@ function opencodeListsPlugin(path: string, pluginId: string): boolean {
  * Handles the maintainer doctor script (`bun scripts/doctor.ts`).
  *
  * Reports whether every discovered kit config parses, runs each category's
- * `inspect` over its shipped items (invalid tool settings degrade, a skill or
- * reference whose file is missing errors), and — best effort — whether the
+ * `inspect` over its shipped items (invalid tool settings degrade, a skill
+ * whose file is missing errors), and — best effort — whether the
  * `openkit` plugin is listed in the relevant OpenCode config (`opencode.json`
  * or `opencode.jsonc`). Config parse errors and fatal inspect reasons make the
  * command return non-zero; a non-fatal reason (e.g. invalid tool settings) and

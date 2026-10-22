@@ -2,7 +2,7 @@ import type { HookHandler, KitContext, Registration, SessionDomain } from "./con
 
 /**
  * Wraps `ctx` so every registration created through its `tool`/`command`/
- * `skill`/`reference`/`session` domains is recorded in `created`, in call order.
+ * `skill`/`session` domains is recorded in `created`, in call order.
  *
  * This is how a category's `registerItem` isolates a partial failure: the
  * registrations a tool creates before throwing are all in `created`, so the
@@ -33,7 +33,7 @@ export function createTrackingContext(ctx: KitContext): { ctx: KitContext; creat
   })
   const overrides: Pick<
     KitContext,
-    "tool" | "command" | "skill" | "reference" | "storage"
+    "tool" | "command" | "skill" | "storage"
   > = {
     tool: {
       async transform(callback) {
@@ -61,20 +61,12 @@ export function createTrackingContext(ctx: KitContext): { ctx: KitContext; creat
         return registration
       },
     },
-    reference: {
-      async transform(callback) {
-        const registration = await ctx.reference.transform(callback)
-        created.push(registration)
-        return registration
-      },
-    },
     storage: ctx.storage,
   }
   const tracking = Object.defineProperties(Object.create(ctx) as KitContext, {
     tool: { value: overrides.tool, enumerable: true, configurable: true, writable: true },
     command: { value: overrides.command, enumerable: true, configurable: true, writable: true },
     skill: { value: overrides.skill, enumerable: true, configurable: true, writable: true },
-    reference: { value: overrides.reference, enumerable: true, configurable: true, writable: true },
     session: { value: session, enumerable: true, configurable: true, writable: true },
     storage: { value: overrides.storage, enumerable: true, configurable: true, writable: true },
   })

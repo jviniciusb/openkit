@@ -21,14 +21,6 @@ test("fake storage exposes scan", async () => {
   expect(await ctx.storage.scan({ prefix: "" })).toEqual({ entries: [] })
 })
 
-test("fake reference transform records name and source", async () => {
-  const { ctx, calls } = createFakeContext()
-  await ctx.reference.transform((editor) => {
-    editor.add("docs", { type: "local", path: "./docs" })
-  })
-  expect(calls.reference).toEqual([{ name: "docs", source: { type: "local", path: "./docs" } }])
-})
-
 test("fake records every hook opts value in order", async () => {
   const { ctx, calls } = createFakeContext()
   await ctx.session.hook("context", () => {}, { providerID: "openai" })
@@ -52,4 +44,26 @@ test("fake prompt stays undefined by default and when false", () => {
 test("fake merges arbitrary options and keeps home", () => {
   const { ctx } = createFakeContext({ options: { tools: { a: { enabled: true } } }, home: "/h" })
   expect(ctx.options).toEqual({ tools: { a: { enabled: true } }, home: "/h" })
+})
+
+test("tool namespaces always carry a description", async () => {
+  const seen: Array<{ name: string; description: string }> = []
+  const { ctx } = createFakeContext()
+  const withEditor = {
+    ...ctx,
+    tool: {
+      transform: async (callback: (editor: any) => void) => {
+        callback({ namespace: (namespace: any) => seen.push(namespace), add: () => {} })
+        return { dispose() {} }
+      },
+      hook: async () => ({ dispose() {} }),
+    },
+  }
+  const kit = createKitApi("t", withEditor, "0.0.0")
+  await kit.tool({ name: "hello" })
+  await kit.tool({ name: "greet", description: "Greet" })
+  expect(seen).toEqual([
+    { name: "t", description: "t" },
+    { name: "t", description: "Greet" },
+  ])
 })

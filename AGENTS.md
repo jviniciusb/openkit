@@ -5,7 +5,7 @@ Guidance for AI agents working in the **openkit** repository.
 ## What this repo is
 
 `openkit` is an OpenCode V2 plugin that hosts independently toggleable items
-grouped into **categories**: tools, skills, and references. The framework (config,
+grouped into **categories**: tools and skills. The framework (config,
 category engine, contracts) is the product; items are added on top. Every
 category is one `KitCategory` descriptor consumed by the generic engine, so
 config resolution, registration/isolation, and `/kit` are shared. Two
@@ -63,11 +63,7 @@ interactive script for steps only a human can take), `router`
 `@router`; points a request at the one kit skill or flow that fits), and
 `diagnosing-sessions` (`src/skills/diagnosing-sessions/SKILL.md`, registered
 `autoinvoke: false`, invoked with `@diagnosing-sessions`; forensically explains
-why a past session went wrong). The **references**
-category
-(`src/references/<id>/reference.json`) ships empty today; references are
-declarative, opt-in, settings-bearing content sources registered through
-`ctx.reference`.
+why a past session went wrong).
 
 ## Commands
 
@@ -92,7 +88,7 @@ src/
   plugin.ts             # Plugin.define + bootstrap/lifecycle orchestration
   catalog.ts            # assembles categories from the descriptors
   constants.ts          # shared PLUGIN_ID
-  categories/           # tool, skill, reference descriptors
+  categories/           # tool and skill descriptors
   operations/           # shared list/toggle/config ops used by /kit
   commands/             # the /kit slash command (adapter over operations)
   config/               # discover, load, merge, effective, validate, edit, coerce, types
@@ -101,8 +97,6 @@ src/
   tools/index.ts        # explicit barrel with <kit:tools> markers
   skills/<id>/SKILL.md  # one folder per skill (+ optional support files)
   skills/index.ts       # explicit barrel with <kit:skills> markers
-  references/<id>/reference.json  # one folder per reference
-  references/index.ts   # explicit barrel with <kit:references> markers
 index.js                # package plugin entry -> src/plugin.ts
 openkit.schema.json     # JSON schema for openkit.jsonc
 docs/                   # examples (not published)
@@ -123,9 +117,9 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 - **Config edits preserve comments.** Use the `jsonc-parser` helpers in
   `src/config/edit.ts`. Do not rewrite config with `JSON.stringify`.
 - **Explicit registration.** Items are discovered from typed barrels
-  (`src/tools/index.ts`, `src/skills/index.ts`, `src/references/index.ts`), not
-  runtime globbing. Keep the `<kit:tools>`, `<kit:skills>`, and
-  `<kit:references>` markers intact; add new entries between them manually.
+  (`src/tools/index.ts`, `src/skills/index.ts`), not
+  runtime globbing. Keep the `<kit:tools>` and `<kit:skills>` markers intact; add
+  new entries between them manually.
 - **Tests accompany behavior.** Use `createFakeContext` from
   `src/core/testing.ts` for harness-style assertions. Add tests for new config
   precedence, registry behavior, `/kit` output, and tool registration.
@@ -158,7 +152,7 @@ item defaultSettings (settings-bearing categories)
 ```
 
 `settings` deep-merge; `enabled` replaces; arrays replace. Config stays
-category-keyed (`tools`, `skills`, `references`).
+category-keyed (`tools`, `skills`).
 
 ## Adding a tool
 
@@ -186,20 +180,5 @@ barrel entry. The steps below are the manual equivalent.
 A skill is declarative: a directory plus one barrel line, no code. `defineSkill`
 defaults `defaultEnabled` to `true`; pass `autoinvoke: false` to hide it from the
 model's advertised list while keeping it loadable by id (`@my-skill`).
-
-## Adding a reference
-
-1. Create `src/references/my-reference/reference.json` and add an entry to
-   `src/references/index.ts` between the `<kit:references>` markers.
-2. Point `src/references/my-reference/reference.json` at real content: `"path"`
-   for a local source, or `"type": "git"` with `"repository"` (and optional
-   `"branch"`).
-3. Add tests.
-4. Add an example entry to `docs/examples/openkit.jsonc`.
-5. `bun run typecheck && bun test`.
-
-A reference is declarative: a directory plus one barrel line, no code. It is
-opt-in (`defaultEnabled` defaults to `false`) and settings-bearing; users override
-its source under `references.<id>.settings`.
 
 See `CONTRIBUTING.md` for the full contributor workflow.

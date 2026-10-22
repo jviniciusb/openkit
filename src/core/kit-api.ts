@@ -52,7 +52,7 @@ export function createKitApi(
     description: string | undefined,
   ) => {
     if (typeof editor.namespace === "function") {
-      editor.namespace({ name: namespaceName, description })
+      editor.namespace({ name: namespaceName, description: description ?? namespaceName })
     }
   }
 

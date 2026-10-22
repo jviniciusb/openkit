@@ -36,6 +36,6 @@ test("skill settings are not allowed", () => {
   expect(validate({ configVersion: 1, skills: { s: { settings: {} } } })).toBe(false)
 })
 
-test("a references section with enabled and settings is valid", () => {
-  expect(validate({ configVersion: 1, references: { std: { enabled: true, settings: { branch: "main" } } } })).toBe(true)
+test("a references section is no longer accepted", () => {
+  expect(validate({ configVersion: 1, references: { std: { enabled: true } } })).toBe(false)
 })

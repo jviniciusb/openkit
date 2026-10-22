@@ -7,8 +7,6 @@ import type {
   KitStorage,
   Logger,
   Namespace,
-  ReferenceEditor,
-  ReferenceSource,
   Registration,
   SkillDefinition,
   SkillEditor,
@@ -50,8 +48,6 @@ export interface FakeContextCalls {
   tool: unknown[]
   command: unknown[]
   skill: unknown[]
-  /** Reference additions, as `{ name, source }` in call order. */
-  reference: unknown[]
   hook: string[]
   /** Session-hook handlers, in the same order as `hook`. */
   hookHandlers: HookHandler[]
@@ -98,28 +94,11 @@ function recordingEditor<D>(bucket: unknown[]): RecordingEditor<D> & { finish():
 }
 
 /**
- * Builds a reference editor that records `add(name, source)` into `bucket` as
- * `{ name, source }`. Like {@link recordingEditor}, a transform whose callback
- * adds nothing records an invocation marker so `.length` still counts calls.
- */
-function recordingReferenceEditor(bucket: unknown[]): ReferenceEditor & { finish(): void } {
-  const before = bucket.length
-  return {
-    add(name: string, source: ReferenceSource) {
-      bucket.push({ name, source })
-    },
-    finish() {
-      if (bucket.length === before) bucket.push({})
-    },
-  }
-}
-
-/**
  * Builds an in-memory {@link KitContext} for unit tests.
  *
- * Every `tool`/`command`/`skill`/`reference` transform invokes its editor
- * callback synchronously against a recorder, so definitions land in
- * `calls.tool` / `calls.command` / `calls.skill` / `calls.reference`.
+ * Every `tool`/`command`/`skill` transform invokes its editor callback
+ * synchronously against a recorder, so definitions land in `calls.tool` /
+ * `calls.command` / `calls.skill`.
  * `session.hook` records the hook's name in `calls.hook` and its `opts` in
  * `calls.hookOpts`. Each transform/hook returns a `Registration` produced by
  * `onRegistration` (a no-op disposer by default).
@@ -129,7 +108,7 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
   calls: FakeContextCalls
 } {
   const calls: FakeContextCalls = {
-    tool: [], command: [], skill: [], reference: [],
+    tool: [], command: [], skill: [],
     hook: [], hookHandlers: [], hookOpts: [],
     toolHook: [], toolHookHandlers: [], prompt: [],
   }
@@ -194,14 +173,6 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
     skill: {
       async transform(callback: (editor: SkillEditor) => void) {
         const editor = recordingEditor<SkillDefinition>(calls.skill)
-        callback(editor)
-        editor.finish()
-        return makeRegistration()
-      },
-    },
-    reference: {
-      async transform(callback: (editor: ReferenceEditor) => void) {
-        const editor = recordingReferenceEditor(calls.reference)
         callback(editor)
         editor.finish()
         return makeRegistration()

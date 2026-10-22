@@ -16,11 +16,32 @@ test("`kit` routes output through session.prompt when available", async () => {
   }
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: () => {} })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
-  await cmd.execute({ arguments: "list", sessionID: "s1" })
+  await cmd.execute({ prompt: { text: "list" }, sessionID: "s1" })
 
   expect(prompts.length).toBeGreaterThan(0)
   expect(prompts.every((p) => p.sessionID === "s1")).toBe(true)
   expect(prompts.some((p) => p.text.includes("background-subagents"))).toBe(true)
+})
+
+test("`kit` prefers a synthetic message so output does not resume the model", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  const { ctx, calls } = createFakeContext()
+  const sent: Array<{ sessionID: string; text: string; resume?: boolean }> = []
+  ctx.session.synthetic = (input) => {
+    sent.push(input)
+  }
+  let prompts = 0
+  ctx.session.prompt = () => {
+    prompts++
+  }
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: () => {} })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+  await cmd.execute({ prompt: { text: "list" }, sessionID: "s1" })
+
+  expect(sent.length).toBeGreaterThan(0)
+  expect(sent.every((m) => m.sessionID === "s1" && m.resume === false)).toBe(true)
+  expect(sent.some((m) => m.text.includes("background-subagents"))).toBe(true)
+  expect(prompts).toBe(0)
 })
 
 test("`kit enable background-subagents` writes config and triggers reload", async () => {
@@ -29,7 +50,7 @@ test("`kit enable background-subagents` writes config and triggers reload", asyn
   const { ctx, calls } = createFakeContext()
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => { reloaded++ }, stdout: () => {} })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
-  await cmd.execute({ arguments: "enable background-subagents", sessionID: "s", prompt: {}, delivery: "steer" })
+  await cmd.execute({ prompt: { text: "enable background-subagents" }, sessionID: "s", delivery: "steer" })
   expect(reloaded).toBe(1)
   expect(readFileSync(globalConfigPath(home), "utf8")).toContain("background-subagents")
 })
@@ -66,7 +87,7 @@ test("`kit config` warns through its output when the write degrades the tool", a
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ arguments: "config background-subagents count 42", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config background-subagents count 42" }, sessionID: "s" })
 
   expect(out).toContain("background-subagents.count = 42")
   expect(out).toContain("warning")
@@ -79,7 +100,7 @@ test("`kit list` includes skills", async () => {
   const { ctx, calls } = createFakeContext()
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
-  await cmd.execute({ arguments: "list", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "list" }, sessionID: "s" })
   expect(out).toContain("skills:")
   expect(out).toContain("sdd-flow")
 })
@@ -91,7 +112,7 @@ test("`kit disable sdd-flow` writes the skills section and reloads", async () =>
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => { reloaded++ }, stdout: () => {} })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ arguments: "disable sdd-flow", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "disable sdd-flow" }, sessionID: "s" })
 
   expect(reloaded).toBe(1)
   const stored = JSON.parse(readFileSync(globalConfigPath(home), "utf8")) as {
@@ -107,7 +128,7 @@ test("`kit config` on a skill id reports that skills have no settings", async ()
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ arguments: "config sdd-flow x 1", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config sdd-flow x 1" }, sessionID: "s" })
 
   expect(out).toContain("skills have no settings")
   expect(out).toContain("sdd-flow")
@@ -123,7 +144,7 @@ test("`kit enable` warns when plugin options override the global write", async (
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ arguments: "enable background-subagents", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "enable background-subagents" }, sessionID: "s" })
 
   expect(out).toContain("background-subagents enabled")
   expect(out).toContain("warning")
@@ -138,9 +159,9 @@ test("`kit config set` then `kit config get` round-trips the value", async () =>
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ arguments: "config set background-subagents count 42", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config set background-subagents count 42" }, sessionID: "s" })
   out = ""
-  await cmd.execute({ arguments: "config get background-subagents count", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config get background-subagents count" }, sessionID: "s" })
 
   expect(out).toBe("42")
 })
@@ -152,10 +173,10 @@ test("`kit config get` reports missing arguments and settings-less categories", 
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ arguments: "config get background-subagents", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config get background-subagents" }, sessionID: "s" })
   expect(out).toContain("config get requires")
 
   out = ""
-  await cmd.execute({ arguments: "config get sdd-flow x", sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config get sdd-flow x" }, sessionID: "s" })
   expect(out).toContain("skills have no settings")
 })

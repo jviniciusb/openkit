@@ -21,35 +21,43 @@ export interface KitCommandDeps {
   stdout(s: string): void
 }
 
-/** Payload OpenCode passes to a slash command's `execute`. */
+/** Payload OpenCode V2 passes to a slash command's `execute`. */
 interface KitCommandInput {
-  arguments?: string
-  /** Session that invoked the command; used to route output through `prompt`. */
+  /** Text entered after the command name. */
+  prompt?: { text?: string }
+  /** Session that invoked the command; used to route output back to it. */
   sessionID?: string
 }
 
 /**
- * Resolves where command output goes: the session's `prompt` channel when the
- * harness exposes one, otherwise the injected `stdout` sink (tests).
+ * Resolves where command output goes: a synthetic session message (preferred,
+ * because it does not resume the model), then the session's `prompt` channel,
+ * and finally the injected `stdout` sink (tests).
  */
 function outputWriter(
   ctx: KitContext,
   deps: KitCommandDeps,
   sessionID: string | undefined,
 ): (s: string) => void {
+  if (sessionID === undefined) return deps.stdout
+  const synthetic = ctx.session.synthetic
   const prompt = ctx.session.prompt
-  if (typeof prompt === "function" && sessionID !== undefined) {
-    return (text) => {
-      try {
-        void Promise.resolve(prompt.call(ctx.session, { sessionID, text })).catch((error) => {
-          console.warn("openkit: failed to deliver /kit output", error)
-        })
-      } catch (error) {
+  const send =
+    typeof synthetic === "function"
+      ? (text: string) => synthetic.call(ctx.session, { sessionID, text, resume: false })
+      : typeof prompt === "function"
+        ? (text: string) => prompt.call(ctx.session, { sessionID, text })
+        : undefined
+  if (send === undefined) return deps.stdout
+  return (text) => {
+    try {
+      void Promise.resolve(send(text)).catch((error) => {
         console.warn("openkit: failed to deliver /kit output", error)
-      }
+      })
+    } catch (error) {
+      console.warn("openkit: failed to deliver /kit output", error)
     }
   }
-  return deps.stdout
 }
 
 /** Help text shown for missing or unknown subcommands. */
@@ -60,7 +68,7 @@ const USAGE = [
   "kit config get <id> <key>",
   "kit config set <id> <key> <value>",
   "kit config <id> <key> <value>  (alias for config set)",
-  "<id> is a tool, skill, or reference id; config applies to settings-bearing categories (tools and references).",
+  "<id> is a tool or skill id; config applies to tools (skills have no settings).",
 ].join("\n")
 
 /**
@@ -68,16 +76,16 @@ const USAGE = [
  *
  * Supported forms:
  * - `list` — print every shipped item with its resolved enabled state;
- * - `enable <id>` / `disable <id>` — write `<category>[id].enabled` (tools,
- *   skills, or references) to the global kit config, then reload;
+ * - `enable <id>` / `disable <id>` — write `<category>[id].enabled` (tools or
+ *   skills) to the global kit config, then reload;
  * - `config get <id> <key>` — print a settings-bearing item's effective
  *   setting as JSON, resolving defaults, discovered config files, and plugin
  *   `options`;
  * - `config set <id> <key> <value>` — write `<category>[id].settings[key]` for a
- *   settings-bearing item (tools and references) to the global kit config
- *   (scalar coercion, comment-preserving), then reload. Skill ids are rejected:
- *   skills have no settings. The legacy `config <id> <key> <value>` form is an
- *   alias for `config set`.
+ *   settings-bearing item (tools) to the global kit config (scalar coercion,
+ *   comment-preserving), then reload. Skill ids are rejected: skills have no
+ *   settings. The legacy `config <id> <key> <value>` form is an alias for
+ *   `config set`.
  *
  * Each form delegates to the shared operations so behavior stays in one place;
  * this adapter only owns I/O routing and the `/kit`-specific usage and
@@ -92,7 +100,7 @@ export async function registerKitCommand(
   return ctx.command.transform((editor) => {
     editor.add({
       name: "kit",
-      description: "Manage openkit tools, skills, and references (list, enable, disable, config get/set)",
+      description: "Manage openkit tools and skills (list, enable, disable, config get/set)",
       execute: (input: KitCommandInput) => executeKitCommand(input, ctx, deps),
     })
   })
@@ -109,7 +117,7 @@ async function executeKitCommand(
   ctx: KitContext,
   deps: KitCommandDeps,
 ): Promise<void> {
-  const [sub, ...rest] = tokenize(input.arguments ?? "")
+  const [sub, ...rest] = tokenize(input.prompt?.text ?? "")
   const writer = outputWriter(ctx, deps, input.sessionID)
   const opDeps: OperationDeps = {
     cwd: deps.cwd,
