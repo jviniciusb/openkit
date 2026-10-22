@@ -104,7 +104,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.23.0"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.23.1"
 ```
 
 ### 2. Configure (optional)
@@ -329,6 +329,7 @@ invoke it with `@sdd-flow`.
 The plugin registers a `/kit` slash command for in-session use:
 
 ```text
+/kit                               # same as /kit list
 /kit list                          # show every item and its state
 /kit enable <id>                   # enable an item in the global config
 /kit disable <id>                  # disable an item

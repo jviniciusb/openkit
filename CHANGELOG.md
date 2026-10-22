@@ -6,6 +6,14 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-10-21
+
+### Fixed
+
+- `/kit` now buffers one invocation's output into a single session message
+  instead of one message per line, so `/kit list` is readable.
+- `/kit` with no subcommand now lists items instead of printing usage.
+
 ## [0.23.0] - 2026-10-21
 
 ### Removed
@@ -443,7 +451,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.23.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.23.1...HEAD
+[0.23.1]: https://github.com/jviniciusb/openkit/compare/v0.23.0...v0.23.1
 [0.23.0]: https://github.com/jviniciusb/openkit/compare/v0.22.1...v0.23.0
 [0.22.1]: https://github.com/jviniciusb/openkit/compare/v0.22.0...v0.22.1
 [0.22.0]: https://github.com/jviniciusb/openkit/compare/v0.21.3...v0.22.0

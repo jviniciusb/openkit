@@ -30,33 +30,49 @@ interface KitCommandInput {
 }
 
 /**
- * Resolves where command output goes: a synthetic session message (preferred,
- * because it does not resume the model), then the session's `prompt` channel,
- * and finally the injected `stdout` sink (tests).
+ * Buffers one command's output and delivers it as a single session message,
+ * so a multi-line result (e.g. `/kit list`) is not split into one synthetic
+ * message per line. Delivery order: `synthetic` (does not resume the model),
+ * then `prompt`, then the injected `stdout` sink.
  */
 function outputWriter(
   ctx: KitContext,
   deps: KitCommandDeps,
   sessionID: string | undefined,
-): (s: string) => void {
-  if (sessionID === undefined) return deps.stdout
-  const synthetic = ctx.session.synthetic
-  const prompt = ctx.session.prompt
-  const send =
-    typeof synthetic === "function"
-      ? (text: string) => synthetic.call(ctx.session, { sessionID, text, resume: false })
-      : typeof prompt === "function"
-        ? (text: string) => prompt.call(ctx.session, { sessionID, text })
-        : undefined
-  if (send === undefined) return deps.stdout
-  return (text) => {
-    try {
-      void Promise.resolve(send(text)).catch((error) => {
+): { write(s: string): void; flush(): void } {
+  let buffer = ""
+  return {
+    write(text) {
+      buffer += text
+    },
+    flush() {
+      const text = buffer
+      buffer = ""
+      if (text.length === 0) return
+      if (sessionID === undefined) {
+        deps.stdout(text)
+        return
+      }
+      const synthetic = ctx.session.synthetic
+      const prompt = ctx.session.prompt
+      const send =
+        typeof synthetic === "function"
+          ? () => synthetic.call(ctx.session, { sessionID, text, resume: false })
+          : typeof prompt === "function"
+            ? () => prompt.call(ctx.session, { sessionID, text })
+            : undefined
+      if (send === undefined) {
+        deps.stdout(text)
+        return
+      }
+      try {
+        void Promise.resolve(send()).catch((error) => {
+          console.warn("openkit: failed to deliver /kit output", error)
+        })
+      } catch (error) {
         console.warn("openkit: failed to deliver /kit output", error)
-      })
-    } catch (error) {
-      console.warn("openkit: failed to deliver /kit output", error)
-    }
+      }
+    },
   }
 }
 
@@ -123,26 +139,34 @@ async function executeKitCommand(
     cwd: deps.cwd,
     home: deps.home,
     options: ctx.options as KitConfigFile,
-    out: writer,
-    err: writer,
+    out: writer.write,
+    err: writer.write,
     reload: deps.reload,
   }
 
-  switch (sub) {
-    case "list":
-      await listOperation(categories, opDeps)
-      return
-    case "enable":
-      await toggleOperation(categories, opDeps, rest[0], true)
-      return
-    case "disable":
-      await toggleOperation(categories, opDeps, rest[0], false)
-      return
-    case "config":
-      await configure(opDeps, rest)
-      return
-    default:
-      writer(USAGE)
+  try {
+    switch (sub) {
+      case "list":
+        await listOperation(categories, opDeps)
+        return
+      case "enable":
+        await toggleOperation(categories, opDeps, rest[0], true)
+        return
+      case "disable":
+        await toggleOperation(categories, opDeps, rest[0], false)
+        return
+      case "config":
+        await configure(opDeps, rest)
+        return
+      default:
+        if (sub === undefined) {
+          await listOperation(categories, opDeps)
+        } else {
+          writer.write(USAGE)
+        }
+    }
+  } finally {
+    writer.flush()
   }
 }
 

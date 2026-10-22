@@ -18,9 +18,10 @@ test("`kit` routes output through session.prompt when available", async () => {
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
   await cmd.execute({ prompt: { text: "list" }, sessionID: "s1" })
 
-  expect(prompts.length).toBeGreaterThan(0)
+  expect(prompts.length).toBe(1)
   expect(prompts.every((p) => p.sessionID === "s1")).toBe(true)
-  expect(prompts.some((p) => p.text.includes("background-subagents"))).toBe(true)
+  expect(prompts[0]!.text).toContain("background-subagents")
+  expect(prompts[0]!.text).toContain("skills:")
 })
 
 test("`kit` prefers a synthetic message so output does not resume the model", async () => {
@@ -38,10 +39,25 @@ test("`kit` prefers a synthetic message so output does not resume the model", as
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
   await cmd.execute({ prompt: { text: "list" }, sessionID: "s1" })
 
-  expect(sent.length).toBeGreaterThan(0)
-  expect(sent.every((m) => m.sessionID === "s1" && m.resume === false)).toBe(true)
-  expect(sent.some((m) => m.text.includes("background-subagents"))).toBe(true)
+  expect(sent.length).toBe(1)
+  expect(sent[0]!.sessionID).toBe("s1")
+  expect(sent[0]!.resume).toBe(false)
+  expect(sent[0]!.text).toContain("background-subagents")
+  expect(sent[0]!.text).toContain("skills:")
   expect(prompts).toBe(0)
+})
+
+test("`kit` with no subcommand lists every item", async () => {
+  const home = mkdtempSync(join(tmpdir(), "home-"))
+  let out = ""
+  const { ctx, calls } = createFakeContext()
+  await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
+  const cmd = (calls.command as any[]).find((c) => c.name === "kit")
+  await cmd.execute({ prompt: { text: "" }, sessionID: "s" })
+
+  expect(out).toContain("tools:")
+  expect(out).toContain("skills:")
+  expect(out).not.toContain("kit enable")
 })
 
 test("`kit enable background-subagents` writes config and triggers reload", async () => {
