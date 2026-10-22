@@ -34,8 +34,9 @@ The package ships two tools: [`background-subagents`](src/tools/background-subag
 control while a child works) and
 [`context-injections`](src/tools/context-injections/index.ts) (opt-in; injects
 built-in behavioral rules — each individually toggleable — plus your own). It is
-global and system-level: its rules are additive to, and sit above, project
-`AGENTS.md`/`instructions`, so do not duplicate them there.
+global and system-level: its rules complement project `AGENTS.md`/`instructions`
+without overriding higher-priority instructions or explicit approval gates, so
+do not duplicate them there.
 [`hello`](src/tools/hello/index.ts) remains as an authoring example, but is not
 registered or exposed at runtime.
 
@@ -104,7 +105,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.23.1"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.23.2"
 ```
 
 ### 2. Configure (optional)

@@ -54,7 +54,10 @@ test("careful-changes is enabled by default and injected", async () => {
   expect(text).toContain("change or refactor existing design")
   expect(text).toContain("within the request and any agreed scope")
   expect(text).toContain("without authorization")
+  expect(text).toContain("explicit user approval")
+  expect(text).toContain("destructive or externally visible actions")
   expect(text).toContain("unrelated or concurrent")
+  expect(text).toContain("add or update focused tests")
   expect(text).toContain("verify the outcome, not just the edit")
   expect(text).toContain("run relevant tests and checks")
   expect(text).toContain("inspect the final diff")
@@ -148,26 +151,31 @@ test("functional-programming keeps the idiomatic-otherwise escape hatch", () => 
   expect(text).toContain("codebase")
 })
 
-test("subagent-driven fans out the ready work and distinguishes tool batches", () => {
+test("subagent-driven delegates ready work and consolidates results", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "subagent-driven")!.text.toLowerCase()
   expect(text).toContain("orchestrator")
   expect(text).toContain("background")
   expect(text).toContain("stay free")
   expect(text).toContain("not stuck waiting")
-  expect(text).toContain("all ready, independent pieces")
-  expect(text).toContain("same dispatch")
   expect(text).toContain("concurrent tool calls")
-  expect(text).toContain("do not delegate dependent work")
+  expect(text).toContain("without shared files, state, or decisions")
+  expect(text).toContain("dispatch ready pieces together")
   expect(text).toContain("fan in")
 })
 
-test("decomposition actively favors safe parallel work without crossing gates", () => {
+test("decomposition identifies parallel-ready work without crossing gates", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "decomposition")!.text.toLowerCase()
-  expect(text).toContain("actively look for safe parallelism")
+  expect(text).toContain("actively look for worthwhile safe parallelism")
   expect(text).toContain("rather than defaulting to serial work")
-  expect(text).toContain("start all ready, independent pieces concurrently")
+  expect(text).toContain("identify which independent pieces are ready")
   expect(text).toContain("keep dependent or shared-state work together")
   expect(text).toContain("never cross an approval gate")
+  expect(text).not.toContain("subagent")
+})
+
+test("preamble defers to higher-priority instructions and approval gates", () => {
+  expect(RULES_PREAMBLE).toContain("higher-priority instructions")
+  expect(RULES_PREAMBLE).toContain("explicit approval gates")
 })
 
 test("think-in-code writes one program for multi-call composition, not bulk only", () => {
