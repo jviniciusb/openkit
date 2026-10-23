@@ -6,6 +6,8 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-10-23
+
 ### Changed
 
 - Tools are on by default, matching skills. `defineTool` and the `tools`
@@ -526,6 +528,7 @@ The first release of the opencode-kit framework.
   `docs/examples/opencode-kit.jsonc`.
 
 [Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.24.3...HEAD
+[0.25.0]: https://github.com/jviniciusb/openkit/compare/v0.24.3...v0.25.0
 [0.24.3]: https://github.com/jviniciusb/openkit/compare/v0.24.2...v0.24.3
 [0.24.2]: https://github.com/jviniciusb/openkit/compare/v0.24.1...v0.24.2
 [0.24.1]: https://github.com/jviniciusb/openkit/compare/v0.24.0...v0.24.1
