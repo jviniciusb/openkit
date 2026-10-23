@@ -6,6 +6,17 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `context-injections` rule `verify-claims`: before acting on an incoming claim
+  that shapes the work — a review, a suggestion, a reference to existing work, a
+  doc — the agent states what would make it wrong here, and acts on it unchanged
+  only when nothing would: it is definitional, already demonstrated here, or
+  backed by evidence in front of it. Verification is bounded: it happens only
+  when the claim changes the action, costs the cheapest check that settles it,
+  and is not repeated. What it adapted or rejected is reported with why.
+  Replaces the single review-only sentence that lived in `careful-changes`.
+
 ## [0.25.1] - 2026-10-23
 
 ### Fixed
