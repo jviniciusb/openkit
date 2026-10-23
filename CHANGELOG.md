@@ -6,6 +6,26 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `context-injections` rule `functional-programming` is rewritten around the
+  behavior that actually changes: mutate only state you own, keep I/O and time
+  at the boundary, and write in the paradigm of the surrounding code. A
+  paradigm switch is routed through the refactor rule in `careful-changes`
+  instead of being forbidden, so the two rules agree. It no longer says to
+  apply functional programming "where it fits", which restated a default and
+  could push a paradigm into codebases that do not use it.
+- `proactive` no longer requires "high-confidence evidence" to act, which
+  contradicted its own "choose a sensible default" and "build a throwaway
+  prototype" clauses. It now asks for thin evidence to be stated instead.
+- `verify-claims` uses one scope, "changes what you do", instead of stating it
+  twice with different reach ("shapes the work", then "changes what you do").
+- `careful-changes` carries the scope bound beside "best coherent end state",
+  where it constrains the instruction, instead of in a later standalone
+  sentence that repeated it.
+- `decomposition` drops "map dependencies as a graph, not a list", which named
+  no action the agent can take or a reader can check.
+
 ## [0.26.0] - 2026-10-23
 
 ### Added
