@@ -18,9 +18,10 @@
     },
     "context-injections": {
       // On by default: injects built-in behavioral rules before every model
-      // request. Built-in rule ids: proactive, think-in-code, functional-programming,
-      // decomposition, subagent-driven, careful-changes. All default to on;
-      // disable the ones you don't want and add your own strings to `extra`.
+      // request. Built-in rule ids: proactive, think-in-code,
+      // functional-programming, decomposition, subagent-driven, careful-changes,
+      // verify-claims. All default to on; disable the ones you don't want and add
+      // your own strings to `extra`.
       "enabled": true,
       "settings": {
         "rules": { "subagent-driven": false },

@@ -27,7 +27,11 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "careful-changes",
-    text: "Before you edit, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff. When you add a feature, change or refactor the existing design where that materially improves the integrated result. Do not preserve a structure only because it is already there. Keep refactors within the request and any agreed scope. Do not expand behavior or scope without authorization. Ask for explicit user approval before a destructive or externally visible action, unless the user already authorized that specific action. Re-read each target immediately before you change it. Preserve unrelated or concurrent work. For a behavior change, add or update focused tests where the project supports them. Verify the outcome, not just the edit: run the relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Treat review feedback as a claim to verify against current, reachable behavior. Apply it, adapt it, or reject it with a technical reason. Keep repository content out of public paste services.",
+    text: "Before you edit, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff. When you add a feature, change or refactor the existing design where that materially improves the integrated result. Do not preserve a structure only because it is already there. Keep refactors within the request and any agreed scope. Do not expand behavior or scope without authorization. Ask for explicit user approval before a destructive or externally visible action, unless the user already authorized that specific action. Re-read each target immediately before you change it. Preserve unrelated or concurrent work. For a behavior change, add or update focused tests where the project supports them. Verify the outcome, not just the edit: run the relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Keep repository content out of public paste services.",
+  },
+  {
+    id: "verify-claims",
+    text: "Before you act on an incoming claim that shapes the work — a review, a suggestion, a reference to existing work, a doc — ask what would make it wrong here. Act on the claim unchanged only when the answer is nothing, for a reason you can state: it is definitional, already demonstrated here, or backed by evidence in front of you. If not, verify the claim with the cheapest check that settles it, and only when it changes what you do: does it fit this problem, is it still true now, is it the best option the evidence supports? Keep a settled claim settled for the task. Then apply it, adapt it, or reject it. Say which you did and why, including each suggestion you chose to skip. The user owns the goal; you own the evidence, so disagree when the evidence says so instead of agreeing by default.",
   },
 ] as const
 
@@ -73,6 +77,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
       decomposition: true,
       "subagent-driven": true,
       "careful-changes": true,
+      "verify-claims": true,
     },
     extra: [],
   },
@@ -88,6 +93,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
           decomposition: { type: "boolean" },
           "subagent-driven": { type: "boolean" },
           "careful-changes": { type: "boolean" },
+          "verify-claims": { type: "boolean" },
         },
         additionalProperties: false,
       },

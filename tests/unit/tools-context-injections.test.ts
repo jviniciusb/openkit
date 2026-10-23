@@ -48,7 +48,6 @@ test("careful-changes is enabled by default and injected", async () => {
   expect(text).toContain("re-read")
   expect(text).toContain("unrelated")
   expect(text).toContain("concurrent")
-  expect(text).toContain("reachable")
   expect(text).toContain("best coherent end state")
   expect(text).toContain("not the smallest diff")
   expect(text).toContain("change or refactor the existing design")
@@ -65,6 +64,50 @@ test("careful-changes is enabled by default and injected", async () => {
   expect(text).toContain("what remains unverified")
   expect(text).toContain("never claim a check passed unless you ran it")
   expect(text).toContain("public paste")
+})
+
+test("verify-claims is enabled by default and covers non-review input", async () => {
+  const rules = contextInjections.defaultSettings.rules as Record<string, boolean>
+  expect(rules["verify-claims"]).toBe(true)
+
+  const rule = BUILT_IN_RULES.find(({ id }) => id === "verify-claims")
+  expect(rule).toBeDefined()
+  if (rule === undefined) return
+
+  const { handler } = await register(defaults())
+  const event = { system: [] as Array<{ type: string; text: string }> }
+  await handler!(event)
+  expect(injectedText(event)).toContain(rule.text)
+
+  const text = rule.text.toLowerCase()
+  expect(text).toContain("before you act on an incoming claim that shapes the work")
+  expect(text).toContain("a review")
+  expect(text).toContain("a suggestion")
+  expect(text).toContain("a reference to existing work")
+  expect(text).toContain("ask what would make it wrong here")
+  expect(text).toContain("act on the claim unchanged only when the answer is nothing")
+  expect(text).toContain("definitional")
+  expect(text).toContain("already demonstrated here")
+  expect(text).toContain("backed by evidence in front of you")
+  expect(text).toContain("verify the claim with the cheapest check that settles it")
+  expect(text).toContain("only when it changes what you do")
+  expect(text).toContain("does it fit this problem")
+  expect(text).toContain("is it still true now")
+  expect(text).toContain("the best option the evidence supports")
+  expect(text).toContain("keep a settled claim settled for the task")
+  expect(text).toContain("apply it, adapt it, or reject it")
+  expect(text).toContain("each suggestion you chose to skip")
+  expect(text).toContain("user owns the goal")
+  expect(text).toContain("you own the evidence")
+  expect(text).toContain("instead of agreeing by default")
+})
+
+test("verify-claims is accepted by the settings schema", () => {
+  const settings = {
+    ...defaults(),
+    rules: { ...defaults().rules, "verify-claims": false },
+  }
+  expect(resolveValidated(contextInjections, { enabled: true, settings }).degraded).toBeUndefined()
 })
 
 test("disabling careful-changes leaves other built-ins enabled", async () => {
