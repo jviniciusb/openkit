@@ -215,8 +215,8 @@
       }
     ],
     "output": "src/skills/writing-for-agents/SKILL.md",
-    "outputHash": "b913b6a3c2c790b9b6b709cec1ef81eec31cd4464f325676a09d0575cb3cfc71",
-    "generatedAt": "2026-10-13T21:13:55.010Z"
+    "outputHash": "5a6630134f1093d746f503e9629ce73b8abd0ada251ebf0c36d677da6b4a1013",
+    "generatedAt": "2026-10-22T00:00:00.000Z"
   },
   {
     "brief": "skill-sources/briefs/codebase-design.md",

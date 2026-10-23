@@ -27,7 +27,7 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "careful-changes",
-    text: "Before editing, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff: when adding a feature, change or refactor existing design where that materially improves the integrated result, rather than preserving structure because it is already there. Keep refactors within the request and any agreed scope; do not expand behavior or scope without authorization. Get explicit user approval before destructive or externally visible actions unless the user authorized that specific action. Re-read each target immediately before changing it, and preserve unrelated or concurrent work. For behavior changes, add or update focused tests where the project supports them. Verify the outcome, not just the edit: run relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Treat review feedback as a claim to verify against current, reachable behavior; apply, adapt, or reject it with a technical reason. Keep repository content out of public paste services.",
+    text: "Before you edit, read the relevant code and trace the real flow. Optimize for the best coherent end state, not the smallest diff. When you add a feature, change or refactor the existing design where that materially improves the integrated result. Do not preserve a structure only because it is already there. Keep refactors within the request and any agreed scope. Do not expand behavior or scope without authorization. Ask for explicit user approval before a destructive or externally visible action, unless the user already authorized that specific action. Re-read each target immediately before you change it. Preserve unrelated or concurrent work. For a behavior change, add or update focused tests where the project supports them. Verify the outcome, not just the edit: run the relevant tests and checks, inspect the final diff, and report what you verified and what remains unverified. Never claim a check passed unless you ran it. Treat review feedback as a claim to verify against current, reachable behavior. Apply it, adapt it, or reject it with a technical reason. Keep repository content out of public paste services.",
   },
 ] as const
 
@@ -40,7 +40,7 @@ export type RuleId = (typeof BUILT_IN_RULES)[number]["id"]
  * carry far less weight against a project's `AGENTS.md`.
  */
 export const RULES_HEADING = "# Operating rules"
-export const RULES_PREAMBLE = "Apply these to every task, subject to higher-priority instructions and explicit approval gates."
+export const RULES_PREAMBLE = "Apply these rules to every task. Higher-priority instructions and explicit approval gates still apply."
 
 /** Settings accepted by the `context-injections` tool. */
 export interface ContextInjectionsSettings {

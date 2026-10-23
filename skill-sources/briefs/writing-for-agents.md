@@ -40,6 +40,11 @@ and every line earns its load.
     behavior; reach for an existing word first.
   - Positive phrasing: state the target behavior so the banned one is never
     spoken.
+  - Unambiguous instruction shape: condition beside action, one action per
+    sentence, nothing dropped (subject, verb, article), one term per concept,
+    the verb over its noun form, a list for sequences and gate sets, and every
+    calibrated hedge ("prefer", "when it fits", "may", "unless") kept at its
+    original strength during an edit.
   - Pruning: single source of truth, the environment as a source of truth, and
     the failure mode of sediment and no-ops.
 - Drop:

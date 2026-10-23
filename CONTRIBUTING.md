@@ -15,10 +15,13 @@ bun test            # bun test
 
 1. Create a branch from `main` (e.g. `feat/my-tool`).
 2. Make the change, following the conventions below.
-3. Run `bun run typecheck && bun test` and make sure both pass.
-4. Keep commits focused and use [Conventional Commits](https://www.conventionalcommits.org/)
+3. For text an agent must follow (injected rules, skill steps, `AGENTS.md`),
+   apply the structural pass in `docs/ste100-before-after.md`. It has no word
+   limit; it removes ambiguity.
+4. Run `bun run typecheck && bun test` and make sure both pass.
+5. Keep commits focused and use [Conventional Commits](https://www.conventionalcommits.org/)
    messages (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
-5. Open a pull request describing what changed and why.
+6. Open a pull request describing what changed and why.
 
 ## Code conventions
 
