@@ -6,6 +6,21 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.24.2] - 2026-10-22
+
+### Changed
+
+- `writing-for-agents` step 8 now names ASD-STE100 as the source of the
+  structural shapes, and states the scope: no length caps and no approved-word
+  dictionary.
+
+### Fixed
+
+- The condition bullet no longer forbids the trailing exception that the
+  shipped `careful-changes` rule uses. It now requires the condition to stay in
+  the same sentence as its action, and forbids only the drift into a later
+  sentence.
+
 ## [0.24.1] - 2026-10-22
 
 ### Removed
@@ -495,7 +510,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.24.1...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.24.2...HEAD
+[0.24.2]: https://github.com/jviniciusb/openkit/compare/v0.24.1...v0.24.2
 [0.24.1]: https://github.com/jviniciusb/openkit/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/jviniciusb/openkit/compare/v0.23.3...v0.24.0
 [0.23.3]: https://github.com/jviniciusb/openkit/compare/v0.23.2...v0.23.3

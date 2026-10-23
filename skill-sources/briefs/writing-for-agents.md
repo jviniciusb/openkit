@@ -44,7 +44,9 @@ and every line earns its load.
     sentence, nothing dropped (subject, verb, article), one term per concept,
     the verb over its noun form, a list for sequences and gate sets, and every
     calibrated hedge ("prefer", "when it fits", "may", "unless") kept at its
-    original strength during an edit.
+    original strength during an edit. Name ASD-STE100 as the source, and scope
+    the list to the structural subset: no length caps, no approved-word
+    dictionary.
   - Pruning: single source of truth, the environment as a source of truth, and
     the failure mode of sediment and no-ops.
 - Drop:
