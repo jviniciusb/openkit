@@ -6,6 +6,26 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-10-22
+
+### Added
+
+- `writing-for-agents` now carries a structural clarity pass for instructions an
+  agent must follow: condition beside action, one action per sentence, no
+  dropped subject or verb, one term per concept, the verb over its noun form, a
+  list for sequences and gate sets, and every hedge kept at its original
+  strength.
+- `english-writing-assistant` applies the same structural pass to
+  instruction-like text, with no word limit.
+- `docs/ste100-before-after.md` shows a worked rewrite of a kit rule, for
+  maintainers.
+
+### Changed
+
+- The `context-injections` preamble and the `careful-changes` rule are split
+  into one instruction per sentence. The approval condition now sits with its
+  command, and the rule IDs are unchanged.
+
 ## [0.23.3] - 2026-10-22
 
 ### Changed
@@ -467,7 +487,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.23.3...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.24.0...HEAD
+[0.24.0]: https://github.com/jviniciusb/openkit/compare/v0.23.3...v0.24.0
 [0.23.3]: https://github.com/jviniciusb/openkit/compare/v0.23.2...v0.23.3
 [0.23.2]: https://github.com/jviniciusb/openkit/compare/v0.23.1...v0.23.2
 [0.23.1]: https://github.com/jviniciusb/openkit/compare/v0.23.0...v0.23.1
