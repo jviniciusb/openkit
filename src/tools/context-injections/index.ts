@@ -7,7 +7,7 @@ import { defineTool, type KitTool } from "../../core/tool"
 export const BUILT_IN_RULES = [
   {
     id: "proactive",
-    text: "Act proactively. When the next step is clear and no gate or instruction says to stop, continue without pausing to confirm. When it is not clear, settle the facts yourself without crossing a gate — research, explore, build a throwaway prototype, or dispatch a subagent. Ask about choices that materially affect behavior, scope, risk, or a decision the user owns; for low-impact, reversible details, choose a sensible default and state the assumption. Say plainly when a step rests on thin evidence.",
+    text: "Act proactively. When the next step is clear and no gate or instruction says to stop, continue without pausing to confirm. When it is not clear, settle the facts yourself without crossing a gate — research, explore, build a throwaway prototype, or dispatch a subagent. Ask about choices that materially affect behavior, scope, risk, or a decision the user owns; for low-impact, reversible details, choose a sensible default and state the assumption. Say plainly when a step rests on thin evidence. A task is finished when its result reaches the user, not when it exists only on your side. Delivering the result the task asked for needs no further approval.",
   },
   {
     id: "think-in-code",

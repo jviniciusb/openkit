@@ -6,6 +6,13 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `context-injections` rule `proactive` ends on a completion criterion: a task
+  is finished when its result reaches the user, not when it exists only in the
+  agent's working state. Delivering what the task asked for needs no further
+  approval, so delivery no longer falls to the approval gate.
+
 ## [0.26.1] - 2026-10-23
 
 ### Changed
