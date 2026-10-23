@@ -20,7 +20,7 @@ export interface KitTool<S = unknown> {
   name: string
   /** One line, shown in `/kit list`. */
   description: string
-  /** Default false: tools are opt-in unless they say otherwise. */
+  /** Default true: tools are on unless they say otherwise. */
   defaultEnabled?: boolean
   /** The tool's default settings, merged with user config. */
   defaultSettings: S
@@ -53,8 +53,8 @@ export interface KitApi {
 
 /**
  * Adds typing and introspection to a tool definition, normalizing
- * `defaultEnabled` to a boolean (opt-in by default).
+ * `defaultEnabled` to a boolean (on by default).
  */
 export function defineTool<S>(tool: KitTool<S>): KitTool<S> {
-  return { defaultEnabled: false, ...tool }
+  return { defaultEnabled: true, ...tool }
 }

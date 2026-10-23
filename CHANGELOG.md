@@ -6,6 +6,13 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- Tools are on by default, matching skills. `defineTool` and the `tools`
+  category now default `defaultEnabled` to `true`, and the two shipped tools
+  (`background-subagents`, `context-injections`) drop their explicit opt-out.
+  Disable one with `"enabled": false` or `/kit disable <id>`.
+
 ## [0.24.3] - 2026-10-22
 
 ### Changed

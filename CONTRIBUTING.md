@@ -47,7 +47,8 @@ Create `src/tools/my-tool/index.ts` and add it to the tool barrel
 Every tool must:
 
 - have a unique kebab-case `id` and a one-line `description`;
-- declare `defaultEnabled` (opt-in unless it is universally useful);
+- declare `defaultEnabled` only to opt a tool out (tools are on by default; set
+  it to `false` for one that is rarely useful);
 - provide `defaultSettings` and, where practical, a `settingsSchema`;
 - do all its work in `register(ctx, settings, kit)`.
 

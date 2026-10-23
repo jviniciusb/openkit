@@ -58,9 +58,9 @@ config file.
 write a setting.
 
 **Manual:** create the file by hand, seeded with the shipped tools —
-`background-subagents` (opt-in; forces every subagent call to run in the
-background) and `context-injections` (opt-in; injects built-in behavioral rules,
-each individually toggleable, plus your own):
+`background-subagents` (on by default; forces every subagent call to run in the
+background) and `context-injections` (on by default; injects built-in
+behavioral rules, each individually toggleable, plus your own):
 
 ```jsonc
 // ~/.config/opencode/openkit.jsonc

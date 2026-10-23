@@ -23,17 +23,16 @@ lifecycle layers do not change. See
 - **Framework-first:** the conventions for adding items matter more than any one
   item. A new tool is a folder plus a registration; a new skill is a folder plus
   a barrel line.
-- **Opt-in by default:** a tool only activates when config says so
-  (or when it explicitly declares `defaultEnabled: true`); bundled skills default
-  to on.
+- **On by default:** a tool activates unless config or the tool itself says
+  otherwise (`defaultEnabled: false`); bundled skills default to on too.
 - **Isolated:** one item failing to configure never stops the kit or the other
   items from loading.
 
 The package ships two tools: [`background-subagents`](src/tools/background-subagents/index.ts)
-(opt-in; forces every subagent call to run in the background so the parent keeps
-control while a child works) and
-[`context-injections`](src/tools/context-injections/index.ts) (opt-in; injects
-built-in behavioral rules — each individually toggleable — plus your own). It is
+(on by default; forces every subagent call to run in the background so the parent
+keeps control while a child works) and
+[`context-injections`](src/tools/context-injections/index.ts) (on by default;
+injects built-in behavioral rules — each individually toggleable — plus your own). It is
 global and system-level: its rules complement project `AGENTS.md`/`instructions`
 without overriding higher-priority instructions or explicit approval gates, so
 do not duplicate them there.
@@ -110,9 +109,8 @@ opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.24
 
 ### 2. Configure (optional)
 
-An item that defaults to enabled works without a config file (every bundled
-skill does; the shipped tools are opt-in). To make the effective configuration
-explicit, create
+An item that defaults to enabled works without a config file (every bundled item
+does). To make the effective configuration explicit, create
 `~/.config/opencode/openkit.jsonc` (or
 `<project>/.opencode/openkit.jsonc`):
 
@@ -125,8 +123,8 @@ explicit, create
 ```
 
 Restart OpenCode after changing `plugins` so it picks up the new entry. After
-restart, use `/kit enable <id>` for opt-in tools and `/kit config set` for
-settings.
+restart, use `/kit enable <id>` or `/kit disable <id>` to toggle an item and
+`/kit config set` for settings.
 
 ### 3. Verify
 
@@ -152,7 +150,7 @@ section:
 
 | Category | Config key | Items | Settings? | Default |
 | --- | --- | --- | --- | --- |
-| **Tools** | `tools` | `KitTool` — a `register` hook that contributes tools, commands, skills, and hooks | yes | opt-in (`defaultEnabled: false`) |
+| **Tools** | `tools` | `KitTool` — a `register` hook that contributes tools, commands, skills, and hooks | yes | on (`defaultEnabled: true`) |
 | **Skills** | `skills` | `KitSkill` — a declarative `SKILL.md` package | no | on (`defaultEnabled: true`) |
 
 The two categories are instances of one `KitCategory` descriptor consumed by a
@@ -379,7 +377,7 @@ export const myTool = defineTool({
   id: "my-tool",
   name: "My Tool",
   description: "What it does, in one line.",
-  defaultEnabled: false,
+  defaultEnabled: true,
   defaultSettings: { /* ... */ },
   settingsSchema: { type: "object", properties: {}, additionalProperties: false },
   register(_ctx, settings, kit) {

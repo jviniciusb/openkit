@@ -55,7 +55,7 @@ test("leaves null, undefined, and array input untouched without throwing", async
   }
 })
 
-test("is an opt-in tool with the expected identity", () => {
+test("is enabled by default with the expected identity", () => {
   expect(backgroundSubagents.id).toBe("background-subagents")
-  expect(backgroundSubagents.defaultEnabled).toBe(false)
+  expect(backgroundSubagents.defaultEnabled).toBe(true)
 })

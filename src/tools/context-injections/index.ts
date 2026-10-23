@@ -65,7 +65,6 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
   id: "context-injections",
   name: "Context Injections",
   description: "Injects built-in behavioral rules, plus your own, into the system prompt.",
-  defaultEnabled: false,
   defaultSettings: {
     rules: {
       proactive: true,

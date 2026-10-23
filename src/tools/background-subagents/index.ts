@@ -20,7 +20,6 @@ export const backgroundSubagents: KitTool<BackgroundSubagentsSettings> = defineT
   id: "background-subagents",
   name: "Background Subagents",
   description: "Force every subagent call to run in the background.",
-  defaultEnabled: false,
   defaultSettings: {},
   settingsSchema: {
     type: "object",

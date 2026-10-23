@@ -236,9 +236,9 @@ test("registers no hook when every rule is disabled and there are no extras", as
   expect(calls.hook).toEqual([])
 })
 
-test("is an opt-in tool with every built-in on by default", () => {
+test("is enabled by default with every built-in rule on", () => {
   expect(contextInjections.id).toBe("context-injections")
-  expect(contextInjections.defaultEnabled).toBe(false)
+  expect(contextInjections.defaultEnabled).toBe(true)
   for (const rule of BUILT_IN_RULES) {
     expect(contextInjections.defaultSettings.rules[rule.id]).toBe(true)
   }
