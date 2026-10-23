@@ -105,7 +105,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.24.2"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.24.3"
 ```
 
 ### 2. Configure (optional)

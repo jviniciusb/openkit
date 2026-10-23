@@ -6,6 +6,14 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.24.3] - 2026-10-22
+
+### Changed
+
+- `dispatching-parallel-agents` now requires every dispatch prompt to name its
+  inputs by path or quote them. A pointer at coordinator context ("the file we
+  discussed", "continue the plan") no longer passes the self-contained gate.
+
 ## [0.24.2] - 2026-10-22
 
 ### Changed
@@ -510,7 +518,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.24.2...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.24.3...HEAD
+[0.24.3]: https://github.com/jviniciusb/openkit/compare/v0.24.2...v0.24.3
 [0.24.2]: https://github.com/jviniciusb/openkit/compare/v0.24.1...v0.24.2
 [0.24.1]: https://github.com/jviniciusb/openkit/compare/v0.24.0...v0.24.1
 [0.24.0]: https://github.com/jviniciusb/openkit/compare/v0.23.3...v0.24.0
