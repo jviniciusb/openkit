@@ -76,9 +76,9 @@ Steering by prohibition drags the forbidden behavior into context and makes it m
 
 ### 8. Write instructions that cannot be misread
 
-An instruction is ambiguous when the agent must decide how to parse it. That decision costs a rerun, and the agent never asks. Six shapes keep it out:
+An instruction is ambiguous when the agent must decide how to parse it. That decision costs a rerun, and the agent never asks. The six shapes below come from the structural rules of ASD-STE100 (Simplified Technical English). This list is the operative subset: no length caps and no approved-word dictionary, because neither is checkable here and neither removes the ambiguity that costs a rerun.
 
-- **Condition beside action.** State the condition and its action in one sentence: "If the tree is clean, delete the branch." Do not append the condition after the command, where it reads as optional advice.
+- **Condition beside action.** Keep the condition in the same sentence as its action: "If the tree is clean, delete the branch." Do not let the condition drift into a later sentence, where it reads as optional advice.
 - **One action per sentence.** Split a sentence that carries two instructions, two actors, or an instruction plus its exception. Each new sentence names its own condition.
 - **Nothing dropped.** Keep the subject, the verb, and the article. "Files not backed up will be lost" leaves the reader to guess which files, and the words that were cut carried the meaning.
 - **One term per concept.** Choose one word for each thing and reuse it. Rotating synonyms ("the user", "the customer") makes one thing look like several.
