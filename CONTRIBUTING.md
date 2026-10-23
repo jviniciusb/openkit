@@ -16,8 +16,8 @@ bun test            # bun test
 1. Create a branch from `main` (e.g. `feat/my-tool`).
 2. Make the change, following the conventions below.
 3. For text an agent must follow (injected rules, skill steps, `AGENTS.md`),
-   apply the structural pass in `docs/ste100-before-after.md`. It has no word
-   limit; it removes ambiguity.
+   apply the structural pass in `src/skills/writing-for-agents/SKILL.md`, step
+   8. It has no word limit; it removes ambiguity.
 4. Run `bun run typecheck && bun test` and make sure both pass.
 5. Keep commits focused and use [Conventional Commits](https://www.conventionalcommits.org/)
    messages (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
