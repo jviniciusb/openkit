@@ -8,7 +8,7 @@ import { tools } from "../tools/index"
 /**
  * The tools category.
  *
- * Settings-bearing and opt-in by default. `registerItem` wraps `ctx` so every
+ * Settings-bearing and on by default. `registerItem` wraps `ctx` so every
  * registration the tool creates is tracked, validates the resolved settings
  * against the tool's schema, and calls `register`. Invalid settings do not
  * disable the tool: `resolveValidated` falls back to the tool's
@@ -22,7 +22,7 @@ export const toolCategory: KitCategory<KitTool> = {
   label: "tools",
   singular: "tool",
   items: tools,
-  defaultEnabled: (tool) => tool.defaultEnabled ?? false,
+  defaultEnabled: (tool) => tool.defaultEnabled ?? true,
   hasSettings: true,
   defaultSettings: (tool) => tool.defaultSettings as Record<string, unknown>,
   describe: (tool) => tool.description,
