@@ -6,6 +6,8 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-10-23
+
 ### Changed
 
 - `context-injections` rule `proactive` ends on a completion criterion: a task
@@ -577,7 +579,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.1...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.2...HEAD
+[0.26.2]: https://github.com/jviniciusb/openkit/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/jviniciusb/openkit/compare/v0.26.0...v0.26.1
 [0.26.0]: https://github.com/jviniciusb/openkit/compare/v0.25.1...v0.26.0
 [0.25.1]: https://github.com/jviniciusb/openkit/compare/v0.25.0...v0.25.1
