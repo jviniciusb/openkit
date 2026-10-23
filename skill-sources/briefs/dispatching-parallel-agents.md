@@ -31,7 +31,9 @@ related, shares state, or needs the whole system stays sequential.
     by what is convenient.
   - Focused, self-contained prompts: specific scope, clear goal, explicit
     constraints, and the expected output. Each agent carries the exact context it
-    needs and never inherits the coordinator's session.
+    needs and never inherits the coordinator's session, so every input is named
+    by path or quoted and no pointer at coordinator context ("the file we
+    discussed", "as above", "continue the plan") survives into the prompt.
   - Dispatch in parallel: issue every subagent call in the same response so they
     run concurrently; one call per response is sequential.
   - Review and integrate afterward: read each summary, check for conflicts, run

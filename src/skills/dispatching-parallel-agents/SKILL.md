@@ -62,7 +62,7 @@ When the agents return:
 
 - **Independence before dispatch.** Every domain is understood without context from the others and shares no state. Related or shared-state work is not parallelized.
 - **One domain per agent.** A prompt covers a single problem domain, not several.
-- **Self-contained prompts.** Each agent gets all the context it needs, since it does not inherit the coordinator's session.
+- **Self-contained prompts.** Each agent gets all the context it needs, since it does not inherit the coordinator's session. Name every input by path or quote it. Never point at context the receiving agent cannot see ("the file we discussed", "as above", "continue the plan").
 - **Constraints are stated.** Each prompt names what the agent must not change.
 - **Parallel dispatch.** Once independent work is ready and authorized, dispatch the full ready set together; use batched tool calls for bounded queries.
 - **Integrated and verified afterward.** The results are reviewed, checked for conflicts, and run against the full suite before they are accepted.
