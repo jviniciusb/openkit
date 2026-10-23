@@ -10,9 +10,9 @@ category engine, contracts) is the product; items are added on top. Every
 category is one `KitCategory` descriptor consumed by the generic engine, so
 config resolution, registration/isolation, and `/kit` are shared. Two
 tools ship today: `background-subagents`
-(`src/tools/background-subagents/index.ts`, opt-in; forces every subagent call to
-run in the background) and `context-injections`
-(`src/tools/context-injections/index.ts`, opt-in; injects built-in behavioral
+(`src/tools/background-subagents/index.ts`, on by default; forces every subagent
+call to run in the background) and `context-injections`
+(`src/tools/context-injections/index.ts`, on by default; injects built-in behavioral
 rules, each individually toggleable, plus your own instructions). The `hello`
 example at `src/tools/hello/index.ts` is not registered at runtime. Twenty-one
 skills ship today, all enabled by default: `english-writing-assistant`
@@ -162,6 +162,9 @@ category-keyed (`tools`, `skills`).
 3. Add tests.
 4. Add an example entry to `docs/examples/openkit.jsonc`.
 5. `bun run typecheck && bun test`.
+
+`defineTool` defaults `defaultEnabled` to `true`; set it to `false` for a tool
+that should stay off until config enables it.
 
 ## Adding a skill
 
