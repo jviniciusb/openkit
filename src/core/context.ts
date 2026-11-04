@@ -61,7 +61,7 @@ export interface KitStorage {
   scan(options: { prefix: string; after?: string; limit?: number }): Promise<StorageScanResult>
 }
 
-/** Namespace metadata applied to a transform editor (V2 `Tool.Namespace`). */
+/** Namespace metadata applied to the tool transform editor (V2 `Tool.Namespace`). */
 export interface Namespace {
   name: string
   description: string
@@ -72,10 +72,20 @@ export interface ToolResult {
   content: unknown
 }
 
+/** Host-level tool options (V2 `Tool.Options`). */
+export interface ToolOptions {
+  namespace?: string
+  permission?: string
+  /** Scriptable from Code Mode; otherwise the tool is only directly callable. */
+  codemode?: boolean
+  pinned?: boolean
+}
+
 export interface ToolDefinition {
   name: string
   description?: string
   input?: unknown
+  options?: ToolOptions
   /** V2 tool executors are async and return `{ content }`. */
   execute?: (input: unknown, context?: unknown) => Promise<ToolResult> | ToolResult
   [key: string]: unknown
@@ -83,7 +93,11 @@ export interface ToolDefinition {
 
 export interface ToolEditor {
   namespace(namespace: Namespace): void
-  add(definition: ToolDefinition): void
+  /**
+   * `any` because the host types this against a generic tool schema the kit
+   * does not model; a tool author's definition is typed by `KitApi.tool`.
+   */
+  add(definition: any): void
 }
 
 /** Payload of the built-in tool `execute.before` hook. `input` is mutable. */
@@ -115,8 +129,8 @@ export interface CommandDefinition {
 }
 
 export interface CommandEditor {
-  add(definition: CommandDefinition): void
-  namespace?(namespace: Namespace): void
+  /** `any` for the same reason as `ToolEditor.add`; `/kit` types its own definition. */
+  add(definition: any): void
 }
 
 export interface SkillDefinition {
@@ -130,8 +144,8 @@ export interface SkillDefinition {
 }
 
 export interface SkillEditor {
-  add(definition: SkillDefinition): void
-  namespace?(namespace: Namespace): void
+  /** `any` for the same reason as `ToolEditor.add`; the kit types `SkillInfo` itself. */
+  add(definition: any): void
 }
 
 /**
@@ -144,7 +158,7 @@ export interface SessionDomain {
   hook(name: string, handler: HookHandler, opts?: unknown): Promise<Registration>
   wait(input: { sessionID: string }): Promise<void>
   context(input: { sessionID: string }): Promise<readonly SessionMessageInfo[]>
-  compact(input: { sessionID: string; delivery: "queue" }): Promise<unknown>
+  compact(input: { sessionID: string; delivery?: "steer" | "queue" }): Promise<unknown>
   /**
    * In-session message without resuming the model. Preferred for command
    * output (e.g. `/kit list`); callers fall back to {@link prompt} and then to
@@ -155,7 +169,7 @@ export interface SessionDomain {
    * In-session prompt admission. Delivers command output at the cost of a
    * model turn; used only when `synthetic` is unavailable.
    */
-  prompt?(input: { sessionID: string; text: string }): Promise<void> | void
+  prompt?(input: { sessionID: string; text: string }): Promise<unknown> | unknown
 }
 
 /**

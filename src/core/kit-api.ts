@@ -4,7 +4,6 @@ import type {
   HookHandler,
   KitContext,
   Logger,
-  Namespace,
   Registration,
   SkillDefinition,
   SkillEditor,
@@ -36,9 +35,8 @@ function scopedLogger(toolId: string): Logger {
  * Creates the per-tool {@link KitApi} handed to `KitTool.register`.
  *
  * The API is scoped to `toolId`: `namespace(name)` changes the name recorded
- * for subsequently registered tools/commands/skills (defaulting to `toolId`),
- * and each helper applies the current namespace to the editor before adding
- * the definition.
+ * for subsequently registered tools (defaulting to `toolId`). Only tools carry
+ * a namespace in V2; commands and skills are added as given.
  */
 export function createKitApi(
   toolId: string,
@@ -48,12 +46,10 @@ export function createKitApi(
   let namespaceName = toolId
 
   const applyNamespace = (
-    editor: { namespace?(namespace: Namespace): void },
+    editor: ToolEditor,
     description: string | undefined,
   ) => {
-    if (typeof editor.namespace === "function") {
-      editor.namespace({ name: namespaceName, description: description ?? namespaceName })
-    }
+    editor.namespace({ name: namespaceName, description: description ?? namespaceName })
   }
 
   return {
@@ -71,13 +67,11 @@ export function createKitApi(
     },
     async command(def: CommandDefinition): Promise<Registration> {
       return ctx.command.transform((editor: CommandEditor) => {
-        applyNamespace(editor, def.description)
         editor.add(def)
       })
     },
     async skill(def: SkillDefinition): Promise<Registration> {
       return ctx.skill.transform((editor: SkillEditor) => {
-        applyNamespace(editor, def.description)
         editor.add(def)
       })
     },
