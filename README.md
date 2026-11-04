@@ -84,7 +84,7 @@ and [`diagnosing-sessions`](src/skills/diagnosing-sessions/SKILL.md) (invoked wi
 
 ## Requirements
 
-- OpenCode V2 `>= 2.0.4`.
+- OpenCode V2 `>= 2.2.5`.
 - Bun, which OpenCode uses to load the plugin's TypeScript at runtime. There is no build step, and the package is not consumable by plain Node.
 
 ## Install
@@ -104,7 +104,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.26.2"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.26.3"
 ```
 
 ### 2. Configure (optional)

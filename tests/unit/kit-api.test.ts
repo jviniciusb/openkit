@@ -67,3 +67,47 @@ test("tool namespaces always carry a description", async () => {
     { name: "t", description: "Greet" },
   ])
 })
+
+test("tool definitions forward host options such as codemode", async () => {
+  const added: unknown[] = []
+  const { ctx } = createFakeContext()
+  const withEditor = {
+    ...ctx,
+    tool: {
+      transform: async (callback: (editor: any) => void) => {
+        callback({ namespace: () => {}, add: (definition: unknown) => added.push(definition) })
+        return { dispose() {} }
+      },
+      hook: async () => ({ dispose() {} }),
+    },
+  }
+  const kit = createKitApi("t", withEditor, "0.0.0")
+  await kit.tool({ name: "hello", options: { codemode: true } })
+  expect(added).toEqual([{ name: "hello", options: { codemode: true } }])
+})
+
+test("commands and skills add their definition without a namespace call", async () => {
+  const added: unknown[] = []
+  // V2 dropped `namespace()` from these editors; calling it would throw here.
+  const editor = { add: (definition: unknown) => added.push(definition) }
+  const { ctx } = createFakeContext()
+  const withEditors = {
+    ...ctx,
+    command: {
+      transform: async (callback: (editor: any) => void) => {
+        callback(editor)
+        return { dispose() {} }
+      },
+    },
+    skill: {
+      transform: async (callback: (editor: any) => void) => {
+        callback(editor)
+        return { dispose() {} }
+      },
+    },
+  }
+  const kit = createKitApi("t", withEditors, "0.0.0")
+  await kit.command({ name: "kit" })
+  await kit.skill({ id: "s", name: "S" })
+  expect(added).toEqual([{ name: "kit" }, { id: "s", name: "S" }])
+})

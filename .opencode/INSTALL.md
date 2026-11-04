@@ -14,7 +14,7 @@ order and report the result to the user.
 
 ## Before you start
 
-- Confirm OpenCode V2 `>= 2.0.4` is installed (`opencode --version`).
+- Confirm OpenCode V2 `>= 2.2.5` is installed (`opencode --version`).
 - No CLI or checkout is required. The plugin registers `/kit` after OpenCode
   restarts; use it to list, toggle, and configure items in-session.
 - Locate the user's OpenCode config. It may be `opencode.json` or
@@ -29,7 +29,7 @@ instead of replacing it.
 
 > **Status:** `openkit` is distributed directly from GitHub (there is no npm
 > package). Add the git spec below. To pin a release, append a tag:
-> `#v0.26.2`.
+> `#v0.26.3`.
 
 Add the git spec to the `plugins` array of `opencode.json(c)`:
 
