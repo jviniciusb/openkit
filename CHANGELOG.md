@@ -6,6 +6,34 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.26.3] - 2026-11-04
+
+### Added
+
+- A compile-time contract check (`tests/unit/context-conformance.test.ts`)
+  pins `KitContext` to the OpenCode V2 `2.2.5` plugin API. `@opencode/plugin` is
+  an exact devDependency imported type-only, so the published plugin still
+  loads without it; a removed or reshaped host member now fails
+  `bun run typecheck` instead of a user's session.
+
+### Changed
+
+- `ToolDefinition` types the host `options` bag (`namespace`, `permission`,
+  `codemode`, `pinned`), so a kit tool can opt into Code Mode. The value was
+  already forwarded to the host unchanged.
+- Requirements name OpenCode V2 `>= 2.2.5`, the release the plugin API surface
+  is verified against.
+
+### Fixed
+
+- `command` and `skill` registration no longer call a `namespace` editor method
+  that V2 no longer exposes; only tools are namespaced. The previous optional
+  guard made this a silent no-op.
+- The declared `session.compact` signature matches the host: `delivery` is
+  optional and accepts `"steer" | "queue"`.
+- The declared `session.prompt` result is `unknown`; the host returns the
+  admitted inbox item, not `void`.
+
 ## [0.26.2] - 2026-10-23
 
 ### Changed
