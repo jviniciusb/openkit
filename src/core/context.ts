@@ -72,14 +72,18 @@ export interface ToolResult {
   content: unknown
 }
 
-/** Host-level tool options (V2 `Tool.Options`). */
-export interface ToolOptions {
+/** Host-level tool options (V2 `Tool.Options`, including its `codemode`/`pinned` union). */
+export type ToolOptions = {
   namespace?: string
   permission?: string
-  /** Scriptable from Code Mode; otherwise the tool is only directly callable. */
-  codemode?: boolean
-  pinned?: boolean
-}
+} & (
+  | {
+      /** Scriptable from Code Mode; otherwise the tool is only directly callable. */
+      codemode?: true
+      pinned?: boolean
+    }
+  | { codemode: boolean; pinned?: never }
+)
 
 export interface ToolDefinition {
   name: string
