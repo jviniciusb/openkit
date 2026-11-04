@@ -607,7 +607,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.2...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.3...HEAD
+[0.26.3]: https://github.com/jviniciusb/openkit/compare/v0.26.2...v0.26.3
 [0.26.2]: https://github.com/jviniciusb/openkit/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/jviniciusb/openkit/compare/v0.26.0...v0.26.1
 [0.26.0]: https://github.com/jviniciusb/openkit/compare/v0.25.1...v0.26.0
