@@ -84,7 +84,7 @@ and [`diagnosing-sessions`](src/skills/diagnosing-sessions/SKILL.md) (invoked wi
 
 ## Requirements
 
-- OpenCode V2 `>= 2.0.4`.
+- OpenCode V2 `>= 2.2.5`.
 - Bun, which OpenCode uses to load the plugin's TypeScript at runtime. There is no build step, and the package is not consumable by plain Node.
 
 ## Install

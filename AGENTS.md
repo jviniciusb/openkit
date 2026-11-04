@@ -85,7 +85,7 @@ Run a single test file with `bun test tests/unit/<file>.test.ts`.
 
 ```text
 src/
-  plugin.ts             # Plugin.define + bootstrap/lifecycle orchestration
+  plugin.ts             # plugin entry (id + setup) and bootstrap/lifecycle orchestration
   catalog.ts            # assembles categories from the descriptors
   constants.ts          # shared PLUGIN_ID
   categories/           # tool and skill descriptors
@@ -123,6 +123,13 @@ tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptanc
 - **Tests accompany behavior.** Use `createFakeContext` from
   `src/core/testing.ts` for harness-style assertions. Add tests for new config
   precedence, registry behavior, `/kit` output, and tool registration.
+- **The host contract is pinned, not assumed.** `@opencode/plugin` is an exact
+  devDependency, and `tests/unit/context-conformance.test.ts` proves at compile
+  time that the real V2 `Context` satisfies `KitContext`. The import is
+  type-only, so the published plugin still loads without the package. When
+  adopting a newer OpenCode, bump the pin, rerun `bun run typecheck`, and fix
+  whatever the contract check surfaces; update the `README.md` requirement to
+  match.
 - **Conventional Commits.** Use `feat:`, `fix:`, `docs:`, `test:`, `chore:`.
   Run `bun run typecheck && bun test` before committing.
 - **No build step — the TypeScript source is the artifact.** Consumers install

@@ -14,7 +14,7 @@ order and report the result to the user.
 
 ## Before you start
 
-- Confirm OpenCode V2 `>= 2.0.4` is installed (`opencode --version`).
+- Confirm OpenCode V2 `>= 2.2.5` is installed (`opencode --version`).
 - No CLI or checkout is required. The plugin registers `/kit` after OpenCode
   restarts; use it to list, toggle, and configure items in-session.
 - Locate the user's OpenCode config. It may be `opencode.json` or
