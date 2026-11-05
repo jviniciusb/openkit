@@ -6,6 +6,16 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-11-05
+
+### Added
+
+- The plugin warns once at load when the host reports a version older than the
+  verified floor (`MIN_OPENCODE_VERSION`, `2.2.5`), so the documented
+  requirement is checked instead of assumed. A version the kit cannot parse
+  warns nothing, and only the numeric `major.minor.patch` triple is compared, so
+  a prerelease or build suffix does not trigger a false warning.
+
 ## [0.26.4] - 2026-11-05
 
 ### Fixed
@@ -615,7 +625,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.4...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.27.0...HEAD
+[0.27.0]: https://github.com/jviniciusb/openkit/compare/v0.26.4...v0.27.0
 [0.26.4]: https://github.com/jviniciusb/openkit/compare/v0.26.3...v0.26.4
 [0.26.3]: https://github.com/jviniciusb/openkit/compare/v0.26.2...v0.26.3
 [0.26.2]: https://github.com/jviniciusb/openkit/compare/v0.26.1...v0.26.2
