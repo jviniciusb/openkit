@@ -294,3 +294,72 @@ test("is enabled by default with every built-in rule on", () => {
   }
   expect(contextInjections.defaultSettings.extra).toEqual([])
 })
+
+const subagentDriven = BUILT_IN_RULES.find(({ id }) => id === "subagent-driven")!
+
+test("keeps subagent-driven when the request advertises the subagent tool", async () => {
+  const { handler } = await register(defaults())
+  const event = {
+    system: [] as Array<{ type: string; text: string }>,
+    tools: { subagent: {}, read: {} },
+  }
+  await handler!(event)
+  expect(injectedText(event)).toContain(subagentDriven.text)
+})
+
+test("drops subagent-driven when the request advertises tools without subagent", async () => {
+  const { handler } = await register(defaults())
+  const event = {
+    system: [] as Array<{ type: string; text: string }>,
+    tools: { glob: {}, read: {} },
+  }
+  await handler!(event)
+  expect(injectedText(event)).not.toContain(subagentDriven.text)
+  expect(injectedText(event)).toContain(BUILT_IN_RULES.find(({ id }) => id === "proactive")!.text)
+})
+
+test("drops subagent-driven when the request advertises no tools at all", async () => {
+  const { handler } = await register(defaults())
+  const event = { system: [] as Array<{ type: string; text: string }>, tools: {} }
+  await handler!(event)
+  const expected = blockFor(
+    BUILT_IN_RULES.filter(({ id }) => id !== "subagent-driven").map((rule) => rule.text),
+  )
+  expect(injectedText(event)).toBe(expected)
+})
+
+test("keeps gated rules when the host omits the tool set", async () => {
+  const { handler } = await register(defaults())
+  const event = { system: [] as Array<{ type: string; text: string }> }
+  await handler!(event)
+  expect(injectedText(event)).toContain(subagentDriven.text)
+})
+
+test("appends extra instructions even when a gated rule is dropped", async () => {
+  const settings = defaults()
+  settings.extra = ["local rule"]
+  const { handler } = await register(settings)
+  const event = {
+    system: [] as Array<{ type: string; text: string }>,
+    tools: { read: {} },
+  }
+  await handler!(event)
+  expect(injectedText(event)).toBe(
+    blockFor([
+      ...BUILT_IN_RULES.filter(({ id }) => id !== "subagent-driven").map((rule) => rule.text),
+      "local rule",
+    ]),
+  )
+})
+
+test("sends no block when the gate removes the only enabled rule", async () => {
+  const settings = defaults()
+  for (const rule of BUILT_IN_RULES) settings.rules[rule.id] = rule.id === "subagent-driven"
+  const { handler } = await register(settings)
+  const event = {
+    system: [] as Array<{ type: string; text: string }>,
+    tools: { read: {} },
+  }
+  await handler!(event)
+  expect(event.system).toEqual([])
+})

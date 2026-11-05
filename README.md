@@ -32,7 +32,9 @@ The package ships two tools: [`background-subagents`](src/tools/background-subag
 (on by default; forces every subagent call to run in the background so the parent
 keeps control while a child works) and
 [`context-injections`](src/tools/context-injections/index.ts) (on by default;
-injects built-in behavioral rules — each individually toggleable — plus your own). It is
+injects built-in behavioral rules — each individually toggleable — plus your own).
+A rule that needs a capability the request does not advertise is skipped for that
+request, such as `subagent-driven` for a leaf subagent with no `subagent` tool. It is
 global and system-level: its rules complement project `AGENTS.md`/`instructions`
 without overriding higher-priority instructions or explicit approval gates, so
 do not duplicate them there.
@@ -104,7 +106,7 @@ enabled in your config. Add the same spec to the `plugins` array of your
 To **pin a release** instead of tracking `main`, append a tag or a commit hash:
 
 ```bash
-opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.27.0"
+opencode plugin add "openkit@git+https://github.com/jviniciusb/openkit.git#v0.28.0"
 ```
 
 ### 2. Configure (optional)

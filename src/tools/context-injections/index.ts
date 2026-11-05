@@ -39,6 +39,16 @@ export const BUILT_IN_RULES = [
 export type RuleId = (typeof BUILT_IN_RULES)[number]["id"]
 
 /**
+ * Rules that only make sense when the request advertises a given tool. Checked
+ * per request against the hook event's `tools`; a rule is dropped only when the
+ * tool set is known and the tool is absent, so a host that omits `tools` keeps
+ * today's behavior.
+ */
+const RULE_REQUIRES_TOOL: Partial<Record<RuleId, string>> = {
+  "subagent-driven": "subagent",
+}
+
+/**
  * Framing for the injected rules. A named, imperative block reads as an
  * instructions document; bare appended paragraphs read as ambient context and
  * carry far less weight against a project's `AGENTS.md`.
@@ -54,16 +64,31 @@ export interface ContextInjectionsSettings {
   extra: string[]
 }
 
+/** Payload of the `context` hook, narrowed to what the tool reads. */
+interface ContextEvent {
+  system?: Array<{ type: string; text: string }>
+  /** Tools advertised for this request; absent on a host that does not send it. */
+  tools?: Record<string, unknown>
+}
+
+/** True when the tool set is unknown (fail open) or advertises `name` as an own key. */
+function advertises(tools: Record<string, unknown> | undefined, name: string): boolean {
+  if (typeof tools !== "object" || tools === null) return true
+  return Object.hasOwn(tools, name)
+}
+
 /**
  * Injects instruction rules into the model's system prompt on every model
  * request (the `context` session hook). Built-in rules ship with the tool and
  * can be toggled individually; `extra` appends user instructions after them.
- * The enabled rules are sent as one headed, imperative block so the model
- * treats them as standing instructions rather than ambient context. With no
- * enabled rules and no extra instructions, no hook is registered. The block is
- * global and system-level, additive to project `AGENTS.md`/`instructions`, and
- * does not override higher-priority instructions or approval gates; do not
- * duplicate its rules there.
+ * Rules marked in {@link RULE_REQUIRES_TOOL} are skipped when the request's tool
+ * set is known and lacks that tool, so a leaf subagent does not receive
+ * delegation advice it cannot act on. The enabled rules are sent as one headed,
+ * imperative block so the model treats them as standing instructions rather
+ * than ambient context. With no enabled rules and no extra instructions, no
+ * hook is registered. The block is global and system-level, additive to project
+ * `AGENTS.md`/`instructions`, and does not override higher-priority instructions
+ * or approval gates; do not duplicate its rules there.
  */
 export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<ContextInjectionsSettings>({
   id: "context-injections",
@@ -102,16 +127,29 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
     additionalProperties: false,
   },
   register(_ctx, settings, kit) {
-    const rules = [
-      ...BUILT_IN_RULES.filter((rule) => settings.rules[rule.id] !== false).map((rule) => rule.text),
-      ...settings.extra.map((text) => text.trim()).filter((text) => text.length > 0),
-    ]
-    if (rules.length === 0) return
-    const block = [RULES_HEADING, "", RULES_PREAMBLE, "", ...rules.map((rule) => `- ${rule}`)].join("\n")
+    const enabled = BUILT_IN_RULES.filter((rule) => settings.rules[rule.id] !== false)
+    const extra = settings.extra.map((text) => text.trim()).filter((text) => text.length > 0)
+    if (enabled.length === 0 && extra.length === 0) return
+    const linesFor = (tools: Record<string, unknown> | undefined) => {
+      const texts: string[] = enabled
+        .filter((rule) => {
+          const required = RULE_REQUIRES_TOOL[rule.id]
+          return required === undefined || advertises(tools, required)
+        })
+        .map((rule) => rule.text)
+      return [...texts, ...extra].map((text) => `- ${text}`)
+    }
     return kit.on("context", (event) => {
-      const system = (event as { system?: Array<{ type: string; text: string }> }).system
+      const { system, tools } = event as ContextEvent
       if (!Array.isArray(system)) return
-      system.push({ type: "text", text: block })
+      const lines = linesFor(tools)
+      // Every enabled rule can be gated away for one request; an empty headed
+      // block would be noise, so send nothing.
+      if (lines.length === 0) return
+      system.push({
+        type: "text",
+        text: [RULES_HEADING, "", RULES_PREAMBLE, "", ...lines].join("\n"),
+      })
     })
   },
 })
