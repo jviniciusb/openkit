@@ -6,6 +6,18 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-11-05
+
+### Changed
+
+- `context-injections` skips `subagent-driven` for a request whose advertised
+  tool set has no `subagent` tool. Built-in leaf subagents (`explore`,
+  `general`), depth-limited children, and custom agents without delegation no
+  longer receive delegation advice they cannot act on. The gate reads the
+  request's `tools`, not an agent list, so custom agents are covered without
+  configuration; it fails open when the host omits the tool set, and every other
+  rule is unchanged. `subagent-driven` stays a normal toggle.
+
 ## [0.27.0] - 2026-11-05
 
 ### Added
@@ -625,7 +637,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.27.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.28.0...HEAD
+[0.28.0]: https://github.com/jviniciusb/openkit/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/jviniciusb/openkit/compare/v0.26.4...v0.27.0
 [0.26.4]: https://github.com/jviniciusb/openkit/compare/v0.26.3...v0.26.4
 [0.26.3]: https://github.com/jviniciusb/openkit/compare/v0.26.2...v0.26.3
