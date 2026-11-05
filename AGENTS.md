@@ -13,7 +13,8 @@ tools ship today: `background-subagents`
 (`src/tools/background-subagents/index.ts`, on by default; forces every subagent
 call to run in the background) and `context-injections`
 (`src/tools/context-injections/index.ts`, on by default; injects built-in behavioral
-rules, each individually toggleable, plus your own instructions). The `hello`
+rules, each individually toggleable, plus your own instructions; a rule needing a
+tool the request lacks is skipped). The `hello`
 example at `src/tools/hello/index.ts` is not registered at runtime. Twenty-one
 skills ship today, all enabled by default: `english-writing-assistant`
 (`src/skills/english-writing-assistant/SKILL.md`, model-visible), `sdd-flow`
