@@ -351,3 +351,15 @@ test("appends extra instructions even when a gated rule is dropped", async () =>
     ]),
   )
 })
+
+test("sends no block when the gate removes the only enabled rule", async () => {
+  const settings = defaults()
+  for (const rule of BUILT_IN_RULES) settings.rules[rule.id] = rule.id === "subagent-driven"
+  const { handler } = await register(settings)
+  const event = {
+    system: [] as Array<{ type: string; text: string }>,
+    tools: { read: {} },
+  }
+  await handler!(event)
+  expect(event.system).toEqual([])
+})

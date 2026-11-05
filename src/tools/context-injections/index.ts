@@ -130,20 +130,26 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
     const enabled = BUILT_IN_RULES.filter((rule) => settings.rules[rule.id] !== false)
     const extra = settings.extra.map((text) => text.trim()).filter((text) => text.length > 0)
     if (enabled.length === 0 && extra.length === 0) return
-    const block = (tools: Record<string, unknown> | undefined) => {
+    const linesFor = (tools: Record<string, unknown> | undefined) => {
       const texts: string[] = enabled
         .filter((rule) => {
           const required = RULE_REQUIRES_TOOL[rule.id]
           return required === undefined || advertises(tools, required)
         })
         .map((rule) => rule.text)
-      const lines = [...texts, ...extra].map((text) => `- ${text}`)
-      return [RULES_HEADING, "", RULES_PREAMBLE, "", ...lines].join("\n")
+      return [...texts, ...extra].map((text) => `- ${text}`)
     }
     return kit.on("context", (event) => {
       const { system, tools } = event as ContextEvent
       if (!Array.isArray(system)) return
-      system.push({ type: "text", text: block(tools) })
+      const lines = linesFor(tools)
+      // Every enabled rule can be gated away for one request; an empty headed
+      // block would be noise, so send nothing.
+      if (lines.length === 0) return
+      system.push({
+        type: "text",
+        text: [RULES_HEADING, "", RULES_PREAMBLE, "", ...lines].join("\n"),
+      })
     })
   },
 })

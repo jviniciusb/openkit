@@ -12,11 +12,12 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `context-injections` skips `subagent-driven` for a request whose advertised
   tool set has no `subagent` tool. Built-in leaf subagents (`explore`,
-  `general`), depth-limited children, and custom agents without delegation no
-  longer receive delegation advice they cannot act on. The gate reads the
-  request's `tools`, not an agent list, so custom agents are covered without
-  configuration; it fails open when the host omits the tool set, and every other
-  rule is unchanged. `subagent-driven` stays a normal toggle.
+  `general`) no longer receive delegation advice they cannot act on, and a
+  custom agent whose permissions deny `subagent` loses only that rule. The gate
+  reads the request's `tools`, not an agent list, so custom agents are covered
+  without configuration; it fails open when the host omits the tool set, and
+  every other rule is unchanged. `subagent-driven` stays a normal toggle. A
+  request that gates away every enabled rule now sends no block at all.
 
 ## [0.27.0] - 2026-11-05
 
