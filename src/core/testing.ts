@@ -13,6 +13,7 @@ import type {
   ToolDefinition,
   ToolEditor,
 } from "./context"
+import { MIN_OPENCODE_VERSION } from "../constants"
 
 /** Overrides accepted by {@link createFakeContext}. */
 export interface FakeContextOptions {
@@ -33,6 +34,8 @@ export interface FakeContextOptions {
    * Defaults to a no-op disposer. Use this to observe disposals in tests.
    */
   onRegistration?: () => Registration
+  /** Value exposed as `ctx.app.version`. Defaults to {@link MIN_OPENCODE_VERSION}. */
+  version?: string
 }
 
 /**
@@ -140,7 +143,7 @@ export function createFakeContext(overrides: FakeContextOptions = {}): {
         }
 
   const ctx: KitContext = {
-    app: { version: "0.0.0" },
+    app: { version: overrides.version ?? MIN_OPENCODE_VERSION },
     location: { directory: overrides.directory ?? process.cwd() },
     options,
     storage,

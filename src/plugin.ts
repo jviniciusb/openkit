@@ -3,10 +3,11 @@ import { homedir } from "node:os"
 
 import { categories } from "./catalog"
 import { registerKitCommand } from "./commands/kit"
-import { PLUGIN_ID } from "./constants"
+import { MIN_OPENCODE_VERSION, PLUGIN_ID } from "./constants"
 import type { KitCategory } from "./core/category"
 import type { KitContext } from "./core/context"
 import { registerCategories, type DegradedItem } from "./core/engine"
+import { isVersionOlder } from "./core/host-version"
 import { discoverKitConfigFiles } from "./config/discover"
 import { loadKitConfig } from "./config/load"
 import { deepMerge } from "./config/merge"
@@ -216,6 +217,14 @@ export async function createLifecycle(
 export default {
   id: PLUGIN_ID,
   async setup(ctx: KitContext): Promise<() => Promise<void>> {
+    // Warn once per plugin load, before registering anything: an old host can
+    // degrade silently, and the version floor is otherwise only a README claim.
+    if (isVersionOlder(ctx.app.version, MIN_OPENCODE_VERSION)) {
+      console.warn(
+        `openkit: OpenCode ${ctx.app.version} is older than the supported ${MIN_OPENCODE_VERSION}; ` +
+          "upgrade OpenCode if items behave unexpectedly.",
+      )
+    }
     const life = await createLifecycle(ctx, categories, ctx.options as Record<string, unknown>)
     // Register the `/kit` command alongside the tool lifecycle so it is
     // disposed with everything else. It lives for the whole session (not per
