@@ -6,6 +6,14 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.26.4] - 2026-11-05
+
+### Fixed
+
+- The install guide no longer claims the shipped tools default to off; both
+  shipped tools have defaulted to on since 0.25.0, and the same file already
+  said so below.
+
 ## [0.26.3] - 2026-11-04
 
 ### Added
@@ -607,7 +615,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.3...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.26.4...HEAD
+[0.26.4]: https://github.com/jviniciusb/openkit/compare/v0.26.3...v0.26.4
 [0.26.3]: https://github.com/jviniciusb/openkit/compare/v0.26.2...v0.26.3
 [0.26.2]: https://github.com/jviniciusb/openkit/compare/v0.26.1...v0.26.2
 [0.26.1]: https://github.com/jviniciusb/openkit/compare/v0.26.0...v0.26.1

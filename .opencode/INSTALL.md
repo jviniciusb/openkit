@@ -29,7 +29,7 @@ instead of replacing it.
 
 > **Status:** `openkit` is distributed directly from GitHub (there is no npm
 > package). Add the git spec below. To pin a release, append a tag:
-> `#v0.26.3`.
+> `#v0.26.4`.
 
 Add the git spec to the `plugins` array of `opencode.json(c)`:
 
@@ -50,8 +50,7 @@ there is no `plugins` key, add one.
 The kit reads `openkit.jsonc` from the global
 (`~/.config/opencode/openkit.jsonc`) and/or project
 (`<project>/.opencode/openkit.jsonc`) locations. Both are optional: shipped
-skills default to on and tools default to off, so the plugin works without a
-config file.
+skills and tools default to on, so the plugin works without a config file.
 
 **Preferred:** after the Step 3 restart, use `/kit list` to see items, `/kit enable <id>` or
 `/kit disable <id>` to toggle them, and `/kit config set <id> <key> <value>` to
