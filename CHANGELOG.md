@@ -6,6 +6,8 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-11-12
+
 ### Changed
 
 - **Breaking:** `context-injections` rule `functional-programming` is replaced by
@@ -656,7 +658,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.28.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/jviniciusb/openkit/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/jviniciusb/openkit/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/jviniciusb/openkit/compare/v0.26.4...v0.27.0
 [0.26.4]: https://github.com/jviniciusb/openkit/compare/v0.26.3...v0.26.4
