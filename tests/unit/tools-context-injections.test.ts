@@ -188,18 +188,25 @@ test("think-in-code uses skills for applicable workflows without speculative tri
   expect(text).toContain("shape reads and queries")
 })
 
-test("functional-programming keeps state at the edges and follows the local paradigm", () => {
-  const text = BUILT_IN_RULES.find(({ id }) => id === "functional-programming")!.text.toLowerCase()
-  expect(text).toContain("keep new state and side effects at the edges")
+test("coding-principles fits the local code and keeps state at the edges", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "coding-principles")!.text.toLowerCase()
+  expect(text).toContain("fit new code to the code around it")
+  expect(text).toContain("its paradigm")
+  expect(text).toContain("its existing abstractions before any new one")
+  expect(text).toContain("simplest design that fully solves the task")
   expect(text).toContain("mutate only what you own")
-  expect(text).toContain("return a new value instead of changing an object the caller still holds")
-  expect(text).toContain("put i/o, randomness, and time at the boundary")
+  expect(text).toContain("returning a new value instead of changing an object the caller still holds")
+  expect(text).toContain("i/o, randomness, and time at the boundary")
   expect(text).toContain("stays testable")
-  expect(text).toContain("write in the paradigm of the code around it")
-  expect(text).toContain("switching paradigm is a refactor that needs a reason")
-  expect(text).toContain("not a side effect of the edit")
-  expect(text).toContain("abstractions the codebase already has")
-  expect(text).toContain("a reason beyond purity")
+})
+
+test("coding-principles rejects speculative structure and premature abstraction", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "coding-principles")!.text.toLowerCase()
+  expect(text).toContain("build only what the task needs")
+  expect(text).toContain("no options, config, flags, or extension points nobody asked for")
+  expect(text).toContain("extract shared code when a second real caller arrives")
+  expect(text).toContain("not when two shapes merely look alike")
+  expect(text).toContain("a wrong abstraction costs more than the duplication it removes")
 })
 
 test("subagent-driven delegates ready work and consolidates results", () => {
@@ -219,6 +226,7 @@ test("subagent-driven delegates ready work and consolidates results", () => {
 
 test("decomposition identifies parallel-ready work without crossing gates", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "decomposition")!.text.toLowerCase()
+  expect(text).toContain("before a non-trivial task, break it into small, independent pieces of work")
   expect(text).toContain("actively look for worthwhile safe parallelism")
   expect(text).toContain("rather than defaulting to serial work")
   expect(text).toContain("identify which independent pieces are ready")
