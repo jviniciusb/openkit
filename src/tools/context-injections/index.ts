@@ -14,12 +14,12 @@ export const BUILT_IN_RULES = [
     text: "Before substantive work, consider available skill descriptions and load the best fit when its workflow meaningfully applies, even if the request doesn't name it; skip only speculative matches. For current facts, repository state, or requested operations, prefer available tools over memory, using the most specific MCP tool, CLI, or project script before shell, and look up the exact tool path and signature. Shape reads and queries to the relevant fields, ranges, matches, or excerpts; when size or structure is unknown, inspect metadata or a small sample first. When several tool calls feed one answer, write one short program (Code Mode, script, or CLI pipeline) that returns only the derived value and keeps intermediates out of context; a single call stays direct. Await every call whose result you use, run independent calls concurrently, and return a small, plain value. Read source directly when semantic understanding is needed; use code to reduce mechanical processing, not judgment.",
   },
   {
-    id: "functional-programming",
-    text: "Keep new state and side effects at the edges. Mutate only what you own: return a new value instead of changing an object the caller still holds. Put I/O, randomness, and time at the boundary, so the core logic stays testable. Write in the paradigm of the code around it; switching paradigm is a refactor that needs a reason, not a side effect of the edit. Reach for the abstractions the codebase already has; a new one needs a reason beyond purity.",
+    id: "coding-principles",
+    text: "Fit new code to the code around it: its paradigm, its existing abstractions before any new one, and the simplest design that fully solves the task. Build only what the task needs — no options, config, flags, or extension points nobody asked for. Extract shared code when a second real caller arrives, not when two shapes merely look alike: a wrong abstraction costs more than the duplication it removes. Mutate only what you own, returning a new value instead of changing an object the caller still holds, and keep I/O, randomness, and time at the boundary so the core stays testable.",
   },
   {
     id: "decomposition",
-    text: "Before a non-trivial task, break it into small, independent pieces, each with one responsibility and explicit inputs and outputs. A piece is well-formed when it can be understood, implemented, and verified without reading the others; if two parts must change together, they are one piece. Actively look for worthwhile safe parallelism rather than defaulting to serial work. Identify which independent pieces are ready; keep dependent or shared-state work together, and never cross an approval gate. For trivial or strictly sequential work, act directly.",
+    text: "Before a non-trivial task, break it into small, independent pieces of work, each with one responsibility and explicit inputs and outputs. A piece is well-formed when it can be understood, implemented, and verified without reading the others; if two parts must change together, they are one piece. Actively look for worthwhile safe parallelism rather than defaulting to serial work. Identify which independent pieces are ready; keep dependent or shared-state work together, and never cross an approval gate. For trivial or strictly sequential work, act directly.",
   },
   {
     id: "subagent-driven",
@@ -98,7 +98,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
     rules: {
       proactive: true,
       "think-in-code": true,
-      "functional-programming": true,
+      "coding-principles": true,
       decomposition: true,
       "subagent-driven": true,
       "careful-changes": true,
@@ -114,7 +114,7 @@ export const contextInjections: KitTool<ContextInjectionsSettings> = defineTool<
         properties: {
           proactive: { type: "boolean" },
           "think-in-code": { type: "boolean" },
-          "functional-programming": { type: "boolean" },
+          "coding-principles": { type: "boolean" },
           decomposition: { type: "boolean" },
           "subagent-driven": { type: "boolean" },
           "careful-changes": { type: "boolean" },

@@ -6,6 +6,26 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-11-12
+
+### Changed
+
+- **Breaking:** `context-injections` rule `functional-programming` is replaced by
+  `coding-principles`, which covers the same state-and-effects guidance and adds
+  the two principles that were missing: build only what the task needs, and
+  extract shared code when a second real caller arrives rather than when two
+  shapes merely look alike. It governs code you add and stays silent on changing
+  existing structure, which `careful-changes` already bounds to the request and
+  any agreed scope, so the two rules no longer compete over when to refactor. A
+  config that still sets `"functional-programming"` now fails schema validation
+  and degrades the tool to its defaults, so every rule comes back on; replace the
+  key with `"coding-principles"`. 101 words, up from 82.
+- `context-injections` rule `decomposition` types its unit: "small, independent
+  pieces" became "small, independent pieces of work". The rule is about execution
+  — splitting a task into steps — not about code structure, and an untyped
+  "piece" next to "one responsibility and explicit inputs and outputs" read as
+  class design. Two words, no behavior change.
+
 ## [0.28.0] - 2026-11-05
 
 ### Changed
@@ -638,7 +658,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.28.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.29.0...HEAD
+[0.29.0]: https://github.com/jviniciusb/openkit/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/jviniciusb/openkit/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/jviniciusb/openkit/compare/v0.26.4...v0.27.0
 [0.26.4]: https://github.com/jviniciusb/openkit/compare/v0.26.3...v0.26.4
