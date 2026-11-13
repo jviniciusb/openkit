@@ -67,15 +67,15 @@ test("list tolerates a throwing describe, printing an empty description", async 
 
 test("list reflects a plugin-options disable", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const x = deps(home, { tools: { "background-subagents": { enabled: false } } })
+  const x = deps(home, { tools: { "context-injections": { enabled: false } } })
   await listOperation(categories, x.d)
-  expect(x.out()).toMatch(/background-subagents\s+disabled/)
+  expect(x.out()).toMatch(/context-injections\s+disabled/)
 })
 
 test("configGet reads the effective value from the plugin-options layer", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
-  const x = deps(home, { tools: { "background-subagents": { settings: { greeting: "yo" } } } })
-  expect(await configGetOperation(categories, x.d, "background-subagents", "greeting")).toEqual({ exitCode: 0 })
+  const x = deps(home, { tools: { "context-injections": { settings: { greeting: "yo" } } } })
+  expect(await configGetOperation(categories, x.d, "context-injections", "greeting")).toEqual({ exitCode: 0 })
   expect(x.out()).toBe(`"yo"`)
 })
 
@@ -83,30 +83,30 @@ test("configGet reads a value set in a project config, not just global", async (
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const projectConfig = join(home, ".opencode", "openkit.jsonc")
   mkdirSync(dirname(projectConfig), { recursive: true })
-  writeFileSync(projectConfig, '{ "tools": { "background-subagents": { "settings": { "greeting": "proj" } } } }')
+  writeFileSync(projectConfig, '{ "tools": { "context-injections": { "settings": { "greeting": "proj" } } } }')
   const x = deps(home)
-  expect(await configGetOperation(categories, x.d, "background-subagents", "greeting")).toEqual({ exitCode: 0 })
+  expect(await configGetOperation(categories, x.d, "context-injections", "greeting")).toEqual({ exitCode: 0 })
   expect(x.out()).toBe(`"proj"`)
 })
 
 test("configSet writes a tool setting and configGet reads it back", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const set = deps(home)
-  expect(await configSetOperation(categories, set.d, "background-subagents", "greeting", ["Hi"])).toEqual({ exitCode: 0 })
-  expect((parse(readFileSync(globalConfigPath(home), "utf8")) as any).tools["background-subagents"].settings.greeting).toBe("Hi")
+  expect(await configSetOperation(categories, set.d, "context-injections", "greeting", ["Hi"])).toEqual({ exitCode: 0 })
+  expect((parse(readFileSync(globalConfigPath(home), "utf8")) as any).tools["context-injections"].settings.greeting).toBe("Hi")
 
   const get = deps(home)
-  expect(await configGetOperation(categories, get.d, "background-subagents", "greeting")).toEqual({ exitCode: 0 })
+  expect(await configGetOperation(categories, get.d, "context-injections", "greeting")).toEqual({ exitCode: 0 })
   expect(get.out()).toBe(`"Hi"`)
 })
 
 test("configSet warns via the category inspect hook when the write degrades a tool", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   const x = deps(home)
-  // `count` is not in background-subagents' schema (additionalProperties:
+  // `count` is not in context-injections' schema (additionalProperties:
   // false), so the written settings are invalid; the warning comes from
   // `category.inspect`.
-  expect(await configSetOperation(categories, x.d, "background-subagents", "count", ["42"])).toEqual({ exitCode: 0 })
+  expect(await configSetOperation(categories, x.d, "context-injections", "count", ["42"])).toEqual({ exitCode: 0 })
   expect(x.err()).toContain("warning")
   expect(x.err()).toContain("invalid")
 })

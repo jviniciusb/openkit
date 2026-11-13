@@ -18,7 +18,7 @@ function parse(version: string): [number, number, number] | undefined {
  *
  * Unparseable input on either side returns `false`: a host that reports a
  * version the kit cannot read gets no warning rather than a wrong one. A
- * prerelease such as `2.2.5-beta.1` compares equal to `2.2.5`, because only the
+ * prerelease such as `2.3.0-beta.1` compares equal to `2.3.0`, because only the
  * numeric triple is compared.
  */
 export function isVersionOlder(version: string, minimum: string): boolean {

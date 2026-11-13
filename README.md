@@ -28,11 +28,10 @@ lifecycle layers do not change. See
 - **Isolated:** one item failing to configure never stops the kit or the other
   items from loading.
 
-The package ships two tools: [`background-subagents`](src/tools/background-subagents/index.ts)
-(on by default; forces every subagent call to run in the background so the parent
-keeps control while a child works) and
+The package ships one tool:
 [`context-injections`](src/tools/context-injections/index.ts) (on by default;
-injects built-in behavioral rules — each individually toggleable — plus your own).
+injects built-in behavioral rules — each individually toggleable — plus your
+own).
 A rule that needs a capability the request does not advertise is skipped for that
 request, such as `subagent-driven` for a leaf subagent with no `subagent` tool. It is
 global and system-level: its rules complement project `AGENTS.md`/`instructions`
@@ -86,7 +85,7 @@ and [`diagnosing-sessions`](src/skills/diagnosing-sessions/SKILL.md) (invoked wi
 
 ## Requirements
 
-- OpenCode V2 `>= 2.2.5`.
+- OpenCode V2 `>= 2.3.0`.
 - Bun, which OpenCode uses to load the plugin's TypeScript at runtime. There is no build step, and the package is not consumable by plain Node.
 
 ## Install
@@ -119,7 +118,7 @@ does). To make the effective configuration explicit, create
 ```jsonc
 {
   "tools": {
-    "background-subagents": { "enabled": true }
+    "context-injections": { "enabled": true }
   }
 }
 ```
@@ -198,7 +197,6 @@ the model is fixed per skill, not configurable — see
   "$schema": "https://raw.githubusercontent.com/jviniciusb/openkit/main/openkit.schema.json",
   "configVersion": 1,
   "tools": {
-    "background-subagents": { "enabled": true },
     "context-injections": { "enabled": true }
   }
 }
@@ -210,7 +208,7 @@ A project file only needs what differs:
 // <project>/.opencode/openkit.jsonc
 {
   "tools": {
-    "background-subagents": { "enabled": false }
+    "context-injections": { "enabled": false }
   }
 }
 ```

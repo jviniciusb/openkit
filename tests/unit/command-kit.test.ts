@@ -20,7 +20,7 @@ test("`kit` routes output through session.prompt when available", async () => {
 
   expect(prompts.length).toBe(1)
   expect(prompts.every((p) => p.sessionID === "s1")).toBe(true)
-  expect(prompts[0]!.text).toContain("background-subagents")
+  expect(prompts[0]!.text).toContain("context-injections")
   expect(prompts[0]!.text).toContain("skills:")
 })
 
@@ -42,7 +42,7 @@ test("`kit` prefers a synthetic message so output does not resume the model", as
   expect(sent.length).toBe(1)
   expect(sent[0]!.sessionID).toBe("s1")
   expect(sent[0]!.resume).toBe(false)
-  expect(sent[0]!.text).toContain("background-subagents")
+  expect(sent[0]!.text).toContain("context-injections")
   expect(sent[0]!.text).toContain("skills:")
   expect(prompts).toBe(0)
 })
@@ -60,15 +60,15 @@ test("`kit` with no subcommand lists every item", async () => {
   expect(out).not.toContain("kit enable")
 })
 
-test("`kit enable background-subagents` writes config and triggers reload", async () => {
+test("`kit enable context-injections` writes config and triggers reload", async () => {
   const home = mkdtempSync(join(tmpdir(), "home-"))
   let reloaded = 0
   const { ctx, calls } = createFakeContext()
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => { reloaded++ }, stdout: () => {} })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
-  await cmd.execute({ prompt: { text: "enable background-subagents" }, sessionID: "s", delivery: "steer" })
+  await cmd.execute({ prompt: { text: "enable context-injections" }, sessionID: "s", delivery: "steer" })
   expect(reloaded).toBe(1)
-  expect(readFileSync(globalConfigPath(home), "utf8")).toContain("background-subagents")
+  expect(readFileSync(globalConfigPath(home), "utf8")).toContain("context-injections")
 })
 
 test("setup disposes the lifecycle when command registration fails", async () => {
@@ -84,7 +84,7 @@ test("setup disposes the lifecycle when command registration fails", async () =>
     },
   })
   ;(ctx as { options: Record<string, unknown> }).options = {
-    tools: { "background-subagents": { enabled: true } },
+    tools: { "context-injections": { enabled: true } },
   }
   const broken = {
     ...ctx,
@@ -103,11 +103,11 @@ test("`kit config` warns through its output when the write degrades the tool", a
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ prompt: { text: "config background-subagents count 42" }, sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config context-injections count 42" }, sessionID: "s" })
 
-  expect(out).toContain("background-subagents.count = 42")
+  expect(out).toContain("context-injections.count = 42")
   expect(out).toContain("warning")
-  expect(out).toContain("background-subagents")
+  expect(out).toContain("context-injections")
 })
 
 test("`kit list` includes skills", async () => {
@@ -155,14 +155,14 @@ test("`kit enable` warns when plugin options override the global write", async (
   let out = ""
   const { ctx, calls } = createFakeContext()
   ;(ctx as { options: Record<string, unknown> }).options = {
-    tools: { "background-subagents": { enabled: false } },
+    tools: { "context-injections": { enabled: false } },
   }
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ prompt: { text: "enable background-subagents" }, sessionID: "s" })
+  await cmd.execute({ prompt: { text: "enable context-injections" }, sessionID: "s" })
 
-  expect(out).toContain("background-subagents enabled")
+  expect(out).toContain("context-injections enabled")
   expect(out).toContain("warning")
   expect(out).toContain("overridden")
   expect(out).toContain("plugin options")
@@ -175,9 +175,9 @@ test("`kit config set` then `kit config get` round-trips the value", async () =>
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ prompt: { text: "config set background-subagents count 42" }, sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config set context-injections count 42" }, sessionID: "s" })
   out = ""
-  await cmd.execute({ prompt: { text: "config get background-subagents count" }, sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config get context-injections count" }, sessionID: "s" })
 
   expect(out).toBe("42")
 })
@@ -189,7 +189,7 @@ test("`kit config get` reports missing arguments and settings-less categories", 
   await registerKitCommand(ctx, { home, cwd: home, reload: async () => {}, stdout: (s) => { out += s } })
   const cmd = (calls.command as any[]).find((c) => c.name === "kit")
 
-  await cmd.execute({ prompt: { text: "config get background-subagents" }, sessionID: "s" })
+  await cmd.execute({ prompt: { text: "config get context-injections" }, sessionID: "s" })
   expect(out).toContain("config get requires")
 
   out = ""

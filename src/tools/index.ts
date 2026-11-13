@@ -1,5 +1,4 @@
 import type { KitTool } from "../core/tool"
-import { backgroundSubagents } from "./background-subagents/index"
 import { contextInjections } from "./context-injections/index"
 
 /**
@@ -10,7 +9,6 @@ import { contextInjections } from "./context-injections/index"
  */
 export const tools: KitTool[] = [
   // <kit:tools>
-  backgroundSubagents,
   contextInjections,
   // </kit:tools>
 ]

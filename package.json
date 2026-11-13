@@ -30,5 +30,5 @@
     "test": "bun test"
   },
   "dependencies": { "ajv": "^8.17.1", "jsonc-parser": "^3.3.1" },
-  "devDependencies": { "@opencode/plugin": "2.2.5", "@types/bun": "latest", "typescript": "^7.0.2" }
+  "devDependencies": { "@opencode/plugin": "2.3.0", "@types/bun": "latest", "typescript": "^7.0.2" }
 }
