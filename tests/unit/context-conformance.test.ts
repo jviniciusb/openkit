@@ -12,7 +12,7 @@ import type { KitContext } from "../../src/core/context"
  * Scope: this catches removed, renamed, or reshaped members. Editor `add`
  * parameters stay loosely typed because the kit does not model the host's
  * generic tool/skill schemas, so a changed argument *list* (e.g. a new required
- * second parameter) would still slip through; the opt-in `tests/live` run is
+ * second parameter) would still slip through; a live run against a real host is
  * the check for that.
  */
 const toKitContext = (ctx: Plugin.Context): KitContext => ctx

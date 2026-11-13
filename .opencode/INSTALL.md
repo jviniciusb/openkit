@@ -14,7 +14,7 @@ order and report the result to the user.
 
 ## Before you start
 
-- Confirm OpenCode V2 `>= 2.2.5` is installed (`opencode --version`).
+- Confirm OpenCode V2 `>= 2.3.0` is installed (`opencode --version`).
 - No CLI or checkout is required. The plugin registers `/kit` after OpenCode
   restarts; use it to list, toggle, and configure items in-session.
 - Locate the user's OpenCode config. It may be `opencode.json` or
@@ -29,7 +29,7 @@ instead of replacing it.
 
 > **Status:** `openkit` is distributed directly from GitHub (there is no npm
 > package). Add the git spec below. To pin a release, append a tag:
-> `#v0.29.0`.
+> `#v0.30.0`.
 
 Add the git spec to the `plugins` array of `opencode.json(c)`:
 
@@ -56,10 +56,9 @@ skills and tools default to on, so the plugin works without a config file.
 `/kit disable <id>` to toggle them, and `/kit config set <id> <key> <value>` to
 write a setting.
 
-**Manual:** create the file by hand, seeded with the shipped tools —
-`background-subagents` (on by default; forces every subagent call to run in the
-background) and `context-injections` (on by default; injects built-in
-behavioral rules, each individually toggleable, plus your own):
+**Manual:** create the file by hand, seeded with the shipped tool —
+`context-injections` (on by default; injects built-in behavioral rules, each
+individually toggleable, plus your own):
 
 ```jsonc
 // ~/.config/opencode/openkit.jsonc
@@ -67,7 +66,6 @@ behavioral rules, each individually toggleable, plus your own):
   "$schema": "https://raw.githubusercontent.com/jviniciusb/openkit/main/openkit.schema.json",
   "configVersion": 1,
   "tools": {
-    "background-subagents": { "enabled": false },
     "context-injections": { "enabled": false }
   },
   "skills": {
@@ -158,8 +156,8 @@ In a session, run:
 ```
 
 Success shows `tools:` and `skills:` sections with each item and its resolved
-state. The two shipped tools are `background-subagents` and
-`context-injections`; twenty-one skills should be listed.
+state. The shipped tool is `context-injections`; twenty-one skills should be
+listed.
 
 - If `/kit` is not available after a restart, the plugin did not load. Check
   that `opencode.json(c)` parses, that the `plugins` entry is present, and check

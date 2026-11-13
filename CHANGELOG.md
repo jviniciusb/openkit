@@ -6,6 +6,28 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-11-13
+
+### Removed
+
+- **Breaking:** the `background-subagents` tool. OpenCode 2.3.0 always runs
+  subagents in the background and removed the `background` input, so the tool
+  had nothing left to do: its `execute.before` hook rewrote a field the host
+  strips, and its "force background" guarantee was the host's new default. The
+  behavior callers relied on is now native, including the idle report. Live and
+  integration coverage for the tool is removed with it.
+
+### Changed
+
+- **Breaking:** the supported floor is OpenCode `>= 2.3.0`, in
+  `MIN_OPENCODE_VERSION` and the README requirement. `@opencode/plugin` is
+  pinned to 2.3.0, the version the context conformance test now checks. A host
+  older than 2.3.0 still loads the plugin and gets the warning, but is no longer
+  supported. A stale `"background-subagents"` key in `openkit.jsonc` is ignored
+  by the catalog; delete it.
+- `context-injections` rule `subagent-driven` drops "where supported" from its
+  delegation instruction: every supported host runs subagents in the background.
+
 ## [0.29.0] - 2026-11-12
 
 ### Changed
@@ -658,7 +680,8 @@ The first release of the opencode-kit framework.
 - `README.md`, `CONTRIBUTING.md`, `AGENTS.md`, `.opencode/INSTALL.md`, and
   `docs/examples/opencode-kit.jsonc`.
 
-[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.29.0...HEAD
+[Unreleased]: https://github.com/jviniciusb/openkit/compare/v0.30.0...HEAD
+[0.30.0]: https://github.com/jviniciusb/openkit/compare/v0.29.0...v0.30.0
 [0.29.0]: https://github.com/jviniciusb/openkit/compare/v0.28.0...v0.29.0
 [0.28.0]: https://github.com/jviniciusb/openkit/compare/v0.27.0...v0.28.0
 [0.27.0]: https://github.com/jviniciusb/openkit/compare/v0.26.4...v0.27.0

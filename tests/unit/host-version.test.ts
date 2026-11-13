@@ -15,12 +15,12 @@ test("reports a host older than the floor", () => {
 
 test("accepts the floor and newer hosts", () => {
   expect(isVersionOlder(MIN_OPENCODE_VERSION, MIN_OPENCODE_VERSION)).toBe(false)
-  expect(isVersionOlder("2.2.6", MIN_OPENCODE_VERSION)).toBe(false)
+  expect(isVersionOlder("2.3.1", MIN_OPENCODE_VERSION)).toBe(false)
   expect(isVersionOlder("3.0.0", MIN_OPENCODE_VERSION)).toBe(false)
 })
 
 test("compares only the numeric triple", () => {
-  expect(isVersionOlder("2.2.5-beta.1", MIN_OPENCODE_VERSION)).toBe(false)
+  expect(isVersionOlder(`${MIN_OPENCODE_VERSION}-beta.1`, MIN_OPENCODE_VERSION)).toBe(false)
   expect(isVersionOlder("2.2.4+build.7", MIN_OPENCODE_VERSION)).toBe(true)
 })
 

@@ -8,10 +8,8 @@ Guidance for AI agents working in the **openkit** repository.
 grouped into **categories**: tools and skills. The framework (config,
 category engine, contracts) is the product; items are added on top. Every
 category is one `KitCategory` descriptor consumed by the generic engine, so
-config resolution, registration/isolation, and `/kit` are shared. Two
-tools ship today: `background-subagents`
-(`src/tools/background-subagents/index.ts`, on by default; forces every subagent
-call to run in the background) and `context-injections`
+config resolution, registration/isolation, and `/kit` are shared. One
+tool ships today: `context-injections`
 (`src/tools/context-injections/index.ts`, on by default; injects built-in behavioral
 rules, each individually toggleable, plus your own instructions; a rule needing a
 tool the request lacks is skipped). The `hello`
@@ -103,7 +101,7 @@ openkit.schema.json     # JSON schema for openkit.jsonc
 docs/                   # examples (not published)
 scripts/                # repo tooling (not published): doctor, skill-source
 skill-sources/          # vendored skill sources (dev-only, not published)
-tests/unit, tests/integration, tests/live   # tests/live = opt-in live acceptance (real opencode)
+tests/unit, tests/integration # behavior tests
 .opencode/INSTALL.md    # agent-driven install for consumers
 ```
 

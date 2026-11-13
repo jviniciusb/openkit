@@ -12,4 +12,4 @@ export const PLUGIN_ID = "openkit"
  * warns (does not refuse to load) when the host reports an older version.
  * Keep this in step with the `README.md` requirement.
  */
-export const MIN_OPENCODE_VERSION = "2.2.5"
+export const MIN_OPENCODE_VERSION = "2.3.0"
