@@ -101,7 +101,7 @@ openkit.schema.json     # JSON schema for openkit.jsonc
 docs/                   # examples (not published)
 scripts/                # repo tooling (not published): doctor, skill-source
 skill-sources/          # vendored skill sources (dev-only, not published)
-tests/unit, tests/integration         # tests/live held opt-in acceptance until it was removed with its tool
+tests/unit, tests/integration # behavior tests
 .opencode/INSTALL.md    # agent-driven install for consumers
 ```
 
