@@ -201,16 +201,30 @@ test("think-in-code uses skills for applicable workflows without speculative tri
   expect(text).toContain("shape reads and queries")
 })
 
-test("coding-principles fits the local code and keeps state at the edges", () => {
+test("coding-principles separates data, calculations, and actions", () => {
   const text = BUILT_IN_RULES.find(({ id }) => id === "coding-principles")!.text.toLowerCase()
+  expect(text).toContain("classify what you write as data, a calculation, or an action")
+  expect(text).toContain("data is inert values")
+  expect(text).toContain("immutable, compared by value")
+  expect(text).toContain("a calculation is pure")
+  expect(text).toContain("same inputs, same output, no effects")
+  expect(text).toContain("holds the branching and business rules")
+  expect(text).toContain("an action depends on when or how often it runs")
+  expect(text).toContain("i/o, the clock, randomness, shared mutation")
+  expect(text).toContain("keep actions few, explicit, and at the boundary")
+  expect(text).toContain("taking data in and returning data out")
+  expect(text).toContain("never hide one inside a calculation")
+})
+
+test("coding-principles refuses purity theatre and keeps the local style", () => {
+  const text = BUILT_IN_RULES.find(({ id }) => id === "coding-principles")!.text.toLowerCase()
+  expect(text).toContain("do not invent an effect system or wrappers to look pure")
   expect(text).toContain("fit new code to the code around it")
   expect(text).toContain("its paradigm")
   expect(text).toContain("its existing abstractions before any new one")
   expect(text).toContain("simplest design that fully solves the task")
-  expect(text).toContain("mutate only what you own")
-  expect(text).toContain("returning a new value instead of changing an object the caller still holds")
-  expect(text).toContain("i/o, randomness, and time at the boundary")
-  expect(text).toContain("stays testable")
+  expect(text).toContain("mutate only the state you own")
+  expect(text).toContain("return a new value instead of changing an object the caller still holds")
 })
 
 test("coding-principles rejects speculative structure and premature abstraction", () => {
