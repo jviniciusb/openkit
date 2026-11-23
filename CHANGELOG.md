@@ -6,6 +6,19 @@ project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `context-injections` rule `coding-principles` is rebuilt around the
+  data/calculations/actions split: data is inert values compared by value, a
+  calculation is pure and holds the branching and business rules, and an action
+  depends on when or where it runs, so actions stay few and explicit at the
+  boundary, taking data in and returning data out. Purity stays a design
+  constraint, not a refactor: the rule governs code you add, so converting
+  existing structure remains `careful-changes`' call, and it forbids the
+  opposite failure — an invented effect system or wrapper types that only look
+  pure. Fit, build-only, extraction, and ownership clauses are preserved.
+  174 words, up from 101.
+
 ## [0.31.0] - 2026-11-18
 
 ### Changed

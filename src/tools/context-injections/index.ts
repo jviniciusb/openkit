@@ -15,7 +15,7 @@ export const BUILT_IN_RULES = [
   },
   {
     id: "coding-principles",
-    text: "Fit new code to the code around it: its paradigm, its existing abstractions before any new one, and the simplest design that fully solves the task. Build only what the task needs — no options, config, flags, or extension points nobody asked for. Extract shared code when a second real caller arrives, not when two shapes merely look alike: a wrong abstraction costs more than the duplication it removes. Mutate only what you own, returning a new value instead of changing an object the caller still holds, and keep I/O, randomness, and time at the boundary so the core stays testable.",
+    text: "Classify what you write as data, a calculation, or an action. Data is inert values: immutable, compared by value. A calculation is pure — same inputs, same output, no effects — and holds the branching and business rules. An action depends on when or how often it runs: I/O, the clock, randomness, shared mutation. Keep actions few, explicit, and at the boundary, taking data in and returning data out; never hide one inside a calculation. Do not invent an effect system or wrappers to look pure. Fit new code to the code around it: its paradigm, its existing abstractions before any new one, and the simplest design that fully solves the task. Build only what the task needs — no options, config, flags, or extension points nobody asked for. Extract shared code when a second real caller arrives, not when two shapes merely look alike: a wrong abstraction costs more than the duplication it removes. Mutate only the state you own: return a new value instead of changing an object the caller still holds.",
   },
   {
     id: "decomposition",
